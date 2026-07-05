@@ -1,218 +1,437 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Mapping = () => {
   const [activeTab, setActiveTab] = useState('CURRENT MATCH');
   const [game, setGame] = useState('Valorant');
-  const [teamA, setTeamA] = useState('Oasis');
-  const [teamB, setTeamB] = useState('Xipto');
-  const [turn, setTurn] = useState('TEAM A');
+  
+  // Editable Team Names
+  const [teamA, setTeamA] = useState('Team A');
+  const [teamB, setTeamB] = useState('Team B');
+
+  // Veto State
+  const [vetoActive, setVetoActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [phaseIndex, setPhaseIndex] = useState(0);
+  const timerRef = useRef(null);
 
   const tabs = ['CURRENT MATCH', 'MAP POOL SETTINGS', 'BAN HISTORY', 'TEAM SETTINGS', 'ADMIN TOOLS'];
 
-  // Valorant Map Pool (All default to 'none')
-  const [valMaps, setValMaps] = useState([
-    { id: 'v1', name: 'CORRODE', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
-    { id: 'v2', name: 'ABYSS', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
-    { id: 'v3', name: 'SUNSET', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
-    { id: 'v4', name: 'LOTUS', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
-    { id: 'v5', name: 'PEARL', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
-    { id: 'v6', name: 'FRACTURE', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
-    { id: 'v7', name: 'BREEZE', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
-    { id: 'v8', name: 'ICEBOX', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
-    { id: 'v9', name: 'BIND', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
-  ]);
+  const initialValMaps = [
+    { id: 'v1', name: 'CORRODE', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
+    { id: 'v2', name: 'ABYSS', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
+    { id: 'v3', name: 'SUNSET', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
+    { id: 'v4', name: 'LOTUS', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
+    { id: 'v5', name: 'PEARL', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
+    { id: 'v6', name: 'FRACTURE', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
+    { id: 'v7', name: 'BREEZE', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
+    { id: 'v8', name: 'ICEBOX', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
+    { id: 'v9', name: 'BIND', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
+  ];
 
-  // Crossfire Map Pool (All default to 'none')
-  const [cfMaps, setCfMaps] = useState([
-    { id: 'c1', name: 'BLACK WIDOW', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
-    { id: 'c2', name: 'PORT', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
-    { id: 'c3', name: 'COMPOUND', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
-    { id: 'c4', name: 'ANKARA', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
-    { id: 'c5', name: 'SUB BASE', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
-    { id: 'c6', name: 'EAGLE EYE', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
-    { id: 'c7', name: 'MEXICO', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
-    { id: 'c8', name: 'FACTORY', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
-    { id: 'c9', name: 'SANTORIA', status: 'none', by: '', img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
-  ]);
+  const initialCfMaps = [
+    { id: 'c1', name: 'BLACK WIDOW', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
+    { id: 'c2', name: 'PORT', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
+    { id: 'c3', name: 'COMPOUND', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
+    { id: 'c4', name: 'ANKARA', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
+    { id: 'c5', name: 'SUB BASE', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
+    { id: 'c6', name: 'EAGLE EYE', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
+    { id: 'c7', name: 'MEXICO', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
+    { id: 'c8', name: 'FACTORY', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
+    { id: 'c9', name: 'SANTORIA', status: 'none', byTeam: null, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
+  ];
+
+  const [valMaps, setValMaps] = useState(initialValMaps);
+  const [cfMaps, setCfMaps] = useState(initialCfMaps);
 
   const currentMaps = game === 'Valorant' ? valMaps : cfMaps;
   const setCurrentMaps = game === 'Valorant' ? setValMaps : setCfMaps;
 
-  const handleAction = (mapId, action) => {
-    setCurrentMaps(currentMaps.map((m) => m.id === mapId ? { ...m, status: action, by: turn } : m));
-    setTurn(turn === 'TEAM A' ? 'TEAM B' : 'TEAM A');
+  // Veto sequence for 9 maps (8 actions to leave 1 decider)
+  const vetoSequence = [
+    { team: 'A', action: 'ban' },
+    { team: 'B', action: 'ban' },
+    { team: 'A', action: 'pick' },
+    { team: 'B', action: 'pick' },
+    { team: 'A', action: 'ban' },
+    { team: 'B', action: 'ban' },
+    { team: 'A', action: 'ban' },
+    { team: 'B', action: 'ban' },
+  ];
+
+  const currentPhase = phaseIndex < vetoSequence.length ? vetoSequence[phaseIndex] : null;
+
+  // Auto-skip logic when timer hits 0
+  useEffect(() => {
+    if (vetoActive && timeLeft === 0 && currentPhase) {
+      autoPlayTurn();
+    }
+  }, [timeLeft, vetoActive, currentPhase]);
+
+  // Timer interval
+  useEffect(() => {
+    if (vetoActive && currentPhase) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => Math.max(0, prev - 1));
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [vetoActive, currentPhase]);
+
+  const autoPlayTurn = () => {
+    const availableMaps = currentMaps.filter(m => m.status === 'none');
+    if (availableMaps.length > 0) {
+      const randomMap = availableMaps[Math.floor(Math.random() * availableMaps.length)];
+      handleMapClick(randomMap.id);
+    }
   };
 
-  const handleReset = () => {
-    setCurrentMaps(currentMaps.map(m => ({ ...m, status: 'none', by: '' })));
-    setTurn('TEAM A');
+  const checkDecider = (maps) => {
+    const availableMaps = maps.filter(m => m.status === 'none');
+    if (availableMaps.length === 1) {
+      // Auto-set decider
+      const updatedMaps = maps.map(m => m.id === availableMaps[0].id ? { ...m, status: 'decider', byTeam: 'none' } : m);
+      setCurrentMaps(updatedMaps);
+      setVetoActive(false);
+    }
   };
+
+  const handleMapClick = (mapId) => {
+    if (!vetoActive || !currentPhase) return;
+
+    const map = currentMaps.find(m => m.id === mapId);
+    if (map.status !== 'none') return; // already acted upon
+
+    const updatedMaps = currentMaps.map((m) => {
+      if (m.id === mapId) {
+        return {
+          ...m,
+          status: currentPhase.action === 'ban' ? 'banned' : 'picked',
+          byTeam: currentPhase.team,
+        };
+      }
+      return m;
+    });
+
+    setCurrentMaps(updatedMaps);
+    
+    // Advance Phase
+    const nextPhaseIndex = phaseIndex + 1;
+    setPhaseIndex(nextPhaseIndex);
+    setTimeLeft(30);
+
+    // If all actions done, find decider
+    if (nextPhaseIndex === vetoSequence.length) {
+      checkDecider(updatedMaps);
+    }
+  };
+
+  const toggleVeto = () => {
+    if (phaseIndex >= vetoSequence.length && !vetoActive) return; // Veto complete
+    setVetoActive(!vetoActive);
+  };
+
+  const resetVeto = () => {
+    setVetoActive(false);
+    setPhaseIndex(0);
+    setTimeLeft(30);
+    if (game === 'Valorant') {
+      setValMaps(initialValMaps);
+    } else {
+      setCfMaps(initialCfMaps);
+    }
+  };
+
+  const handleGameSwitch = (e) => {
+    setGame(e.target.value);
+    setVetoActive(false);
+    setPhaseIndex(0);
+    setTimeLeft(30);
+  };
+
+  // SVG Circle calculations
+  const circleRadius = 36;
+  const circleCircumference = 2 * Math.PI * circleRadius;
+  const strokeDashoffset = circleCircumference - (timeLeft / 30) * circleCircumference;
+  const isTimeLow = timeLeft <= 5;
 
   return (
-    <div className="flex-1 p-6 lg:p-8 bg-[#181a20] overflow-y-auto w-full h-full text-white font-sans custom-scrollbar">
+    <div className="flex-1 p-6 lg:p-8 bg-[#040814] overflow-y-auto w-full h-full text-white font-sans custom-scrollbar">
       
-      {/* Top Navigation Tabs (Inalis na ang duplicate na MAP VETOES title) */}
-      <div className="flex flex-wrap items-center gap-6 md:gap-8 border-b border-[#2e344e] pb-3 mb-6 w-full">
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes pulse-red {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+          50% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+        }
+        .timer-pulse {
+          animation: pulse-red 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .veto-card-enter {
+          animation: fadeInScale 0.4s ease-out forwards;
+        }
+        @keyframes fadeInScale {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+      `}} />
+
+      {/* Top Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-6 md:gap-8 border-b border-slate-800/60 pb-3 mb-6 w-full">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`relative pb-2 whitespace-nowrap transition-colors text-sm font-bold uppercase tracking-wide ${
-              activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+              activeTab === tab ? 'text-[#00ffcc]' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             {tab}
             {activeTab === tab && (
-              <div className="absolute bottom-[-3px] left-0 w-full h-1 bg-[#42d3e5] rounded-t-sm shadow-[0_0_8px_rgba(66,211,229,0.5)]"></div>
+              <div className="absolute bottom-[-2px] left-0 w-full h-0.5 bg-[#00ffcc] shadow-[0_0_8px_rgba(0,255,204,0.6)]"></div>
             )}
           </button>
         ))}
       </div>
 
-      {/* Main Blue-Grey Panel Container */}
-      <div className="bg-[#2c334a] rounded-xl border border-[#3e4868] p-6 lg:p-8 shadow-2xl mb-12">
+      {/* Main Panel */}
+      <div className="bg-[#0B1120] rounded-2xl border border-slate-800/60 p-6 lg:p-8 shadow-2xl mb-12">
         
-        {/* Map Grip Panel Header */}
-        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-8">
+        {/* Header Section */}
+        <div className="flex flex-col xl:flex-row justify-between items-center gap-6 mb-10 pb-8 border-b border-slate-800/60">
           
-          <div className="flex flex-col gap-3">
-            <h2 className="text-2xl font-black text-white tracking-widest uppercase">MAP GRIP PANEL</h2>
-            
-            {/* Clean Game Select (No overlapping logo) */}
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">SELECT GAME:</span>
-              <select 
-                value={game} 
-                onChange={(e) => setGame(e.target.value)}
-                className="bg-[#1e2336] border border-[#3e4868] hover:border-[#42d3e5] text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-md outline-none cursor-pointer transition-colors"
-              >
-                <option value="Valorant">Valorant</option>
-                <option value="Crossfire">Crossfire</option>
-              </select>
-            </div>
+          {/* Left: Game Switcher */}
+          <div className="flex items-center gap-3 bg-white/[0.03] p-1.5 rounded-full border border-white/[0.05] shrink-0">
+            <button 
+              onClick={() => handleGameSwitch({target: {value: 'Valorant'}})}
+              className={`px-6 py-2.5 rounded-full text-xs font-black tracking-widest uppercase transition-all ${game === 'Valorant' ? 'bg-[#ff4655] text-white shadow-[0_0_15px_rgba(255,70,85,0.4)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'}`}
+            >
+              Valorant
+            </button>
+            <button 
+              onClick={() => handleGameSwitch({target: {value: 'Crossfire'}})}
+              className={`px-6 py-2.5 rounded-full text-xs font-black tracking-widest uppercase transition-all ${game === 'Crossfire' ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'}`}
+            >
+              Crossfire
+            </button>
           </div>
 
-          <div className="flex items-center gap-4 bg-transparent">
-            {/* Team A Input (Pill Shape) */}
-            <select 
-              value={teamA}
-              onChange={(e) => setTeamA(e.target.value)}
-              className="bg-[#1d4ed8] text-white text-sm font-bold px-6 py-2 rounded-full border border-[#2563eb] shadow-lg outline-none cursor-pointer text-center"
-            >
-              <option value="Oasis">Oasis</option>
-              <option value="Gryphon">Gryphon</option>
-            </select>
+          {/* Center: Veto Controls & Timer */}
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex items-center gap-8 bg-slate-900/50 p-5 rounded-3xl border border-slate-800/50 shadow-lg">
+              
+              {/* Team A (Blue) */}
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase">Team A</span>
+                <input 
+                  type="text" 
+                  value={teamA} 
+                  onChange={(e) => setTeamA(e.target.value)}
+                  className="bg-[#1d4ed8]/20 border border-[#1d4ed8]/50 text-white text-base font-black px-4 py-2.5 rounded-xl outline-none text-center w-36 focus:border-[#60a5fa] transition-colors focus:bg-[#1d4ed8]/40 shadow-[0_0_15px_rgba(29,78,216,0.2)]"
+                />
+              </div>
 
-            <span className="text-xl font-black italic text-gray-400">VS</span>
+              {/* Timer */}
+              <div className="relative flex flex-col items-center justify-center">
+                <div className={`relative flex items-center justify-center rounded-full ${isTimeLow && vetoActive ? 'timer-pulse' : ''} bg-slate-900 shadow-inner`}>
+                  <svg width="100" height="100" className="transform -rotate-90">
+                    {/* Background ring */}
+                    <circle cx="50" cy="50" r={40} fill="transparent" stroke="#1e293b" strokeWidth="6" />
+                    {/* Progress ring */}
+                    <circle 
+                      cx="50" cy="50" r={40} fill="transparent" 
+                      stroke={isTimeLow ? '#ef4444' : '#00ffcc'} 
+                      strokeWidth="6" 
+                      strokeDasharray={2 * Math.PI * 40}
+                      strokeDashoffset={2 * Math.PI * 40 - (timeLeft / 30) * (2 * Math.PI * 40)}
+                      className="transition-all duration-1000 ease-linear"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute flex flex-col items-center">
+                    <span className={`text-3xl font-black ${isTimeLow ? 'text-red-500' : 'text-white'}`}>{timeLeft}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest -mt-1">Sec</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Team B (Red) */}
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-[10px] text-red-400 font-bold tracking-[0.2em] uppercase">Team B</span>
+                <input 
+                  type="text" 
+                  value={teamB} 
+                  onChange={(e) => setTeamB(e.target.value)}
+                  className="bg-[#b91c1c]/20 border border-[#b91c1c]/50 text-white text-base font-black px-4 py-2.5 rounded-xl outline-none text-center w-36 focus:border-[#f87171] transition-colors focus:bg-[#b91c1c]/40 shadow-[0_0_15px_rgba(185,28,28,0.2)]"
+                />
+              </div>
+
+            </div>
             
-            {/* Team B Input (Pill Shape) */}
-            <select 
-              value={teamB}
-              onChange={(e) => setTeamB(e.target.value)}
-              className="bg-[#b91c1c] text-white text-sm font-bold px-6 py-2 rounded-full border border-[#dc2626] shadow-lg outline-none cursor-pointer text-center"
+            {/* Turn Indicator positioned safely below */}
+            <div className="whitespace-nowrap text-center">
+              {currentPhase ? (
+                <span className="text-[12px] font-black uppercase tracking-[0.25em]">
+                  <span className="text-slate-400">TURN: </span>
+                  <span className={currentPhase.team === 'A' ? 'text-blue-400' : 'text-red-400'}>
+                    {currentPhase.team === 'A' ? teamA : teamB}
+                  </span>
+                </span>
+              ) : (
+                <span className="text-[12px] font-black uppercase tracking-[0.25em] text-[#00ffcc]">DECIDER</span>
+              )}
+            </div>
+          </div>
+          {/* Right: Veto Actions */}
+          <div className="flex flex-row xl:flex-col gap-3 shrink-0">
+            <button 
+              onClick={toggleVeto}
+              disabled={!currentPhase}
+              className={`px-8 py-3.5 rounded-xl text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-lg border ${
+                !currentPhase ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed' :
+                vetoActive 
+                  ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
+                  : 'bg-[#00ffcc]/10 text-[#00ffcc] border-[#00ffcc]/30 hover:bg-[#00ffcc]/20 shadow-[0_0_20px_rgba(0,255,204,0.2)]'
+              }`}
             >
-              <option value="Xipto">Xipto</option>
-              <option value="Storm">Storm</option>
-            </select>
-            
-            {/* Turn Indicator (Pill Shape) */}
-            <div className="border border-[#42d3e5] bg-[#1e2336] px-5 py-2 rounded-full font-black text-xs tracking-wide ml-2 shadow-[0_0_10px_rgba(66,211,229,0.2)]">
-              <span className="text-white">Turn: </span>
-              <span className="text-[#42d3e5]">{turn}</span>
+              {vetoActive ? 'PAUSE VETO' : (phaseIndex > 0 && currentPhase ? 'RESUME' : 'START VETO')}
+            </button>
+            <button 
+              onClick={resetVeto}
+              className="px-8 py-3.5 rounded-xl text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50"
+            >
+              RESET
+            </button>
+          </div>
+          
+        </div>
+
+        {/* Phase Timeline / Status Bar */}
+        <div className="flex justify-center mb-8">
+          <div className="flex gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800/60">
+            {vetoSequence.map((seq, idx) => (
+              <div 
+                key={idx} 
+                className={`px-4 py-2 rounded-lg flex flex-col items-center justify-center transition-colors border ${
+                  idx < phaseIndex ? 'bg-slate-800 border-slate-700 opacity-50' :
+                  idx === phaseIndex ? 'bg-white/[0.08] border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]' :
+                  'bg-transparent border-transparent opacity-40'
+                }`}
+              >
+                <span className={`text-[10px] font-bold tracking-widest ${seq.team === 'A' ? 'text-blue-400' : 'text-red-400'}`}>T-{seq.team}</span>
+                <span className={`text-[11px] font-black tracking-widest uppercase ${seq.action === 'ban' ? 'text-red-500' : 'text-green-400'}`}>{seq.action}</span>
+              </div>
+            ))}
+            <div className={`px-4 py-2 rounded-lg flex items-center justify-center transition-colors border ${
+              !currentPhase ? 'bg-[#00ffcc]/20 border-[#00ffcc]/50 shadow-[0_0_15px_rgba(0,255,204,0.3)]' : 'bg-transparent border-transparent opacity-40'
+            }`}>
+              <span className="text-[11px] font-black tracking-widest text-[#00ffcc]">DECIDER</span>
             </div>
           </div>
         </div>
 
         {/* Maps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
-          {currentMaps.map((m) => (
-            <div 
-              key={m.id} 
-              className={`relative aspect-[16/8] rounded-xl overflow-hidden group transition-all duration-300 ${
-                m.status === 'banned' ? 'border-[3px] border-[#ef4444] shadow-[0_0_15px_rgba(239,68,68,0.3)]' :
-                m.status === 'picked' ? 'border-[3px] border-[#2dd4bf] shadow-[0_0_15px_rgba(45,212,191,0.3)]' :
-                'border-[3px] border-transparent hover:border-[#60a5fa] bg-[#1e2336]'
-              }`}
-            >
-              {/* Background Image */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
+          {currentMaps.map((m) => {
+            const isClickable = vetoActive && currentPhase && m.status === 'none';
+            const teamColorStr = m.byTeam === 'A' ? 'blue' : m.byTeam === 'B' ? 'red' : 'gray';
+            const teamHex = m.byTeam === 'A' ? '#3b82f6' : '#ef4444'; // blue-500 : red-500
+            
+            return (
               <div 
-                className={`absolute inset-0 bg-cover bg-center transition-transform duration-500 ${
-                  m.status === 'banned' ? 'opacity-30 blur-[2px] grayscale' : 
-                  m.status === 'picked' ? 'opacity-70' : 'opacity-90 group-hover:scale-105'
-                }`}
-                style={{ backgroundImage: `url(${m.img})` }}
-              ></div>
+                key={m.id} 
+                onClick={() => isClickable && handleMapClick(m.id)}
+                className={`veto-card-enter relative aspect-[16/8] rounded-2xl overflow-hidden transition-all duration-400 
+                  ${isClickable ? 'cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(255,255,255,0.1)] group border-[2px] border-slate-700 hover:border-slate-400' : 'border-[2px] border-slate-800/60'}
+                  ${m.status === 'banned' ? `border-${teamColorStr}-500 shadow-[0_0_20px_rgba(${m.byTeam === 'A' ? '59,130,246' : '239,68,68'},0.3)]` : ''}
+                  ${m.status === 'picked' ? `border-${teamColorStr}-500 shadow-[0_0_20px_rgba(${m.byTeam === 'A' ? '59,130,246' : '239,68,68'},0.3)]` : ''}
+                  ${m.status === 'decider' ? 'border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.4)] scale-[1.02] z-10' : ''}
+                `}
+              >
+                {/* Background Image */}
+                <div 
+                  className={`absolute inset-0 bg-cover bg-center transition-all duration-700 
+                    ${m.status === 'banned' ? 'opacity-30 blur-[3px] grayscale' : 
+                      m.status === 'picked' ? 'opacity-50' : 
+                      m.status === 'decider' ? 'opacity-100 scale-105' : 'opacity-60'}
+                    ${isClickable ? 'group-hover:opacity-100 group-hover:scale-105' : ''}
+                  `}
+                  style={{ backgroundImage: `url(${m.img})` }}
+                ></div>
 
-              {/* White Map Name Badge */}
-              <div className="absolute top-3 left-3 z-10">
-                <span className="bg-white text-black px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest shadow-md">
-                  {m.name}
-                </span>
+                {/* Gradient overlays for team colors */}
+                {m.status === 'picked' && (
+                  <div className={`absolute inset-0 opacity-70 bg-gradient-to-t from-transparent ${m.byTeam === 'A' ? 'to-blue-900' : 'to-red-900'}`}></div>
+                )}
+                {m.status === 'banned' && (
+                  <div className={`absolute inset-0 opacity-50 bg-gradient-to-t from-transparent ${m.byTeam === 'A' ? 'to-blue-900' : 'to-red-900'}`}></div>
+                )}
+
+                {/* Map Name Badge */}
+                <div className="absolute bottom-4 left-4 z-10">
+                  <span className={`px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-[0.3em] backdrop-blur-md shadow-lg border ${
+                    m.status === 'decider' ? 'bg-amber-400 text-amber-950 border-amber-300' : 'bg-black/60 text-white border-white/10'
+                  }`}>
+                    {m.name}
+                  </span>
+                </div>
+                
+                {/* Hover interaction overlay */}
+                {isClickable && currentPhase && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px] z-20">
+                    <div className={`px-6 py-3 rounded-xl border-2 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ${
+                      currentPhase.action === 'ban' 
+                        ? currentPhase.team === 'A' ? 'bg-blue-600/90 border-blue-400 text-white' : 'bg-red-600/90 border-red-400 text-white'
+                        : currentPhase.team === 'A' ? 'bg-blue-500/90 border-blue-300 text-white' : 'bg-red-500/90 border-red-300 text-white'
+                    }`}>
+                      <span className="text-sm font-black uppercase tracking-[0.2em]">
+                        CLICK TO {currentPhase.action.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Banned State */}
+                {m.status === 'banned' && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
+                    <span className="text-8xl font-black drop-shadow-[0_4px_15px_rgba(0,0,0,0.8)] opacity-90" style={{color: teamHex}}>✕</span>
+                    <div className="absolute top-4 right-4">
+                      <span className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${
+                        m.byTeam === 'A' ? 'bg-blue-600/90 text-white border-blue-400' : 'bg-red-600/90 text-white border-red-400'
+                      }`}>
+                        BANNED BY {m.byTeam === 'A' ? teamA : teamB}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Picked State */}
+                {m.status === 'picked' && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
+                    <span className="text-8xl font-black drop-shadow-[0_4px_15px_rgba(0,0,0,0.8)] opacity-90" style={{color: teamHex}}>✓</span>
+                    <div className="absolute top-4 right-4">
+                      <span className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${
+                        m.byTeam === 'A' ? 'bg-blue-600/90 text-white border-blue-400' : 'bg-red-600/90 text-white border-red-400'
+                      }`}>
+                        PICKED BY {m.byTeam === 'A' ? teamA : teamB}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Decider State */}
+                {m.status === 'decider' && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-amber-500/10">
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-amber-400 text-amber-950 border border-amber-300 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-[0_0_15px_rgba(251,191,36,0.5)] tracking-[0.2em]">
+                        DECIDER MAP
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-              
-              {/* Hover state for Picking/Banning */}
-              {m.status === 'none' && (
-                <div className="absolute inset-x-0 bottom-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-3 z-20">
-                  <button 
-                    onClick={() => handleAction(m.id, 'picked')} 
-                    className="bg-[#22c55e] hover:bg-[#16a34a] text-white text-[11px] font-black tracking-widest px-4 py-1.5 rounded border border-[#14532d] shadow-lg transition-transform hover:-translate-y-1"
-                  >
-                    [PICK]
-                  </button>
-                  <button 
-                    onClick={() => handleAction(m.id, 'banned')} 
-                    className="bg-[#ef4444] hover:bg-[#dc2626] text-white text-[11px] font-black tracking-widest px-4 py-1.5 rounded border border-[#7f1d1d] shadow-lg transition-transform hover:-translate-y-1"
-                  >
-                    [BAN]
-                  </button>
-                </div>
-              )}
-
-              {/* Banned State */}
-              {m.status === 'banned' && (
-                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
-                  <span className="text-8xl font-black text-[#ef4444] drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">✕</span>
-                  <div className="absolute bottom-3 right-3">
-                    <span className="bg-[#7f1d1d] text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase shadow-lg border border-[#450a0a] tracking-widest">
-                      BAN BY {m.by}
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {/* Picked State */}
-              {m.status === 'picked' && (
-                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0d9488]/20 backdrop-blur-[1px]">
-                  <span className="text-8xl font-black text-[#4ade80] drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">✓</span>
-                  <div className="absolute bottom-3 right-3">
-                    <span className="bg-[#115e59] text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase shadow-lg border border-[#042f2e] tracking-widest">
-                      PICK BY {m.by}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* PROPER BUTTONS: Visual Separation, Colors, and Spacing (gap-8) */}
-        <div className="flex flex-wrap justify-center items-center gap-8 mt-10 pt-8 border-t border-[#3e4868]">
-          
-          <button 
-            onClick={handleReset}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black px-8 py-3.5 rounded-md shadow-lg transition-all transform hover:-translate-y-1 uppercase tracking-widest border border-[#1e40af]"
-          >
-            SYNC MAP POOL DATA
-          </button>
-          
-          <button className="bg-[#0d9488] hover:bg-[#0f766e] text-white text-xs font-black px-8 py-3.5 rounded-md shadow-lg transition-all transform hover:-translate-y-1 uppercase tracking-widest border border-[#115e59]">
-            PUBLISH MAP TO BROADCAST
-          </button>
-          
-          <button className="bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-black px-8 py-3.5 rounded-md shadow-lg transition-all transform hover:-translate-y-1 uppercase tracking-widest border border-[#166534]">
-            FINALIZE MAP SELECTION
-          </button>
-
+            );
+          })}
         </div>
 
       </div>
