@@ -30,10 +30,10 @@ const Tooltip = ({ x, y, content, visible }) => {
 const Card = ({ title, children, className = "" }) => (
   <div className={`bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl flex flex-col overflow-hidden relative group ${className}`}>
     <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none z-0"></div>
-    <div className="p-4 border-b border-[#232f40] bg-[#151e2b] relative z-10 flex justify-between items-center">
+    <div className="p-4 border-b border-[#232f40] bg-[#151e2b] relative z-10 flex justify-between items-center shrink-0">
       <h3 className="text-sm font-bold tracking-wider text-gray-200">{title}</h3>
     </div>
-    <div className="flex-1 p-4 relative z-10 flex items-center justify-center">
+    <div className="flex-1 p-4 relative z-10 min-h-[300px]">
       {children}
     </div>
   </div>
@@ -522,7 +522,13 @@ const Analytics = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-hidden flex flex-col h-full custom-scrollbar relative">
+    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full custom-scrollbar relative">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
+      `}</style>
       
       {/* Top Header Controls */}
       <div className="bg-[#0f1722]/80 backdrop-blur-xl border-b border-[#1c2532] shadow-xl py-4 px-8 relative z-30">
@@ -587,8 +593,8 @@ const Analytics = () => {
       </div>
 
       {/* Main Dashboard Grid */}
-      <div className="flex-1 overflow-y-auto p-8 relative z-10">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8 pb-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 relative z-10">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8 pb-16">
           
           <Card title="Global Player Skill Matrix">
              <RadarChart data={filteredRadar} axes={currentData.radarAxes} theme={currentData.theme} onSelect={openRadarOverview} />

@@ -1,9 +1,125 @@
 import React, { useState } from 'react';
 
+const TeamModal = ({ team, onClose, activeGame }) => {
+  if (!team) return null;
+  const accent = activeGame === 'VALORANT' ? '#ff4655' : '#4c7fd6';
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
+      <div className="bg-[#0b111a] border border-slate-700/60 rounded-2xl w-full max-w-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        
+        {/* Banner */}
+        <div className="h-32 relative overflow-hidden bg-slate-900 flex items-end px-8 py-4">
+          <div className="absolute inset-0 opacity-40" style={{ background: `linear-gradient(45deg, ${accent}, transparent)` }} />
+          <div className="relative z-10 flex items-end gap-5">
+            <div className="w-20 h-20 rounded-xl bg-[#121a25] border-2 shadow-lg flex items-center justify-center" style={{ borderColor: accent }}>
+              <span className="text-3xl font-black text-white">{team.team ? team.team[0] : team.name?.[0] || 'T'}</span>
+            </div>
+            <div className="mb-2">
+              <h2 className="text-3xl font-black uppercase tracking-widest text-white drop-shadow-md">{team.team || team.name || 'Team Name'}</h2>
+              <p className="text-sm font-bold tracking-widest uppercase" style={{ color: accent }}>Rank #{team.rank}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors z-20 bg-black/20">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="bg-[#121a25] border border-slate-800 rounded-xl p-5 flex flex-col gap-1 items-center">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Matches Won</span>
+              <span className="text-3xl font-black text-white">{team.w || team.diff || 12}</span>
+            </div>
+            <div className="bg-[#121a25] border border-slate-800 rounded-xl p-5 flex flex-col gap-1 items-center">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Matches Lost</span>
+              <span className="text-3xl font-black text-white">{team.l || 4}</span>
+            </div>
+            <div className="bg-[#121a25] border border-slate-800 rounded-xl p-5 flex flex-col gap-1 items-center">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Win Rate</span>
+              <span className="text-3xl font-black text-white">{team.w ? Math.round((team.w / (team.w + team.l)) * 100) : 75}%</span>
+            </div>
+          </div>
+
+          <div className="bg-[#151e2b] border border-[#232f40] rounded-xl overflow-hidden">
+            <div className="bg-[#182331] px-5 py-3 border-b border-[#232f40]">
+              <h3 className="text-xs font-black tracking-widest text-gray-300 uppercase">Active Roster</h3>
+            </div>
+            <div className="divide-y divide-[#1e2938]">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-[#1a2533] transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400">P{i}</div>
+                    <span className="font-bold text-gray-200">Player_{i}</span>
+                  </div>
+                  <span className="text-xs font-mono text-slate-500">Starter</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PlayerModal = ({ player, onClose, activeGame }) => {
+  if (!player) return null;
+  const accent = activeGame === 'VALORANT' ? '#00d0eb' : '#ef4444';
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
+      <div className="bg-[#0b111a] border border-slate-700/60 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        
+        <div className="px-6 py-5 border-b border-slate-800/60 flex items-center justify-between bg-slate-900/30">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-slate-800 border-2 shadow-lg flex items-center justify-center text-xl font-black text-white" style={{ borderColor: accent }}>
+              {player.name ? player.name[0] : 'P'}
+            </div>
+            <div>
+              <h2 className="text-xl font-black uppercase tracking-widest text-white drop-shadow-md">{player.name || 'Player Profile'}</h2>
+              <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mt-1">Rank #{player.rank || 1} — {activeGame}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div className="p-6 grid grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="bg-[#151e2b] border border-[#232f40] rounded-xl p-5">
+              <h3 className="text-[10px] font-black tracking-widest text-gray-500 uppercase mb-4">Combat Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">K/D Ratio</span><span className="text-lg font-black text-white">{player.kd || '1.85'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Total Kills</span><span className="text-lg font-black text-white">{player.kills || '420'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Total Deaths</span><span className="text-lg font-black text-white">{player.death || '225'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Rounds Played</span><span className="text-lg font-black text-white">{player.round || '130'}</span></div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-[#151e2b] border border-[#232f40] rounded-xl p-5 h-full">
+              <h3 className="text-[10px] font-black tracking-widest text-gray-500 uppercase mb-4">Advanced Metrics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Kill per Round</span><span className="text-lg font-black text-[#8a9db8]">{player.kr || '1.15'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Survive Rate</span><span className="text-lg font-black text-[#8a9db8]">{player.sr || '0.62'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Headshot/Kill</span><span className="text-lg font-black text-[#8a9db8]">{player.hk || '0.55'}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-300">Avg Points</span><span className="text-lg font-black text-[#8a9db8]">{player.ap || '3200'}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Leaderboards = () => {
   const [activeGame, setActiveGame] = useState('VALORANT');
   const [dailySearch, setDailySearch] = useState('');
   const [weeklySearch, setWeeklySearch] = useState('');
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   // --- MOCK DATA: VALORANT ---
   const valorantData = {
@@ -154,9 +270,15 @@ const Leaderboards = () => {
   );
 
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-hidden flex flex-col h-full custom-scrollbar">
+    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full custom-scrollbar">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
+      `}</style>
       {/* Top Header */}
-      <div className="bg-[#0f1722] py-6 border-b border-[#1c2532] shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-20">
+      <div className="bg-[#0f1722] py-6 border-b border-[#1c2532] shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-20 shrink-0">
         <div className="max-w-[1400px] mx-auto px-8 flex justify-center">
           <div className="flex w-full max-w-4xl justify-between items-center relative">
             
@@ -188,7 +310,7 @@ const Leaderboards = () => {
       </div>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pb-16">
         <div className="max-w-[1400px] mx-auto space-y-8">
           
           {/* Top Grid */}
@@ -213,7 +335,7 @@ const Leaderboards = () => {
                     </thead>
                     <tbody className="divide-y divide-[#1e2938]">
                       {standings.map((row) => (
-                        <tr key={row.rank} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
+                        <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
                           <td className="py-3 px-2 font-mono text-gray-500 group-hover:text-white bg-[#151e2b]/50 transition-colors">{row.rank}</td>
                           <td className="py-3 px-4 text-left font-bold flex items-center space-x-3 text-gray-200 group-hover:text-white transition-colors">
                             <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#2a3a52] to-[#405470] flex-shrink-0 border border-white/5 shadow-sm"></div>
@@ -237,7 +359,7 @@ const Leaderboards = () => {
                   <table className="w-full text-xs text-center">
                     <tbody className="divide-y divide-[#1e2938]">
                       {setDiff.map((row) => (
-                        <tr key={row.rank} className="hover:bg-[#1a2533] transition-colors">
+                        <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors cursor-pointer group">
                           <td className="py-2 px-2 text-gray-500 w-12 border-r border-[#1e2938]">{row.rank}.</td>
                           <td className="py-2 px-4 font-mono text-[#8a9db8] font-medium">{row.diff}</td>
                         </tr>
@@ -252,7 +374,7 @@ const Leaderboards = () => {
                   <table className="w-full text-xs text-center">
                     <tbody className="divide-y divide-[#1e2938]">
                       {roundDiff.map((row) => (
-                        <tr key={row.rank} className="hover:bg-[#1a2533] transition-colors">
+                        <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors cursor-pointer group">
                           <td className="py-2 px-2 text-gray-500 w-12 border-r border-[#1e2938]">{row.rank}.</td>
                           <td className="py-2 px-4 font-mono text-[#8a9db8] font-medium">{row.diff}</td>
                         </tr>
@@ -419,7 +541,7 @@ const Leaderboards = () => {
                    </thead>
                    <tbody className="divide-y divide-[#1e2938]">
                      {filteredDaily.length > 0 ? filteredDaily.map((p, i) => (
-                       <tr key={i} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
+                       <tr key={i} onClick={() => setSelectedPlayer(p)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
                          <td className="py-3.5 px-2 text-left pl-4 font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors">
                            <span className="text-gray-600 w-4 text-right font-mono">{p.rank}.</span>
                            <span className="truncate max-w-[120px]" title={p.name}>{p.name}</span>
@@ -481,7 +603,7 @@ const Leaderboards = () => {
                    </thead>
                    <tbody className="divide-y divide-[#1e2938]">
                      {filteredWeekly.length > 0 ? filteredWeekly.map((p, i) => (
-                       <tr key={i} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
+                       <tr key={i} onClick={() => setSelectedPlayer(p)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
                          <td className="py-3.5 px-2 text-left pl-4 font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors">
                            <span className="text-gray-600 w-4 text-right font-mono">{p.rank}.</span>
                            <span className="truncate max-w-[120px]" title={p.name}>{p.name}</span>
@@ -509,6 +631,10 @@ const Leaderboards = () => {
           </div>
         </div>
       </div>
+      
+      {/* Interactive Modals */}
+      <TeamModal team={selectedTeam} onClose={() => setSelectedTeam(null)} activeGame={activeGame} />
+      <PlayerModal player={selectedPlayer} onClose={() => setSelectedPlayer(null)} activeGame={activeGame} />
     </div>
   );
 };

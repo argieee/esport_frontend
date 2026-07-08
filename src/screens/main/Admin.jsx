@@ -93,10 +93,16 @@ const Admin = () => {
   const [activeMap, setActiveMap] = useState('Ascent');
 
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-hidden flex flex-col h-full relative font-sans">
+    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full relative font-sans custom-scrollbar">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
+      `}</style>
       
       {/* Scrollable Container */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
+      <div className="flex-1 p-6 md:p-8 pb-16">
         <div className="max-w-[1600px] mx-auto flex flex-col gap-6">
           
           {/* TOP SECTION: Stats & User Management */}
