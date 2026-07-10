@@ -278,8 +278,8 @@ const Leaderboards = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
       {/* Top Header */}
-      <div className="bg-[#0f1722] py-6 border-b border-[#1c2532] shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-20 shrink-0">
-        <div className="max-w-[1400px] mx-auto px-8 flex justify-center">
+      <div className="bg-[#0f1722] py-6 border-b border-[#1c2532] shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-20 shrink-0 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] px-8 flex justify-center">
           <div className="flex w-full max-w-4xl justify-between items-center relative">
             
             <button 
@@ -310,8 +310,8 @@ const Leaderboards = () => {
       </div>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pb-16">
-        <div className="max-w-[1400px] mx-auto space-y-8">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-8 lg:px-12 pb-16 pt-8 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] space-y-8">
           
           {/* Top Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">

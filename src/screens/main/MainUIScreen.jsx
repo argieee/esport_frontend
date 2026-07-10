@@ -467,7 +467,7 @@ const MainUIScreen = ({ onLogout }) => {
         </header>
         
         {/* Dynamic Rendering of Components */}
-        <div className="flex-1 overflow-hidden relative z-10 bg-[#040814]">
+        <div className="flex-1 overflow-auto relative z-10 bg-[#040814]">
             {renderContent()}
         </div>
       </main>

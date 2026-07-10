@@ -866,7 +866,8 @@ const Tournament = () => {
       `}</style>
 
       {/* ── Sticky Top Bar ── */}
-      <div className="shrink-0 px-6 md:px-8 pt-6 pb-0 bg-[#090e14]">
+      <div className="shrink-0 px-8 md:px-12 pt-6 pb-0 bg-[#090e14] flex flex-col items-center">
+        <div className="w-full max-w-[1400px]">
 
         {/* Title row */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -914,11 +915,12 @@ const Tournament = () => {
             </button>
           ))}
         </div>
+        </div>
       </div>
 
       {/* ── Scrollable Content ── */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 md:px-8 py-6">
-        <div className="max-w-[1400px] mx-auto">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-8 md:px-12 py-6 flex flex-col items-center">
+        <div className="w-full max-w-[1400px]">
           {renderTab()}
         </div>
       </div>

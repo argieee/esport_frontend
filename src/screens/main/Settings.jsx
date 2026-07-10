@@ -146,8 +146,8 @@ const Settings = () => {
       `}</style>
       
       {/* Scrollable Container */}
-      <div className="flex-1 p-6 md:p-8 pb-16">
-        <div className="max-w-[1500px] mx-auto flex flex-col gap-8">
+      <div className="flex-1 px-8 md:px-12 py-6 pb-16 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] flex flex-col gap-8">
 
           {/* Header */}
           <div className="flex items-center space-x-4 mb-4 border-b border-[#1c2532] pb-6">

@@ -344,7 +344,7 @@ const Dashboard = () => {
   const t = fmt(timeLeft);
 
   return (
-    <div className="w-full h-full bg-[#05080f] text-white overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e293b transparent' }}>
+    <div className="w-full h-full bg-[#05080f] text-white overflow-y-auto flex flex-col items-center" style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e293b transparent' }}>
       <style>{`
         .dash-scroll::-webkit-scrollbar { width: 4px; }
         .dash-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -357,7 +357,7 @@ const Dashboard = () => {
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-5 md:px-8 py-6 pb-16 flex flex-col gap-7">
+      <div className="relative z-10 w-full max-w-[1400px] px-8 md:px-12 py-6 pb-16 flex flex-col gap-7">
 
         {/* ── Section: Game Selector + Page Title ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

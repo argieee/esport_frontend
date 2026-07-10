@@ -531,8 +531,8 @@ const Analytics = () => {
       `}</style>
       
       {/* Top Header Controls */}
-      <div className="bg-[#0f1722]/80 backdrop-blur-xl border-b border-[#1c2532] shadow-xl py-4 px-8 relative z-30">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+      <div className="bg-[#0f1722]/80 backdrop-blur-xl border-b border-[#1c2532] shadow-xl py-4 px-8 relative z-30 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] flex items-center justify-between">
           
           {/* Dropdowns - Increased Spacing */}
           <div className="flex space-x-12">
@@ -593,8 +593,8 @@ const Analytics = () => {
       </div>
 
       {/* Main Dashboard Grid */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 relative z-10">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8 pb-16">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 relative z-10 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] grid grid-cols-1 xl:grid-cols-2 gap-8 pb-16">
           
           <Card title="Global Player Skill Matrix">
              <RadarChart data={filteredRadar} axes={currentData.radarAxes} theme={currentData.theme} onSelect={openRadarOverview} />

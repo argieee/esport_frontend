@@ -36,34 +36,34 @@ const Mapping = () => {
 
   // Veto State
   const [vetoActive, setVetoActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(45);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const timerRef = useRef(null);
 
   const tabs = ['CURRENT MATCH', 'MAP POOL SETTINGS', 'BAN HISTORY', 'TEAM SETTINGS', 'ADMIN TOOLS'];
 
   const initialValMaps = [
-    { id: 'v1', name: 'CORRODE', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
-    { id: 'v2', name: 'ABYSS', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
-    { id: 'v3', name: 'SUNSET', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
-    { id: 'v4', name: 'LOTUS', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
-    { id: 'v5', name: 'PEARL', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
-    { id: 'v6', name: 'FRACTURE', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
-    { id: 'v7', name: 'BREEZE', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
-    { id: 'v8', name: 'ICEBOX', status: 'none', byTeam: null, enabled: false, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
-    { id: 'v9', name: 'BIND', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
+    { id: 'v1', name: 'CORRODE', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
+    { id: 'v2', name: 'ABYSS', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
+    { id: 'v3', name: 'SUNSET', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
+    { id: 'v4', name: 'LOTUS', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
+    { id: 'v5', name: 'PEARL', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
+    { id: 'v6', name: 'FRACTURE', status: 'none', byTeam: null, side: null, enabled: false, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
+    { id: 'v7', name: 'BREEZE', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
+    { id: 'v8', name: 'ICEBOX', status: 'none', byTeam: null, side: null, enabled: false, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
+    { id: 'v9', name: 'BIND', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
   ];
 
   const initialCfMaps = [
-    { id: 'c1', name: 'BLACK WIDOW', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
-    { id: 'c2', name: 'PORT', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
-    { id: 'c3', name: 'COMPOUND', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
-    { id: 'c4', name: 'ANKARA', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
-    { id: 'c5', name: 'SUB BASE', status: 'none', byTeam: null, enabled: false, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
-    { id: 'c6', name: 'EAGLE EYE', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
-    { id: 'c7', name: 'MEXICO', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
-    { id: 'c8', name: 'FACTORY', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
-    { id: 'c9', name: 'SANTORIA', status: 'none', byTeam: null, enabled: true, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
+    { id: 'c1', name: 'BLACK WIDOW', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1505775561242-7276188ed08c?q=80&w=600' },
+    { id: 'c2', name: 'PORT', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600' },
+    { id: 'c3', name: 'COMPOUND', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600' },
+    { id: 'c4', name: 'ANKARA', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?q=80&w=600' },
+    { id: 'c5', name: 'SUB BASE', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1623934199716-f331c19b0f47?q=80&w=600' },
+    { id: 'c6', name: 'EAGLE EYE', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600' },
+    { id: 'c7', name: 'MEXICO', status: 'none', byTeam: null, side: null, enabled: true, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600' },
+    { id: 'c8', name: 'FACTORY', status: 'none', byTeam: null, side: null, enabled: false, img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=600' },
+    { id: 'c9', name: 'SANTORIA', status: 'none', byTeam: null, side: null, enabled: false, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600' },
   ];
 
   const [valMaps, setValMaps] = useState(initialValMaps);
@@ -72,16 +72,17 @@ const Mapping = () => {
   const currentMaps = game === 'Valorant' ? valMaps : cfMaps;
   const setCurrentMaps = game === 'Valorant' ? setValMaps : setCfMaps;
 
-  // Veto sequence for 9 maps (8 actions to leave 1 decider)
+  // Alternating BO3 veto sequence (Leaves 1 Decider from 7 maps)
   const vetoSequence = [
-    { team: 'A', action: 'ban' },
-    { team: 'B', action: 'ban' },
-    { team: 'A', action: 'pick' },
-    { team: 'B', action: 'pick' },
-    { team: 'A', action: 'ban' },
-    { team: 'B', action: 'ban' },
-    { team: 'A', action: 'ban' },
-    { team: 'B', action: 'ban' },
+    { team: 'A', action: 'ban', label: 'BAN 1' },
+    { team: 'B', action: 'ban', label: 'BAN 2' },
+    { team: 'A', action: 'pick', label: 'PICK 1' },
+    { team: 'B', action: 'side', label: 'SIDE 1' },
+    { team: 'B', action: 'pick', label: 'PICK 2' },
+    { team: 'A', action: 'side', label: 'SIDE 2' },
+    { team: 'A', action: 'ban', label: 'BAN 3' },
+    { team: 'B', action: 'ban', label: 'BAN 4' },
+    { team: 'A', action: 'side', label: 'DECIDER SIDE' },
   ];
 
   const currentPhase = phaseIndex < vetoSequence.length ? vetoSequence[phaseIndex] : null;
@@ -106,6 +107,13 @@ const Mapping = () => {
   }, [vetoActive, currentPhase]);
 
   const autoPlayTurn = () => {
+    if (currentPhase.action === 'side') {
+      const sides = game === 'Valorant' ? ['ATK', 'DEF'] : ['BL', 'GR'];
+      const randomSide = sides[Math.floor(Math.random() * sides.length)];
+      handleSidePick(randomSide);
+      return;
+    }
+
     const availableMaps = currentMaps.filter(m => m.status === 'none' && m.enabled);
     if (availableMaps.length > 0) {
       const randomMap = availableMaps[Math.floor(Math.random() * availableMaps.length)];
@@ -119,12 +127,11 @@ const Mapping = () => {
       // Auto-set decider
       const updatedMaps = maps.map(m => m.id === availableMaps[0].id ? { ...m, status: 'decider', byTeam: 'none' } : m);
       setCurrentMaps(updatedMaps);
-      setVetoActive(false);
     }
   };
 
   const handleMapClick = (mapId) => {
-    if (!vetoActive || !currentPhase) return;
+    if (!vetoActive || !currentPhase || currentPhase.action === 'side') return;
 
     const map = currentMaps.find(m => m.id === mapId);
     if (map.status !== 'none' || !map.enabled) return; // already acted upon or disabled
@@ -145,11 +152,37 @@ const Mapping = () => {
     // Advance Phase
     const nextPhaseIndex = phaseIndex + 1;
     setPhaseIndex(nextPhaseIndex);
-    setTimeLeft(30);
+    setTimeLeft(45);
 
-    // If all actions done, find decider
+    // If all actions done, find decider (or we check decider before side pick of decider)
+    checkDecider(updatedMaps);
+  };
+
+  const handleSidePick = (sideStr) => {
+    if (!vetoActive || !currentPhase || currentPhase.action !== 'side') return;
+
+    // Find the last picked or decider map that doesn't have a side yet
+    const targetMap = currentMaps.slice().reverse().find(m => 
+      (m.status === 'picked' || m.status === 'decider') && m.side === null
+    );
+
+    if (targetMap) {
+      const updatedMaps = currentMaps.map((m) => {
+        if (m.id === targetMap.id) {
+          return { ...m, side: sideStr, sideByTeam: currentPhase.team };
+        }
+        return m;
+      });
+      setCurrentMaps(updatedMaps);
+    }
+
+    // Advance Phase
+    const nextPhaseIndex = phaseIndex + 1;
+    setPhaseIndex(nextPhaseIndex);
+    setTimeLeft(45);
+    
     if (nextPhaseIndex >= vetoSequence.length) {
-      checkDecider(updatedMaps);
+      setVetoActive(false); // Veto completely finished
     }
   };
 
@@ -161,7 +194,7 @@ const Mapping = () => {
   const resetVeto = () => {
     setVetoActive(false);
     setPhaseIndex(0);
-    setTimeLeft(30);
+    setTimeLeft(45);
     if (game === 'Valorant') {
       setValMaps(initialValMaps);
     } else {
@@ -173,7 +206,7 @@ const Mapping = () => {
     setGame(e.target.value);
     setVetoActive(false);
     setPhaseIndex(0);
-    setTimeLeft(30);
+    setTimeLeft(45);
   };
 
   // --- SUB-VIEWS RENDERERS ---
@@ -229,7 +262,7 @@ const Mapping = () => {
                       stroke={isTimeLow ? '#ef4444' : '#00ffcc'} 
                       strokeWidth="6" 
                       strokeDasharray={2 * Math.PI * 40}
-                      strokeDashoffset={2 * Math.PI * 40 - (timeLeft / 30) * (2 * Math.PI * 40)}
+                      strokeDashoffset={2 * Math.PI * 40 - (timeLeft / 45) * (2 * Math.PI * 40)}
                       className="transition-all duration-1000 ease-linear"
                       strokeLinecap="round"
                     />
@@ -293,8 +326,8 @@ const Mapping = () => {
         </div>
 
         {/* Phase Timeline / Status Bar */}
-        <div className="flex justify-center mb-8">
-          <div className="flex gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800/60">
+        <div className="flex justify-center mb-8 w-full max-w-full overflow-x-auto pb-2 custom-scrollbar">
+          <div className="flex flex-wrap justify-center gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800/60 min-w-max">
             {vetoSequence.map((seq, idx) => (
               <div 
                 key={idx} 
@@ -317,8 +350,9 @@ const Mapping = () => {
         </div>
 
         {/* Maps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
-          {currentMaps.map((m) => {
+        <div className="relative mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {currentMaps.map((m) => {
             const isClickable = vetoActive && currentPhase && m.status === 'none' && m.enabled;
             const teamColorStr = m.byTeam === 'A' ? 'blue' : m.byTeam === 'B' ? 'red' : 'gray';
             const teamHex = m.byTeam === 'A' ? '#3b82f6' : '#ef4444';
@@ -365,7 +399,7 @@ const Mapping = () => {
                 </div>
                 
                 {/* Hover interaction overlay */}
-                {isClickable && currentPhase && (
+                {isClickable && currentPhase && currentPhase.action !== 'side' && (
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px] z-20">
                     <div className={`px-6 py-3 rounded-xl border-2 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ${
                       currentPhase.action === 'ban' 
@@ -376,6 +410,15 @@ const Mapping = () => {
                         CLICK TO {currentPhase.action.toUpperCase()}
                       </span>
                     </div>
+                  </div>
+                )}
+
+                {/* Side Indicator */}
+                {m.side && (
+                  <div className="absolute top-4 left-4 z-30">
+                    <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-slate-900/90 border border-slate-700 text-white shadow-lg">
+                      SIDE: <span className="text-[#00ffcc]">{m.side}</span>
+                    </span>
                   </div>
                 )}
 
@@ -416,6 +459,34 @@ const Mapping = () => {
               </div>
             );
           })}
+          </div>
+
+          {/* SIDE PICK OVERLAY */}
+          {vetoActive && currentPhase?.action === 'side' && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#040814]/80 backdrop-blur-md rounded-2xl border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+              <div className="bg-[#0b121e] border border-slate-700/60 p-10 rounded-3xl flex flex-col items-center gap-8 shadow-2xl transform animate-[fadeInScale_0.3s_ease-out] min-w-[500px]">
+                <h3 className="text-2xl font-black uppercase tracking-widest text-white text-center">
+                  <span className={currentPhase.team === 'A' ? 'text-blue-400' : 'text-red-400'}>{currentPhase.team === 'A' ? teamA : teamB}</span>
+                  <br />
+                  <span className="text-slate-400 text-lg mt-2 inline-block">SELECT STARTING SIDE</span>
+                </h3>
+                
+                <div className="flex gap-6 w-full">
+                  {game === 'Valorant' ? (
+                    <>
+                      <button onClick={() => handleSidePick('ATK')} className="flex-1 py-8 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 hover:border-amber-500 hover:bg-amber-500/20 text-amber-500 font-black text-xl uppercase tracking-widest transition-all">ATTACKER</button>
+                      <button onClick={() => handleSidePick('DEF')} className="flex-1 py-8 rounded-2xl bg-teal-500/10 border-2 border-teal-500/30 hover:border-teal-500 hover:bg-teal-500/20 text-teal-500 font-black text-xl uppercase tracking-widest transition-all">DEFENDER</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => handleSidePick('BL')} className="flex-1 py-8 rounded-2xl bg-slate-900 border-2 border-yellow-500/30 hover:border-yellow-500 hover:bg-yellow-500/10 text-yellow-500 font-black text-xl uppercase tracking-widest transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)]">BL <br/><span className="text-xs text-yellow-500/60">Black List</span></button>
+                      <button onClick={() => handleSidePick('GR')} className="flex-1 py-8 rounded-2xl bg-slate-900 border-2 border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 text-blue-500 font-black text-xl uppercase tracking-widest transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)]">GR <br/><span className="text-xs text-blue-500/60">Global Risk</span></button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </>
     );
@@ -659,7 +730,8 @@ const Mapping = () => {
 
 
   return (
-    <div className="flex-1 p-6 lg:p-8 bg-[#040814] overflow-y-auto w-full h-full text-white font-sans custom-scrollbar">
+    <div className="flex-1 bg-[#040814] overflow-y-auto w-full h-full text-white font-sans custom-scrollbar flex flex-col items-center">
+      <div className="w-full max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8">
       
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes pulse-red {
@@ -705,6 +777,7 @@ const Mapping = () => {
         {activeTab === 'ADMIN TOOLS' && renderAdminTools()}
       </div>
       
+      </div>
     </div>
   );
 };

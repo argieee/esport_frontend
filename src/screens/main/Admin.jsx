@@ -102,8 +102,8 @@ const Admin = () => {
       `}</style>
       
       {/* Scrollable Container */}
-      <div className="flex-1 p-6 md:p-8 pb-16">
-        <div className="max-w-[1600px] mx-auto flex flex-col gap-6">
+      <div className="flex-1 px-8 md:px-12 py-6 pb-16 flex flex-col items-center">
+        <div className="w-full max-w-[1400px] flex flex-col gap-6">
           
           {/* TOP SECTION: Stats & User Management */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
