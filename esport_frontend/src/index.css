@@ -19,6 +19,12 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+  --theme-hue: 0deg;
+}
+
+/* Safeguard images and specific SVGs from being hue-rotated with the theme */
+img, video {
+  filter: hue-rotate(calc(-1 * var(--theme-hue, 0deg)));
 }
 
 /* ─── Reset & Base ─── */
@@ -37,30 +43,45 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  filter: hue-rotate(var(--theme-hue, 0deg));
+  transition: filter 0.5s ease-out;
 }
 
-/* ─── Global Custom Scrollbar ─── */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+/* ─── Custom Scrollbar for sidebar navigation */
+/* Staggered entry animations */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-15px); }
+  to { opacity: 1; transform: translateX(0); }
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 9999px;
-  transition: background 0.2s;
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-* {
+
+.animate-slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.5s; }
+.animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; opacity: 0; }
+
+/* Modern thin scrollbar */
+.custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .app {
@@ -291,10 +312,20 @@ input:focus {
   color: white;
 }
 
-.dashboard-grid {
+.dashboard-wrapper {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.5rem;
+  /* Allocates roughly 65% width to the left table, 35% to the bracket */
+  grid-template-columns: 2fr 1fr; 
+  gap: 32px; /* Forces physical space between the panels */
+  width: 100%;
+  /* CRITICAL FIX: Forces both panels to be exactly the same height */
+  align-items: stretch; 
+}
+
+.dashboard-section {
+  padding: 24px 32px; 
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .card {
@@ -380,3 +411,558 @@ input:focus {
   gap: 1rem;
   margin-top: 1.5rem;
 }
+
+/* ─── Tournament Page Animations ─── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 6px 2px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 14px 5px rgba(239, 68, 68, 0.8);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes borderRotate {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+
+.glass-card {
+  background: rgba(13, 19, 28, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.glass-card:hover {
+  border-color: rgba(100, 116, 139, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+
+.live-pulse {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.progress-bar-fill {
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Match card animated border on hover */
+.match-card-hover {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+.match-card-hover:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Tab sliding indicator */
+.tab-indicator {
+  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1), width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scroll arrow buttons */
+.scroll-arrow {
+  transition: opacity 0.2s, transform 0.2s;
+  opacity: 0;
+}
+.scroll-container:hover .scroll-arrow {
+  opacity: 1;
+}
+.scroll-arrow:hover {
+  transform: scale(1.15);
+}
+.scroll-arrow:active {
+  transform: scale(0.95);
+}
+
+/* Container for the horizontally scrolling matches */
+.match-scroll-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 16px 0;
+  scrollbar-width: none; 
+}
+.match-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* The Individual Match Card */
+.match-card {
+  min-width: 280px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(30, 38, 49, 0.9) 0%, rgba(18, 24, 33, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Team Logo Styling */
+.team-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+}
+
+/* Glowing Live Indicator */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff3333;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ff3333;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ff3333;
+  animation: pulse-live 1.5s infinite alternate;
+}
+
+@keyframes pulse-live {
+  from { opacity: 0.6; box-shadow: 0 0 4px #ff3333; }
+  to { opacity: 1; box-shadow: 0 0 12px #ff3333; }
+}
+
+/* Glassmorphism Cards */
+.glass-panel {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.15); /* Subtle cyan border */
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+}
+
+.bracket-panel {
+  /* Inherits the stretched height from the grid wrapper */
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+  
+  background: linear-gradient(145deg, rgba(15, 23, 34, 0.8) 0%, rgba(10, 15, 24, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.empty-bracket-placeholder {
+  /* Fills the remaining vertical space under the title */
+  flex-grow: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Glowing Rank Badges */
+.rank-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+}
+.rank-1 { background: rgba(255, 215, 0, 0.15); color: #ffd700; border-color: rgba(255, 215, 0, 0.5); box-shadow: 0 0 12px rgba(255, 215, 0, 0.3); }
+.rank-2 { background: rgba(192, 192, 192, 0.15); color: #e2e8f0; border-color: rgba(192, 192, 192, 0.5); box-shadow: 0 0 12px rgba(192, 192, 192, 0.3); }
+.rank-3 { background: rgba(205, 127, 50, 0.15); color: #cd7f32; border-color: rgba(205, 127, 50, 0.5); box-shadow: 0 0 12px rgba(205, 127, 50, 0.3); }
+
+/* Table Enhancements */
+.stats-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  table-layout: auto;
+}
+.stats-table th {
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.stats-table th,
+.stats-table td {
+  white-space: nowrap;
+  padding: 12px 16px;
+}
+.stats-table td {
+  background: rgba(255, 255, 255, 0.02); /* Slight row background */
+}
+/* Targets the 3rd, 4th, and 5th columns (Prize, Record, Pts) */
+.stats-table th:nth-child(n+3),
+.stats-table td:nth-child(n+3) {
+  text-align: center; 
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.stats-table tr:hover td {
+  background: rgba(0, 240, 255, 0.05); /* Cyan hover state */
+}
+
+/* Cyan Glowing Button */
+.btn-glow-cyan {
+  background: linear-gradient(90deg, #00f0ff 0%, #0080ff 100%);
+  color: #000;
+  font-weight: 800;
+  padding: 8px 20px;
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.btn-glow-cyan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.6);
+}
+
+/* Timeline Scroll Container */
+.timeline-scroll-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none; /* Firefox */
+}
+.timeline-scroll-row::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Individual Match Card styling */
+.timeline-card {
+  min-width: 260px;
+  background: rgba(15, 23, 34, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  transition: background 0.2s ease;
+}
+.timeline-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Team Placeholder Circles */
+.team-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* Dynamic Game Indicators */
+.league-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.indicator-vct { background-color: #ff4655; box-shadow: 0 0 8px #ff4655; } /* Valorant Red */
+.indicator-cfpl { background-color: #eab308; box-shadow: 0 0 8px #eab308; } /* Crossfire Yellow */
+
+/* Calendar Widget */
+.calendar-card {
+  background: linear-gradient(145deg, rgba(15, 23, 34, 0.8) 0%, rgba(10, 15, 24, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Wraps the entire top section of the calendar */
+.calendar-header-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* 1. "SCHEDULE" Subtitle */
+.calendar-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+/* 2. "June 2027" and Arrows */
+.calendar-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.calendar-month-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.nav-arrow {
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 12px;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.nav-arrow:hover {
+  color: #ffffff;
+}
+
+/* 3. "M T W T F S S" Row */
+.calendar-days-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #3b82f6;
+  margin-top: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* Date Cell Styling */
+.date-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+}
+
+.date-cell:hover:not(.empty) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.date-cell.empty {
+  cursor: default;
+}
+
+/* Active States */
+.date-cell.selected {
+  background-color: #00f0ff;
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+.date-cell.today {
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+
+/* Match Day Dot Indicator */
+.match-dot {
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  background-color: #ff0055; /* Neon Pink */
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ff0055;
+}
+
+/* Legend Styling */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Filter Component */
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.filter-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.game-filter-item.active {
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Minimal Scrollbar for the enlarged layout */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+/* Staggered Initial Load Animation */
+
+
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-sweep {
+  animation: sweep 1s ease-in-out infinite;
+}
+
+/* ─── Mapping Page Layout Fixes ─── */
+.mapping-card-container {
+  padding: 24px 32px !important;
+  box-sizing: border-box !important;
+}
+
+.mapping-tab-nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  overflow-x: auto !important;
+  width: 100% !important;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.mapping-tab-nav button {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.mapping-section-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}

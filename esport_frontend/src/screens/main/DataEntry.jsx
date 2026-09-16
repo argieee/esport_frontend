@@ -100,23 +100,24 @@ const IconSave = () => (
   </svg>
 );
 const SectionHeader = ({ icon, label, sub, accent = "#06b6d4" }) => (
-  <div className="px-5 py-3.5 border-b border-slate-800/60 light:border-slate-200 flex items-center gap-3 bg-slate-900/30 light:bg-slate-50">
+  <div className="border-b border-slate-800/60 light:border-slate-200 flex items-center gap-8 bg-slate-900/30 light:bg-slate-50" style={{ padding: '32px 48px' }}>
     <div
-      className="p-1.5 rounded-lg flex-shrink-0"
+      className="rounded-xl flex-shrink-0"
       style={{
         backgroundColor: accent + "18",
         border: `1px solid ${accent}30`,
+        padding: '16px'
       }}
     >
       <span style={{ color: accent }}>{icon}</span>
     </div>
-    <div>
+    <div className="flex flex-col gap-4">
       {sub && (
-        <div className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-600 light:text-slate-500 mb-0.5">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 light:text-slate-400">
           {sub}
         </div>
       )}
-      <h2 className="text-[11px] font-black text-white light:text-slate-900 uppercase tracking-[0.2em]">
+      <h2 className="text-sm font-black text-white light:text-slate-900 uppercase tracking-[0.2em]">
         {label}
       </h2>
     </div>
@@ -849,7 +850,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       `}</style>
       {/* ── Scrollable Content ── */}
       <div className="flex-1 overflow-y-auto de-scroll flex flex-col items-center">
-        <div className="w-full max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8 flex flex-col gap-5">
+        <div className="w-full max-w-[1400px] flex flex-col" style={{ padding: '32px', gap: '24px' }}>
           {/* ── Top Bar: Broadcast Toggle ── */}
           <div className="flex items-center justify-end gap-3">
             <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-lg shadow-sm" title="Your edits are instantly saved and synced with other admins">
@@ -864,7 +865,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </span>
               <button
                 onClick={() => setBroadcast(!broadcast)}
-                className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${broadcast ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "bg-slate-700"}`}
+                className={`w-11 h-10 rounded-full p-0.5 transition-all duration-300 ${broadcast ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "bg-slate-700"}`}
               >
                 <div
                   className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${broadcast ? "translate-x-5" : "translate-x-0"}`}
@@ -878,7 +879,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             </div>
           </div>
           {/* ── Row 1: Match Header + Teams ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: '48px' }}>
             {/* Match Header */}
             <div className="lg:col-span-2 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
               <SectionHeader
@@ -886,7 +887,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 label="Main Match Header"
                 sub="Configuration"
               />
-              <div className="p-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4" style={{ padding: '56px 24px', gap: '32px' }}>
                 <Field label="League/Tournament:">
                   <input
                     type="text"
@@ -968,11 +969,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Matchup"
                 accent="#6366f1"
               />
-              <div className="p-5 flex flex-col gap-3">
+              <div className="flex flex-col" style={{ padding: '56px 24px', gap: '48px' }}>
                 {/* Team A & B side by side */}
-                <div className="flex gap-3">
-                  <div className="flex-1 bg-blue-900/10 border border-blue-900/30 rounded-xl p-3 flex flex-col items-center gap-2 hover:border-blue-700/40 transition-colors">
-                    <div className="w-12 h-12 rounded-xl bg-blue-900/30 border border-blue-800/40 flex items-center justify-center text-lg font-black text-blue-400 shrink-0 overflow-hidden">
+                <div className="flex" style={{ display: 'flex', gap: '24px' }}>
+                  <div className="flex-1 bg-blue-900/10 border border-blue-900/30 rounded-xl hover:border-blue-700/40 transition-colors" style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                    <div className="bg-blue-900/30 border border-blue-800/40 text-blue-400 shrink-0 overflow-hidden font-black text-2xl" style={{ width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {dbTeams.find((t) => t.team_name === teamA.name)
                         ?.logo_url ? (
                         <img
@@ -981,7 +982,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               .logo_url
                           }
                           alt="Logo"
-                          className="w-8 h-8 object-contain drop-shadow-md"
+                          className="w-10 h-10 object-contain drop-shadow-md"
                         />
                       ) : teamA.name ? (
                         teamA.name[0]
@@ -989,12 +990,13 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         "A"
                       )}
                     </div>
-                    <div className="text-center w-full">
-                      <div className="text-[9px] font-black uppercase tracking-widest text-blue-500 mb-0.5">
+                    <div className="text-center w-full" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-blue-500">
                         Team A:
                       </div>
                       <select
-                        className="bg-transparent text-[10px] font-black text-white w-full text-center outline-none border-b border-transparent focus:border-blue-500 transition-colors pb-0.5 appearance-none cursor-pointer"
+                        className="bg-transparent text-xs font-black text-white w-full text-center outline-none border-b border-transparent focus:border-blue-500 transition-colors appearance-none cursor-pointer"
+                        style={{ paddingBottom: '8px' }}
                         value={teamA.name}
                         onChange={(e) => handleTeamSelect("A", e.target.value)}
                       >
@@ -1016,8 +1018,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       </select>
                     </div>
                   </div>
-                  <div className="flex-1 bg-red-900/10 border border-red-900/30 rounded-xl p-3 flex flex-col items-center gap-2 hover:border-red-700/40 transition-colors">
-                    <div className="w-12 h-12 rounded-xl bg-red-900/30 border border-red-800/40 flex items-center justify-center text-lg font-black text-red-400 shrink-0 overflow-hidden">
+                  <div className="flex-1 bg-red-900/10 border border-red-900/30 rounded-xl hover:border-red-700/40 transition-colors" style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                    <div className="bg-red-900/30 border border-red-800/40 text-red-400 shrink-0 overflow-hidden font-black text-2xl" style={{ width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {dbTeams.find((t) => t.team_name === teamB.name)
                         ?.logo_url ? (
                         <img
@@ -1026,7 +1028,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               .logo_url
                           }
                           alt="Logo"
-                          className="w-8 h-8 object-contain drop-shadow-md"
+                          className="w-10 h-10 object-contain drop-shadow-md"
                         />
                       ) : teamB.name ? (
                         teamB.name[0]
@@ -1034,12 +1036,13 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         "B"
                       )}
                     </div>
-                    <div className="text-center w-full">
-                      <div className="text-[9px] font-black uppercase tracking-widest text-red-500 mb-0.5">
+                    <div className="text-center w-full" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-red-500">
                         Team B:
                       </div>
                       <select
-                        className="bg-transparent text-[10px] font-black text-white w-full text-center outline-none border-b border-transparent focus:border-red-500 transition-colors pb-0.5 appearance-none cursor-pointer"
+                        className="bg-transparent text-xs font-black text-white w-full text-center outline-none border-b border-transparent focus:border-red-500 transition-colors appearance-none cursor-pointer"
+                        style={{ paddingBottom: '8px' }}
                         value={teamB.name}
                         onChange={(e) => handleTeamSelect("B", e.target.value)}
                       >
@@ -1063,23 +1066,25 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   </div>
                 </div>
                 {/* Winner */}
-                <div className="flex items-center justify-between bg-slate-800/40 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl px-3.5 py-2.5">
-                  <div>
-                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
+                <div className="bg-slate-800/40 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                       Winner:
                     </div>
                     <div
-                      className={`text-xs font-black ${winner === "A" ? "text-blue-400 light:text-blue-600" : "text-red-400 light:text-red-600"}`}
+                      className={`text-sm font-black ${winner === "A" ? "text-blue-400 light:text-blue-600" : "text-red-400 light:text-red-600"}`}
                     >
                       {winner === "A" ? teamA.name : teamB.name}
                     </div>
                   </div>
                   <button
                     onClick={() => setWinner(winner === "A" ? "B" : "A")}
-                    className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${winner === "A" ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"}`}
+                    className={`rounded-full transition-all duration-300 ${winner === "A" ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"}`}
+                    style={{ width: '64px', height: '32px', padding: '4px', display: 'flex', alignItems: 'center' }}
                   >
                     <div
-                      className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${winner === "B" ? "translate-x-5" : "translate-x-0"}`}
+                      className={`bg-white rounded-full shadow-md transform transition-transform duration-300`}
+                      style={{ width: '24px', height: '24px', transform: winner === "B" ? "translateX(32px)" : "translateX(0)" }}
                     />
                   </button>
                 </div>
@@ -1095,7 +1100,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Visible because valorant is selected"
                 accent="#f59e0b"
               />
-              <div className="p-5">
+              <div style={{ padding: '56px 24px' }}>
                 {/* Score */}
                 <div className="flex flex-wrap items-end gap-4 mb-6">
                   <div>
@@ -1136,7 +1141,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Visible because crossfire is selected"
                 accent="#f59e0b"
               />
-              <div className="p-5">
+              <div style={{ padding: '56px 24px' }}>
                 <div className="flex flex-wrap items-end gap-8">
                   <div>
                     <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1.5">
@@ -1202,17 +1207,17 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Tracker"
               accent="#ec4899"
             />
-            <div className="p-5 overflow-x-auto de-scroll">
+            <div className="overflow-x-auto de-scroll" style={{ padding: '56px 24px' }}>
               <table className="w-full text-center border-collapse min-w-[1200px] text-[10px] font-black uppercase tracking-wider text-slate-300 light:text-slate-600">
                 <thead>
                   <tr className="bg-slate-800/80 light:bg-slate-100 border-b border-slate-700/50 light:border-slate-300">
-                    <th className="py-2 px-3 border-r border-slate-700/50 light:border-slate-300 text-left w-48">
+                    <th className="py-2 px-3 border-r border-slate-700/50 light:border-slate-300 text-left w-48" style={{ padding: '16px 12px' }}>
                       Team
                     </th>
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-16">
+                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-16" style={{ padding: '16px 12px' }}>
                       Win
                     </th>
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20">
+                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20" style={{ padding: '16px 12px' }}>
                       Side
                     </th>
                     {Array(25)
@@ -1225,10 +1230,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                           R{i + 1}
                         </th>
                       ))}
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20 text-emerald-400 light:text-emerald-600">
+                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20 text-emerald-400 light:text-emerald-600" style={{ padding: '16px 12px' }}>
                       R. Score
                     </th>
-                    <th className="py-2 px-2 text-emerald-400 light:text-emerald-600">
+                    <th className="py-2 px-2 text-emerald-400 light:text-emerald-600" style={{ padding: '16px 12px' }}>
                       Total
                     </th>
                   </tr>
@@ -1236,10 +1241,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 <tbody>
                   {/* Team A Row */}
                   <tr className="border-b border-slate-700/50 bg-blue-900/10">
-                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-blue-400">
+                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-blue-400" style={{ padding: '16px 12px' }}>
                       {teamA.name || "Team A"}
                     </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50">
+                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
                         className="bg-transparent text-center outline-none cursor-pointer w-full"
                         value={matchWin === "A" ? "Yes" : "No"}
@@ -1251,7 +1256,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         <option>No</option>
                       </select>
                     </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50">
+                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
                         className="bg-transparent text-center outline-none cursor-pointer w-full"
                         value={sideA}
@@ -1273,10 +1278,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     {roundLogsA.map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
                       >
                         <div
-                          className={`w-full h-6 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-emerald-500/20 border-emerald-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
+                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-emerald-500/20 border-emerald-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
                         >
                           <input
                             type="text"
@@ -1305,11 +1310,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         </div>
                       </td>
                     ))}
-                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm">
+                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}>
                       {autoScoreA}
                     </td>
                     <td
-                      className="py-2 px-2 text-emerald-400 text-sm"
+                      className="py-2 px-2 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}
                       rowSpan={2}
                     >
                       <input
@@ -1322,10 +1327,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   </tr>
                   {/* Team B Row */}
                   <tr className="bg-red-900/10">
-                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-red-400">
+                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-red-400" style={{ padding: '16px 12px' }}>
                       {teamB.name || "Team B"}
                     </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50">
+                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
                         className="bg-transparent text-center outline-none cursor-pointer w-full"
                         value={matchWin === "B" ? "Yes" : "No"}
@@ -1337,7 +1342,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         <option>No</option>
                       </select>
                     </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50">
+                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
                         className="bg-transparent text-center outline-none cursor-pointer w-full"
                         value={sideB}
@@ -1359,10 +1364,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     {roundLogsB.map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
                       >
                         <div
-                          className={`w-full h-6 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-pink-500/20 border-pink-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
+                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-pink-500/20 border-pink-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
                         >
                           <input
                             type="text"
@@ -1391,7 +1396,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         </div>
                       </td>
                     ))}
-                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm">
+                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}>
                       {autoScoreB}
                     </td>
                   </tr>
@@ -1399,17 +1404,17 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   <tr className="border-t-2 border-slate-700/80 bg-amber-900/10">
                     <td
                       colSpan={3}
-                      className="py-2 px-3 border-r border-slate-700/50 text-right text-amber-500 font-black tracking-widest text-[10px]"
+                      className="py-2 px-3 border-r border-slate-700/50 text-right text-amber-500 font-black tracking-widest text-[10px]" style={{ padding: '16px 12px' }}
                     >
                       TIMEOUTS
                     </td>
                     {timeoutRowLogs.map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
                       >
                         <div
-                          className={`w-full h-6 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-amber-500/20 border-amber-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
+                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-amber-500/20 border-amber-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
                         >
                           <input
                             type="text"
@@ -1442,24 +1447,24 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     ))}
                     <td
                       colSpan={2}
-                      className="py-2 px-2 border-slate-700/50"
+                      className="py-2 px-2 border-slate-700/50" style={{ padding: '16px 12px' }}
                     ></td>
                   </tr>
                   {/* Dead Rounds Row */}
                   <tr className="border-b border-slate-700/50 bg-purple-900/10">
                     <td
                       colSpan={3}
-                      className="py-2 px-3 border-r border-slate-700/50 text-right text-purple-500 font-black tracking-widest text-[10px]"
+                      className="py-2 px-3 border-r border-slate-700/50 text-right text-purple-500 font-black tracking-widest text-[10px]" style={{ padding: '16px 12px' }}
                     >
                       DEAD ROUNDS
                     </td>
                     {deadRoundRowLogs.map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
                       >
                         <div
-                          className={`w-full h-6 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-purple-500/20 border-purple-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
+                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-purple-500/20 border-purple-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
                         >
                           <input
                             type="text"
@@ -1492,20 +1497,21 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     ))}
                     <td
                       colSpan={2}
-                      className="py-2 px-2 border-slate-700/50"
+                      className="py-2 px-2 border-slate-700/50" style={{ padding: '16px 12px' }}
                     ></td>
                   </tr>
                 </tbody>
               </table>
               {/* Timeouts and Current Round Display */}
-              <div className="flex items-start gap-8 mt-5">
-                <div className="flex flex-col border border-amber-500/30 rounded-lg overflow-hidden w-48">
-                  <div className="bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase text-center py-1 border-b border-amber-500/30">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', marginTop: '32px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', overflow: 'hidden', width: '192px' }}>
+                  <div className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase text-center border-b border-amber-500/30" style={{ padding: '8px' }}>
                     Timeout Indicator
                   </div>
-                  <div className="flex flex-col">
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <select
-                      className={`text-xs font-bold py-1.5 text-center outline-none cursor-pointer border-b border-amber-500/10 appearance-none ${timeoutA === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
+                      className={`text-xs font-bold text-center outline-none cursor-pointer border-b border-amber-500/10 appearance-none ${timeoutA === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
+                      style={{ padding: '12px' }}
                       value={timeoutA}
                       onChange={(e) => handleTimeoutChange("A", e.target.value)}
                     >
@@ -1513,7 +1519,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <option value="USED">USED</option>
                     </select>
                     <select
-                      className={`text-xs font-bold py-1.5 text-center outline-none cursor-pointer appearance-none ${timeoutB === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
+                      className={`text-xs font-bold text-center outline-none cursor-pointer appearance-none ${timeoutB === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
+                      style={{ padding: '12px' }}
                       value={timeoutB}
                       onChange={(e) => handleTimeoutChange("B", e.target.value)}
                     >
@@ -1522,11 +1529,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </select>
                   </div>
                 </div>
-                <div className="flex flex-col border border-amber-500/30 rounded-lg overflow-hidden w-40">
-                  <div className="bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase text-center py-1 border-b border-amber-500/30">
+                <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', overflow: 'hidden', width: '160px' }}>
+                  <div className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase text-center border-b border-amber-500/30" style={{ padding: '8px' }}>
                     Current Round No.
                   </div>
-                  <div className="bg-amber-500/10 text-amber-400 text-2xl font-black py-2 text-center">
+                  <div className="bg-amber-500/10 text-amber-400 text-2xl font-black text-center" style={{ padding: '16px' }}>
                     {currentRoundNo}
                   </div>
                 </div>
@@ -1549,7 +1556,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
                         <th
                           rowSpan={2}
-                          className="px-5 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold sticky left-0 bg-slate-900/90 light:bg-slate-100 z-30 min-w-[200px]"
+                          className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]"
+                          style={{ paddingLeft: '32px', paddingRight: '20px' }}
                         >
                           Player IGN
                         </th>
@@ -1593,7 +1601,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             </div>
                           </th>
                         ))}
-                        <th rowSpan={2} className="px-3 py-3 text-center w-24">
+                        <th rowSpan={2} className="px-3 py-3 text-center w-24" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                           <button
                             onClick={handleAddCfGroup}
                             className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap font-bold"
@@ -1605,16 +1613,16 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 relative z-10">
                         {cfGroups.map((g) => (
                           <React.Fragment key={`${g.id}-sub`}>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-12">
+                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                               K
                             </th>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-12">
+                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                               D
                             </th>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-12">
+                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                               A
                             </th>
-                            <th className="px-3 py-2 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold w-12 text-[#00ffcc] light:text-blue-600">
+                            <th className="px-3 py-2 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold min-w-[70px] text-[#00ffcc] light:text-blue-600" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                               H
                             </th>
                           </React.Fragment>
@@ -1623,25 +1631,25 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </>
                   ) : (
                     <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
-                      <th className="px-5 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold sticky left-0 bg-slate-900/90 light:bg-slate-100 z-30 min-w-[200px]">
+                      <th className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]" style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '32px', paddingRight: '20px' }}>
                         Player IGN
                       </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]">
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         Hero/Agent/Class
                       </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14">
+                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         K
                       </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14">
+                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         D
                       </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14">
+                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         A
                       </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold">
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         ACS
                       </th>
-                      <th className="px-4 py-3 text-center font-bold">
+                      <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         Econ Rating
                       </th>
                     </tr>
@@ -1654,7 +1662,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       key={`a-${idx}`}
                       className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
                     >
-                      <td className="px-5 py-2 border-r border-slate-800/30 light:border-slate-200 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors">
+                      <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
                         <select
                           className={`bg-transparent text-[#38bdf8] light:text-blue-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
                           value={p.ign}
@@ -1687,7 +1695,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         </select>
                       </td>
                       {game === "Valorant" && (
-                        <td className="px-4 py-2 border-r border-slate-800/30">
+                        <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
                               {p.agent ? p.agent[0] : ""}
@@ -1710,7 +1718,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       )}
                       {game === "Valorant" ? (
                         <>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1725,7 +1733,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1740,7 +1748,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1755,7 +1763,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400">
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-emerald-400`}
@@ -1770,7 +1778,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 text-emerald-400">
+                          <td className="px-4 py-2 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-emerald-400`}
@@ -1792,16 +1800,16 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             if (g.isTotal) {
                               return (
                                 <React.Fragment key={g.id}>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                     {getCfTotal(p, "k")}
                                   </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                     {getCfTotal(p, "d")}
                                   </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                     {getCfTotal(p, "a")}
                                   </td>
-                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                     {getCfTotal(p, "h")}
                                   </td>
                                 </React.Fragment>
@@ -1809,7 +1817,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             }
                             return (
                               <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -1828,7 +1836,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -1847,7 +1855,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -1866,7 +1874,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]">
+                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                                   <input
                                     type="number"
                                     className={`${tableInput} text-[#00ffcc]`}
@@ -1888,7 +1896,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               </React.Fragment>
                             );
                           })}
-                          <td className="px-2 py-2"></td>
+                          <td className="px-2 py-2" style={{ paddingTop: '8px', paddingBottom: '8px' }}></td>
                         </>
                       )}
                     </tr>
@@ -1906,7 +1914,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       key={`b-${idx}`}
                       className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
                     >
-                      <td className="px-5 py-2 border-r border-slate-800/30 light:border-slate-200 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors">
+                      <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
                         <select
                           className={`bg-transparent text-[#f87171] light:text-red-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
                           value={p.ign}
@@ -1939,7 +1947,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         </select>
                       </td>
                       {game === "Valorant" && (
-                        <td className="px-4 py-2 border-r border-slate-800/30">
+                        <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
                               {p.agent ? p.agent[0] : ""}
@@ -1962,7 +1970,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       )}
                       {game === "Valorant" ? (
                         <>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1977,7 +1985,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1992,7 +2000,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -2007,7 +2015,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]">
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-[#f87171]`}
@@ -2022,7 +2030,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 text-[#f87171]">
+                          <td className="px-4 py-2 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-[#f87171]`}
@@ -2044,16 +2052,16 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             if (g.isTotal) {
                               return (
                                 <React.Fragment key={g.id}>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
                                     {getCfTotal(p, "k")}
                                   </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
                                     {getCfTotal(p, "d")}
                                   </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
                                     {getCfTotal(p, "a")}
                                   </td>
-                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10">
+                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
                                     {getCfTotal(p, "h")}
                                   </td>
                                 </React.Fragment>
@@ -2061,7 +2069,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             }
                             return (
                               <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -2080,7 +2088,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -2099,7 +2107,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white">
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
                                   <input
                                     type="number"
                                     className={tableInput}
@@ -2118,7 +2126,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                     }
                                   />
                                 </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]">
+                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ padding: '16px 12px' }}>
                                   <input
                                     type="number"
                                     className={`${tableInput} text-[#00ffcc]`}
@@ -2140,7 +2148,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               </React.Fragment>
                             );
                           })}
-                          <td className="px-2 py-2"></td>
+                          <td className="px-2 py-2" style={{ padding: '16px 12px' }}></td>
                         </>
                       )}
                     </tr>
@@ -2157,9 +2165,9 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Event Coordinate Plotting"
               accent="#06b6d4"
             />
-            <div className="p-8 flex flex-col lg:flex-row gap-8 items-start">
+            <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: '32px' }}>
               {}
-              <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl p-5 flex flex-col gap-6">
+              <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
                 <Field label="Target Round">
                   <div className="relative">
                     <select
@@ -2182,26 +2190,29 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   </div>
                 </Field>
                 <Field label="Action Marker">
-                  <div className="flex gap-2">
+                  <div style={{ display: 'flex', gap: '16px' }}>
                     <button
                       onClick={() => setSelectedAction("Plant")}
-                      className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Plant" ? "bg-red-500/20 border-red-500 text-red-400 light:text-red-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                      className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Plant" ? "bg-red-500/20 border-red-500 text-red-400 light:text-red-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                      style={{ flex: 1, padding: '12px' }}
                     >
                       Plant
                     </button>
                     <button
                       onClick={() => setSelectedAction("Defuse")}
-                      className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Defuse" ? "bg-blue-500/20 border-blue-500 text-blue-400 light:text-blue-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                      className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Defuse" ? "bg-blue-500/20 border-blue-500 text-blue-400 light:text-blue-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                      style={{ flex: 1, padding: '12px' }}
                     >
                       Defuse
                     </button>
                   </div>
                 </Field>
                 <Field label="Manual Input (X/Y %)">
-                  <div className="flex gap-2 items-center">
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <input
                       type="number"
                       className={inputBase}
+                      style={{ flex: 1 }}
                       placeholder="X %"
                       value={manualX}
                       onChange={(e) => setManualX(e.target.value)}
@@ -2209,13 +2220,15 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     <input
                       type="number"
                       className={inputBase}
+                      style={{ flex: 1 }}
                       placeholder="Y %"
                       value={manualY}
                       onChange={(e) => setManualY(e.target.value)}
                     />
                     <button
                       onClick={handleManualAdd}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-lg text-[10px] uppercase tracking-widest transition-colors shadow-lg"
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-[10px] uppercase tracking-widest transition-colors shadow-lg"
+                      style={{ padding: '12px 24px' }}
                     >
                       Add
                     </button>
@@ -2260,7 +2273,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 </div>
               </div>
               {}
-              <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl p-4 overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]">
+              <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]" style={{ padding: '24px' }}>
                 <div
                   className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
                   onClick={handleMapClick}
@@ -2297,22 +2310,21 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Match Commentary"
               accent="#10b981"
             />
-            <div className="p-5 flex flex-col xl:flex-row gap-4 items-end">
-              <div className="flex-1 w-full">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
-                    Notes:
-                  </span>
-                </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '56px 32px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                  Notes:
+                </span>
                 <textarea
                   rows={2}
-                  className="w-full bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-sm px-4 py-3 rounded-xl outline-none focus:border-cyan-500/60 light:focus:border-blue-500/60 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all resize-none placeholder-slate-600 light:placeholder-slate-400"
+                  className="w-full bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-sm rounded-xl outline-none focus:border-cyan-500/60 light:focus:border-blue-500/60 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all resize-none placeholder-slate-600 light:placeholder-slate-400"
+                  style={{ padding: '16px 24px' }}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Add match notes, pause events, technical issues..."
                 />
               </div>
-              <div className="flex gap-3 w-full xl:w-auto shrink-0">
+              <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'flex-end' }}>
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
@@ -2323,14 +2335,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         ? "opacity-70 cursor-wait"
                         : "submit-pulse hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]"
                   }`}
-                  style={
-                    !submitSuccess
-                      ? {
-                          background:
-                            "linear-gradient(135deg, #0d9488, #2563eb)",
-                        }
-                      : {}
-                  }
+                  style={{
+                    padding: '12px 32px',
+                    borderRadius: '9999px',
+                    ...(!submitSuccess ? { background: "linear-gradient(135deg, #0d9488, #2563eb)" } : {})
+                  }}
                 >
                   {isSubmitting ? (
                     <svg
@@ -2365,6 +2374,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   onClick={handleCancel}
                   className="flex-1 xl:flex-none px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 border border-red-500/40 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
                   style={{
+                    padding: '12px 32px',
+                    borderRadius: '9999px',
                     background: "linear-gradient(135deg, #991b1b, #dc2626)",
                   }}
                 >

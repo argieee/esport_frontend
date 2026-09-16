@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CalendarX, Trophy, ClipboardList, ArrowRight } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
 const Predictions = ({ globalGame }) => {
   const [matches, setMatches] = useState([]);
@@ -7,6 +8,7 @@ const Predictions = ({ globalGame }) => {
   const [username, setUsername] = useState('Player1'); 
   const activeGame = (globalGame || 'VALORANT').toLowerCase();
   const accent = activeGame === 'valorant' ? '#06b6d4' : '#f59e0b';
+  const secondaryAccent = activeGame === 'valorant' ? '#f43f5e' : '#8b5cf6';
   const API_URL = 'http://localhost:5000/api';
   useEffect(() => {
     fetchMatches();
@@ -75,23 +77,35 @@ const Predictions = ({ globalGame }) => {
               <h1 className="text-xl font-black uppercase tracking-[0.15em] text-white">Predictions</h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400">Playing as:</span>
+          <div className="flex items-center gap-3 bg-[#151A22]/80 border border-white/5 pl-6 pr-4 py-2 rounded-full shadow-sm backdrop-blur-sm shrink-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap shrink-0">Playing as:</span>
             <input 
               type="text" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="bg-slate-900 border border-slate-700 rounded px-3 py-1 text-sm font-bold text-white focus:outline-none focus:border-cyan-500"
+              className="bg-transparent text-sm font-black text-white focus:outline-none w-24 placeholder-slate-600"
+              placeholder="Username"
             />
           </div>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {}
-          <div className="xl:col-span-2 flex flex-col gap-6">
-            <div className="bg-[#0d131c] rounded-2xl border border-slate-800/60 p-6">
-              <h2 className="text-sm font-black uppercase tracking-widest text-slate-300 mb-6">Upcoming Matches</h2>
+          <div className="xl:col-span-2 flex flex-col gap-8">
+            {/* UPCOMING MATCHES SECTION */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 pl-2">
+                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
+                <h2 className="text-sm font-black uppercase tracking-widest text-white">Upcoming Matches</h2>
+              </div>
+              <div className="bg-[#151A22]/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl hover:border-white/10 transition-colors duration-500 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+              <div className="p-6">
               {matches.length === 0 ? (
-                <div className="text-center text-slate-500 py-8 text-sm">No scheduled matches available for prediction.</div>
+                <div className="flex flex-col items-center justify-center py-16 bg-slate-900/20 rounded-xl border border-slate-700/30 border-dashed group">
+                  <CalendarX size={48} strokeWidth={1} className="text-slate-600 mb-4 group-hover:text-cyan-500/70 transition-colors duration-500" />
+                  <div className="text-slate-300 font-semibold text-sm mb-2">No upcoming matches right now.</div>
+                  <div className="text-slate-500 text-xs">Check back when the new season drops!</div>
+                </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   {matches.map(match => {
@@ -157,48 +171,73 @@ const Predictions = ({ globalGame }) => {
                   })}
                 </div>
               )}
+              </div>
+              </div>
             </div>
-            <div className="bg-[#0d131c] rounded-2xl border border-slate-800/60 p-6">
-              <h2 className="text-sm font-black uppercase tracking-widest text-slate-300 mb-6">My Past Predictions</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
+            
+            {/* MY PAST PREDICTIONS SECTION */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 pl-2">
+                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
+                <h2 className="text-sm font-black uppercase tracking-widest text-white">My Past Predictions</h2>
+              </div>
+              <div className="bg-[#151A22]/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl hover:border-white/10 transition-colors duration-500 relative overflow-hidden">
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+              <div className="w-full overflow-x-auto">
+                <table className="w-full text-left whitespace-nowrap">
                   <thead>
-                    <tr className="text-[10px] uppercase tracking-widest text-slate-500 border-b border-slate-800/50">
-                      <th className="pb-3 font-bold">Match ID</th>
-                      <th className="pb-3 font-bold">Predicted Winner</th>
-                      <th className="pb-3 font-bold">Status</th>
-                      <th className="pb-3 font-bold text-right">Points</th>
+                    <tr className="text-[11px] uppercase tracking-[0.15em] font-semibold text-slate-300 border-b border-slate-700/50">
+                      <th className="py-4" style={{ paddingLeft: '32px', paddingRight: '24px' }}>Match ID</th>
+                      <th className="py-4" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Predicted Winner</th>
+                      <th className="py-4" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Status</th>
+                      <th className="py-4 text-right" style={{ paddingLeft: '24px', paddingRight: '32px' }}>Points</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/30">
+                  <tbody className="divide-y divide-slate-800/50">
                     {myPredictions.filter(p => p.status !== 'pending').length === 0 && (
-                      <tr><td colSpan="4" className="py-4 text-center text-slate-500 text-sm">No evaluated predictions yet.</td></tr>
+                      <tr><td colSpan="4" className="py-12 px-6 text-center">
+                        <div className="flex flex-col items-center justify-center">
+                          <ClipboardList size={32} strokeWidth={1} className="text-slate-600 mb-3" />
+                          <div className="text-slate-300 text-sm font-semibold mb-1">No predictions on record yet.</div>
+                          <div className="text-slate-500 text-xs">Make a call on an upcoming match!</div>
+                        </div>
+                      </td></tr>
                     )}
                     {myPredictions.filter(p => p.status !== 'pending').map(p => (
-                      <tr key={p.id}>
-                        <td className="py-3 text-sm text-slate-400">#{p.match_id}</td>
-                        <td className="py-3 text-sm font-bold text-white">Team {p.predicted_winner_team_id}</td>
-                        <td className="py-3 text-xs">
+                      <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 text-sm text-slate-400" style={{ paddingLeft: '32px', paddingRight: '24px' }}>#{p.match_id}</td>
+                        <td className="py-4 text-sm font-bold text-white" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Team {p.predicted_winner_team_id}</td>
+                        <td className="py-4 text-xs" style={{ paddingLeft: '24px', paddingRight: '24px' }}>
                           <span className="px-2 py-1 rounded bg-slate-800 text-slate-300">{p.status}</span>
                         </td>
-                        <td className="py-3 text-sm font-black text-right text-green-400">+{p.points_awarded}</td>
+                        <td className="py-4 text-sm font-black text-right text-green-400" style={{ paddingLeft: '24px', paddingRight: '32px' }}>+{p.points_awarded}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              </div>
             </div>
           </div>
           {}
-          <div className="xl:col-span-1 flex flex-col gap-6">
-             <div className="bg-[#0d131c] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col">
-              <div className="p-6 border-b border-slate-800/50">
-                <h2 className="text-sm font-black uppercase tracking-widest text-slate-300">Global Leaderboard</h2>
-                <p className="text-[10px] text-slate-500 mt-1">Top prediction scores</p>
+          <div className="xl:col-span-1 flex flex-col gap-8">
+             <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 pl-2">
+                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
+                <div>
+                  <h2 className="text-sm font-black uppercase tracking-widest text-white leading-none">Global Leaderboard</h2>
+                  <p className="text-[9px] text-slate-500 mt-1 font-bold tracking-widest uppercase">Top prediction scores</p>
+                </div>
               </div>
-              <div className="flex-1 p-4 overflow-y-auto max-h-[500px]">
+              <div className="bg-[#151A22]/90 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden flex flex-col shadow-xl hover:border-white/10 transition-colors duration-500 relative">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
+              <div className="flex-1 p-5 overflow-y-auto max-h-[500px] custom-scrollbar">
                 {leaderboard.length === 0 ? (
-                  <div className="text-center text-slate-500 py-8 text-sm">No scores yet.</div>
+                  <div className="flex flex-col items-center justify-center py-16 bg-slate-900/20 rounded-xl border border-slate-700/30 border-dashed m-1 group">
+                    <Trophy size={40} strokeWidth={1} className="text-slate-600 mb-3 group-hover:text-amber-500/60 transition-colors" />
+                    <div className="text-slate-300 font-semibold text-sm mb-1">No scores posted yet.</div>
+                    <div className="text-slate-500 text-xs">Be the first to claim the top spot!</div>
+                  </div>
                 ) : (
                   <div className="flex flex-col gap-2">
                     {leaderboard.map((user, idx) => (
@@ -214,6 +253,7 @@ const Predictions = ({ globalGame }) => {
                     ))}
                   </div>
                 )}
+              </div>
               </div>
             </div>
           </div>

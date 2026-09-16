@@ -42,6 +42,9 @@ const RawRecords = ({ globalTournament }) => {
         .spreadsheet-table th, .spreadsheet-table td {
           white-space: nowrap;
         }
+        .spreadsheet-table th { padding: 12px 10px !important; }
+        .spreadsheet-table td { padding: 10px 10px !important; }
+        .spreadsheet-table th:first-child, .spreadsheet-table td:first-child { padding-left: 16px !important; }
         .title-gradient {
           background: linear-gradient(135deg, #38bdf8, #818cf8);
           -webkit-background-clip: text;
@@ -49,22 +52,23 @@ const RawRecords = ({ globalTournament }) => {
         }
       `}</style>
       {}
-      <div className="p-8 pb-6 border-b border-slate-800/80 light:border-slate-200 bg-[#0a0f18]/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between flex-shrink-0 shadow-lg">
+      <div className="border-b border-slate-800/80 light:border-slate-200 bg-[#0a0f18]/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between flex-shrink-0 shadow-lg" style={{ padding: "48px 48px 32px 48px" }}>
         <div>
-          <h1 className="text-3xl font-black uppercase tracking-widest mb-1 title-gradient">Raw Match Records</h1>
+          <h1 className="text-3xl font-black uppercase tracking-widest title-gradient" style={{ marginBottom: "16px" }}>Raw Match Records</h1>
           <p className="text-slate-400 light:text-slate-500 text-sm tracking-wide font-medium">Spreadsheet view of every individual player's match performance.</p>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="flex gap-3">
+        <div className="flex items-center" style={{ gap: "24px" }}>
+          <div className="flex" style={{ gap: "12px" }}>
             {['All', 'Valorant', 'Crossfire'].map(filter => (
               <button
                 key={filter}
                 onClick={() => setGameFilter(filter)}
-                className={`px-6 py-2.5 text-sm font-black uppercase tracking-widest rounded-xl transition-all duration-300 border ${
+                className={`text-sm font-black uppercase tracking-widest transition-all duration-300 border ${
                   gameFilter === filter 
                     ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)] scale-105' 
                     : 'bg-slate-900/50 border-slate-800/60 text-slate-500 hover:text-slate-300 hover:bg-slate-800/80'
                 }`}
+                style={{ padding: "12px 24px", borderRadius: "12px" }}
               >
                 {filter}
               </button>
@@ -72,9 +76,10 @@ const RawRecords = ({ globalTournament }) => {
           </div>
           <button 
             onClick={fetchRecords}
-            className="group flex items-center gap-2 px-6 py-2.5 bg-slate-800/80 hover:bg-slate-700 light:bg-white light:hover:bg-slate-50 border border-slate-700/80 light:border-slate-300 rounded-xl text-white light:text-slate-700 text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-95"
+            className="group flex items-center bg-slate-800/80 hover:bg-slate-700 light:bg-white light:hover:bg-slate-50 border border-slate-700/80 light:border-slate-300 text-white light:text-slate-700 text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-95"
+            style={{ padding: "12px 24px", borderRadius: "12px", gap: "12px" }}
           >
-            <svg className={`w-4 h-4 text-cyan-400 group-hover:rotate-180 transition-transform duration-500 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className={`text-cyan-400 group-hover:rotate-180 transition-transform duration-500 ${loading ? 'animate-spin' : ''}`} style={{ width: "16px", height: "16px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Refresh
@@ -87,7 +92,7 @@ const RawRecords = ({ globalTournament }) => {
         </div>
       )}
       {}
-      <div className="flex-1 p-8 overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-hidden flex flex-col" style={{ padding: "48px" }}>
         <div className="flex-1 overflow-auto custom-scrollbar rounded-2xl border border-slate-700/50 light:border-slate-300 shadow-2xl light:shadow-md bg-[#0b1018] light:bg-white relative">
           <table className="min-w-full text-left border-collapse spreadsheet-table">
             <thead className="bg-[#0f1522] light:bg-slate-50 sticky top-0 z-10 shadow-md">

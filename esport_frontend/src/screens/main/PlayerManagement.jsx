@@ -11,13 +11,13 @@ const IconShield = () => (
   </svg>
 );
 const SectionHeader = ({ icon, label, sub, accent = '#06b6d4' }) => (
-  <div className="px-5 py-3.5 border-b border-slate-800/60 light:border-slate-200 flex items-center gap-3 bg-slate-900/30 light:bg-slate-50">
-    <div className="p-1.5 rounded-lg flex-shrink-0" style={{ backgroundColor: accent + '18', border: `1px solid ${accent}30` }}>
+  <div className="border-b border-slate-800/60 light:border-slate-200 flex items-center gap-8 bg-slate-900/30 light:bg-slate-50" style={{ padding: '32px 48px' }}>
+    <div className="rounded-xl flex-shrink-0" style={{ backgroundColor: accent + '18', border: `1px solid ${accent}30`, padding: '16px' }}>
       <span style={{ color: accent }}>{icon}</span>
     </div>
-    <div>
-      {sub && <div className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-600 light:text-slate-500 mb-0.5">{sub}</div>}
-      <h2 className="text-[11px] font-black text-white light:text-slate-800 uppercase tracking-[0.2em]">{label}</h2>
+    <div className="flex flex-col gap-4">
+      {sub && <div className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 light:text-slate-400">{sub}</div>}
+      <h2 className="text-sm font-black text-white light:text-slate-800 uppercase tracking-[0.2em]">{label}</h2>
     </div>
   </div>
 );
@@ -140,34 +140,45 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
   return (
     <div className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-900">
       <div className="flex-1 overflow-y-auto de-scroll flex flex-col items-center">
-        <div className="w-full max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8 flex flex-col gap-5">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {}
+        <div className="w-full max-w-[95%] flex flex-col" style={{ padding: '64px 32px', gap: '48px' }}>
+          <div className="grid grid-cols-1 xl:grid-cols-2" style={{ gap: '64px' }}>
+            {/* Teams Management Panel */}
             <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col">
               <SectionHeader icon={<IconShield />} label="Teams Management" sub="Add & Remove Teams" accent="#3b82f6" />
-              <div className="p-5 flex-1 flex flex-col">
-                <form onSubmit={handleAddTeam} className="flex gap-3 mb-6">
-                  <div className="flex-1 flex flex-col xl:flex-row gap-3">
+              <div className="flex-1 flex flex-col" style={{ padding: '56px 24px', gap: '32px' }}>
+                <form onSubmit={handleAddTeam} className="flex flex-col max-w-xl self-center" style={{ width: '85%', gap: '32px' }}>
+                  <div className="flex flex-col gap-8 w-full">
                     <input 
                       type="text" 
-                      className={inputBase} 
+                      className={`${inputBase} p-3.5 text-xs rounded-xl`} 
                       placeholder="Enter Team Name..." 
                       value={newTeamName} 
                       onChange={(e) => setNewTeamName(e.target.value)} 
                     />
-                    <input 
-                      id="team-logo-input"
-                      type="file" 
-                      accept="image/*"
-                      className="bg-slate-800/50 light:bg-white border border-slate-700/70 light:border-slate-300 text-white light:text-slate-800 text-[10px] px-3 py-2 rounded-lg outline-none focus:border-cyan-500/70 light:focus:border-blue-500/70 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20 cursor-pointer w-full transition-all" 
-                      onChange={(e) => setNewTeamLogo(e.target.files[0])} 
-                    />
+                    <div className="flex flex-col gap-4">
+                      <label htmlFor="team-logo-input" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Team Logo (Optional)</label>
+                      <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-1.5">
+                        <input 
+                          id="team-logo-input"
+                          type="file" 
+                          accept="image/*"
+                          className="text-white light:text-slate-800 text-[11px] outline-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 cursor-pointer w-full transition-all" 
+                          onChange={(e) => setNewTeamLogo(e.target.files[0])} 
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <button type="submit" className={btnBase} style={{ backgroundColor: '#3b82f6' }}>Add Team</button>
+                  <div className="flex justify-center mt-8">
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg shadow-blue-500/25" style={{ padding: '12px 32px', borderRadius: '9999px' }}>
+                      Add Team
+                    </button>
+                  </div>
                 </form>
                 <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar">
                   {teams.length === 0 ? (
-                    <div className="text-center text-slate-500 light:text-slate-400 py-10 text-xs uppercase tracking-widest font-bold">No teams added yet</div>
+                    <div className="flex w-full justify-center pt-4 pb-10">
+                      <div className="text-slate-500 light:text-slate-400 text-xs uppercase tracking-widest font-bold text-center" style={{ paddingLeft: '0.1em' }}>No teams added yet</div>
+                    </div>
                   ) : (
                     <ul className="space-y-2">
                       {teams.map(t => (
@@ -190,18 +201,20 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
                 </div>
               </div>
             </div>
-            {}
+            {/* Players Management Panel */}
             <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col">
               <SectionHeader icon={<IconUsers />} label="Players Management" sub="Roster Configuration" accent="#00ffcc" />
-              <div className="p-5 flex-1 flex flex-col">
-                <div className="flex gap-2 mb-4 bg-slate-900/50 p-1 rounded-xl w-max">
-                  <button onClick={() => setIsBulkMode(false)} className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${!isBulkMode ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.1)]' : 'text-slate-500 hover:text-slate-300'}`}>Single Add</button>
-                  <button onClick={() => setIsBulkMode(true)} className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${isBulkMode ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.1)]' : 'text-slate-500 hover:text-slate-300'}`}>Bulk Add (6 Players)</button>
+              <div className="flex-1 flex flex-col" style={{ padding: '56px 24px', gap: '32px' }}>
+                <div className="max-w-xl flex justify-center self-center" style={{ width: '85%' }}>
+                  <div className="flex w-full gap-4 bg-slate-900/50 p-1.5 rounded-xl">
+                    <button onClick={() => setIsBulkMode(false)} className={`flex-1 px-4 py-3 text-[11px] uppercase tracking-widest font-bold rounded-lg transition-all ${!isBulkMode ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : 'text-slate-500 hover:text-slate-300'}`}>Single Add</button>
+                    <button onClick={() => setIsBulkMode(true)} className={`flex-1 px-4 py-3 text-[11px] uppercase tracking-widest font-bold rounded-lg transition-all ${isBulkMode ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : 'text-slate-500 hover:text-slate-300'}`}>Bulk Add (6 Players)</button>
+                  </div>
                 </div>
-                <form onSubmit={handleAddPlayer} className="flex flex-col gap-3 mb-6">
+                <form onSubmit={handleAddPlayer} className="flex flex-col max-w-xl self-center" style={{ width: '85%', gap: '32px' }}>
                   <div className="relative">
                     <select 
-                      className={selectBase} 
+                      className={`${selectBase} p-3.5 text-xs rounded-xl`} 
                       value={newPlayerTeamId} 
                       onChange={(e) => setNewPlayerTeamId(e.target.value)}
                       required
@@ -211,37 +224,39 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
                         <option key={t.team_id} value={t.team_id}>{t.team_name}</option>
                       ))}
                     </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">▾</div>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">▼</div>
                   </div>
                   {!isBulkMode ? (
-                    <>
+                    <div className="flex flex-col gap-8 mt-2">
                       <input 
                         type="text" 
-                        className={inputBase} 
+                        className={`${inputBase} p-3.5 text-xs rounded-xl`} 
                         placeholder="Player IGN" 
                         value={newPlayerName} 
                         onChange={(e) => setNewPlayerName(e.target.value)} 
                         required
                       />
-                      <div className="flex gap-3">
-                        <input 
-                          type="text" 
-                          className={inputBase} 
-                          placeholder="Role (e.g. IGL, Rifler, Sniper) - Optional" 
-                          value={newPlayerRole} 
-                          onChange={(e) => setNewPlayerRole(e.target.value)} 
-                        />
-                        <button type="submit" className={btnBase} style={{ backgroundColor: '#00ffcc', color: '#090e14', minWidth: '120px' }}>Add Player</button>
+                      <input 
+                        type="text" 
+                        className={`${inputBase} p-3.5 text-xs rounded-xl`} 
+                        placeholder="Role (e.g. IGL, Rifler, Sniper) - Optional" 
+                        value={newPlayerRole} 
+                        onChange={(e) => setNewPlayerRole(e.target.value)} 
+                      />
+                      <div className="flex justify-center mt-8">
+                        <button type="submit" className="bg-[#00ffcc] text-[#090e14] font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#00ffcc]/25" style={{ padding: '12px 32px', borderRadius: '9999px' }}>
+                          Add Player
+                        </button>
                       </div>
-                    </>
+                    </div>
                   ) : (
-                    <>
-                      <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-8 mt-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {bulkPlayerNames.map((name, idx) => (
                           <input 
                             key={idx}
                             type="text" 
-                            className={inputBase} 
+                            className={`${inputBase} p-3.5 text-xs rounded-xl`} 
                             placeholder={`Player ${idx + 1} IGN`} 
                             value={name} 
                             onChange={(e) => {
@@ -252,13 +267,19 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
                           />
                         ))}
                       </div>
-                      <button type="submit" className={`${btnBase} mt-2`} style={{ backgroundColor: '#00ffcc', color: '#090e14' }}>Add All 6 Players</button>
-                    </>
+                      <div className="flex justify-center mt-8">
+                        <button type="submit" className="bg-[#00ffcc] text-[#090e14] font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#00ffcc]/25" style={{ padding: '12px 32px', borderRadius: '9999px' }}>
+                          Add All 6 Players
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </form>
                 <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar">
                   {players.length === 0 ? (
-                    <div className="text-center text-slate-500 light:text-slate-400 py-10 text-xs uppercase tracking-widest font-bold">No players added yet</div>
+                    <div className="flex w-full justify-center pt-4 pb-10">
+                      <div className="text-slate-500 light:text-slate-400 text-xs uppercase tracking-widest font-bold text-center" style={{ paddingLeft: '0.1em' }}>No players added yet</div>
+                    </div>
                   ) : (
                     <div className="space-y-6">
                       {Object.entries(

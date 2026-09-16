@@ -153,10 +153,12 @@ const DATA = {
       {
         id: 2,
         title: "VCT Challengers",
-        bracket: "NA FINAL: FNATIC vs. LOUD",
-        mapScore: "Map 2: 7-9",
-        type: "bracket",
+        team1: "Sentinels",
+        team2: "100 Thieves",
+        score: "0–0",
+        viewers: "95K",
         isLive: true,
+        type: "match",
       },
       {
         id: 3,
@@ -168,6 +170,34 @@ const DATA = {
         isLive: true,
         type: "match",
       },
+      {
+        id: 4,
+        title: "VCT EMEA — Group Stage",
+        team1: "NAVI",
+        team2: "Team Liquid",
+        score: "0–2",
+        viewers: "70K",
+        isLive: true,
+        type: "match",
+      },
+      {
+        id: 5,
+        title: "VCT Pacific",
+        team1: "Paper Rex",
+        team2: "ZETA DIVISION",
+        score: "",
+        isLive: false,
+        type: "match",
+      },
+      {
+        id: 6,
+        title: "VCT Americas",
+        team1: "Leviatán",
+        team2: "KRÜ Esports",
+        score: "",
+        isLive: false,
+        type: "match",
+      },
     ],
     rankings: [
       { rank: 1, name: "Fnatic", abbr: "FNC", color: "#f97316" },
@@ -175,6 +205,13 @@ const DATA = {
       { rank: 3, name: "LOUD", abbr: "LDN", color: "#22c55e" },
       { rank: 4, name: "DRX", abbr: "DRX", color: "#60a5fa" },
       { rank: 5, name: "Imperial", abbr: "IMP", color: "#10b981" },
+      { rank: 6, name: "Paper Rex", abbr: "PRX", color: "#e11d48" },
+      { rank: 7, name: "Sentinels", abbr: "SEN", color: "#dc2626" },
+      { rank: 8, name: "Cloud9", abbr: "C9", color: "#0ea5e9" },
+      { rank: 9, name: "NRG", abbr: "NRG", color: "#000000" },
+      { rank: 10, name: "NAVI", abbr: "NAV", color: "#eab308" },
+      { rank: 11, name: "ZETA DIVISION", abbr: "ZET", color: "#737373" },
+      { rank: 12, name: "100 Thieves", abbr: "100T", color: "#ef4444" },
     ],
     circuit: [
       {
@@ -380,19 +417,39 @@ const DATA = {
       {
         id: 2,
         title: "CFPL Summer",
-        bracket: "SEMI: AG vs. BS",
-        mapScore: "Map 3: 10-8",
-        type: "bracket",
+        team1: "Q9",
+        team2: "eStar",
+        score: "1–2",
+        viewers: "65K",
         isLive: true,
+        type: "match",
       },
       {
         id: 3,
         title: "CFS Invitational",
-        team1: "Q9",
-        team2: "BD",
+        team1: "Black Dragons",
+        team2: "Imperial",
         score: "1–1",
         viewers: "45K",
         isLive: true,
+        type: "match",
+      },
+      {
+        id: 4,
+        title: "CFPL Autumn",
+        team1: "WE",
+        team2: "R.LGD",
+        score: "",
+        isLive: false,
+        type: "match",
+      },
+      {
+        id: 5,
+        title: "CFS Qualifier",
+        team1: "Vincit",
+        team2: "Anubis",
+        score: "",
+        isLive: false,
         type: "match",
       },
     ],
@@ -402,6 +459,13 @@ const DATA = {
       { rank: 3, name: "Q9", abbr: "Q9", color: "#3b82f6" },
       { rank: 4, name: "Imperial", abbr: "IMP", color: "#10b981" },
       { rank: 5, name: "Black Dragons", abbr: "BD", color: "#6b7280" },
+      { rank: 6, name: "eStar", abbr: "EST", color: "#f97316" },
+      { rank: 7, name: "R.LGD", abbr: "LGD", color: "#dc2626" },
+      { rank: 8, name: "Team WE", abbr: "WE", color: "#ef4444" },
+      { rank: 9, name: "Vincit Gaming", abbr: "VIN", color: "#8b5cf6" },
+      { rank: 10, name: "Anubis Gaming", abbr: "ANU", color: "#d946ef" },
+      { rank: 11, name: "Extenzy", abbr: "EXT", color: "#14b8a6" },
+      { rank: 12, name: "Lazarus", abbr: "LZR", color: "#06b6d4" },
     ],
     circuit: [
       {
@@ -567,45 +631,60 @@ const CrossfireLogo = ({ size = 20, color = "#4c7fd6" }) => (
     <line x1="0" y1="50" x2="100" y2="50" stroke={color} strokeWidth="8" />
   </svg>
 );
-const MatchCard = ({ match, showCountdown, game }) => {
-  const d = DATA[game];
+const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
+  const isLive = match.isLive;
   return (
-    <div className="w-[180px] flex-shrink-0 snap-center rounded-2xl border border-slate-700/40 bg-[#0d131c]/80 backdrop-blur-md p-5 flex flex-col hover:border-slate-400/60 transition-all duration-500 cursor-pointer group shadow-xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)] relative overflow-hidden transform hover:-translate-y-1">
-      {/* Dynamic Background Glow */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${d?.colorClass || 'from-blue-500/10'} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
-      
-      <div className="h-7 mb-2 relative z-10">
-        {showCountdown && (
-          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 text-slate-200 text-[10px] font-black px-2.5 py-1 rounded-lg w-max shadow-inner group-hover:text-white transition-colors">
-            {match.countdown || "2h 13m 27s"}
+    <div 
+      className="match-card snap-center animate-slide-in-right shrink-0 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all duration-300 cursor-pointer"
+      style={{ animationDelay: `${index * 0.08}s` }}
+    >
+      {/* Header Row */}
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+          Day {match.day || 2}
+        </span>
+        {isLive ? (
+          <div className="live-indicator">
+            <span className="live-dot"></span> LIVE
           </div>
-        )}
+        ) : showCountdown ? (
+          <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 text-slate-200 text-[10px] font-black px-2.5 py-1 rounded-lg shadow-inner group-hover:text-white transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            {match.countdown || "2h 13m"}
+          </div>
+        ) : null}
       </div>
-      <div className="text-[11px] font-black tracking-widest uppercase text-slate-500 group-hover:text-slate-400 transition-colors mb-3 relative z-10">
-        Day {match.day || 2}
+
+      {/* Team 1 Row */}
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-3">
+          {match.team1Logo ? (
+            <img src={match.team1Logo} alt={match.team1} className="team-logo" />
+          ) : (
+            <div className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-full font-bold text-white text-xs shadow-md">{match.team1?.[0]}</div>
+          )}
+          <span className="text-white font-semibold truncate max-w-[120px]">{match.team1}</span>
+        </div>
+        <span className="text-xl text-white font-bold">{match.score?.split("–")[0]}</span>
       </div>
-      
-      <div className="flex flex-col gap-3 relative z-10">
-        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors">
-          <div className="w-8 h-8 bg-slate-800/80 backdrop-blur-md rounded-lg flex items-center justify-center border border-slate-700/50 shadow-inner group-hover:border-slate-500/50 transition-colors">
-            {match.team1Logo ? (
-              <img src={match.team1Logo} className="w-full h-full object-contain p-1" />
-            ) : (
-              <span className="text-[11px] text-white font-black">{match.team1?.[0]}</span>
-            )}
-          </div>
-          <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors truncate">{match.team1}</span>
+
+      {/* VS Divider */}
+      <div className="text-center text-[10px] text-slate-500 mb-3 font-semibold relative flex items-center justify-center">
+        <div className="absolute top-1/2 left-0 w-full h-px bg-slate-700/50 z-0"></div>
+        <span className="bg-[#182029] px-2 relative z-10">VS</span>
+      </div>
+
+      {/* Team 2 Row */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          {match.team2Logo ? (
+            <img src={match.team2Logo} alt={match.team2} className="team-logo" />
+          ) : (
+             <div className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-full font-bold text-white text-xs shadow-md">{match.team2?.[0]}</div>
+          )}
+          <span className="text-white font-semibold truncate max-w-[120px]">{match.team2}</span>
         </div>
-        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors">
-          <div className="w-8 h-8 bg-slate-800/80 backdrop-blur-md rounded-lg flex items-center justify-center border border-slate-700/50 shadow-inner group-hover:border-slate-500/50 transition-colors">
-            {match.team2Logo ? (
-              <img src={match.team2Logo} className="w-full h-full object-contain p-1" />
-            ) : (
-              <span className="text-[11px] text-white font-black">{match.team2?.[0]}</span>
-            )}
-          </div>
-          <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors truncate">{match.team2}</span>
-        </div>
+        <span className="text-xl text-white font-bold">{match.score?.split("–")[1]}</span>
       </div>
     </div>
   );
@@ -613,274 +692,157 @@ const MatchCard = ({ match, showCountdown, game }) => {
 const LiveUpcomingTab = ({ game }) => {
   const d = DATA[game];
   const [showCountdown, setShowCountdown] = useState(true);
+  const [showAllRankings, setShowAllRankings] = useState(false);
+  const scrollRef = useRef(null);
+  
+  const scroll = (dir) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: dir * 280, behavior: 'smooth' });
+    }
+  };
+  
+  // Parse qualifier slots for progress bar
+  const slotsMatch = d.qualifier.slots.match(/(\d+)\s*\/\s*(\d+)/);
+  const slotsFilled = slotsMatch ? parseInt(slotsMatch[1]) : 0;
+  const slotsTotal = slotsMatch ? parseInt(slotsMatch[2]) : 64;
+  const slotsPercent = Math.round((slotsFilled / slotsTotal) * 100);
   
   return (
     <div className="flex flex-col gap-8">
       {/* Upcoming Matches Section */}
-      <div className="relative bg-[#0d131c] p-6 rounded-3xl border border-slate-700/40 shadow-[0_8px_30px_rgb(0,0,0,0.4)] overflow-hidden">
+      <section className="relative bg-[#0d131c] rounded-3xl border border-slate-700/40 shadow-[0_8px_30px_rgb(0,0,0,0.4)] overflow-hidden animate-fade-in-up w-full" style={{ padding: '24px 32px', boxSizing: 'border-box', marginBottom: '32px' }}>
         {/* Abstract Background Glow */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] blur-[80px] rounded-full pointer-events-none -translate-x-1/3 translate-y-1/3" style={{ backgroundColor: `${d.color}15` }} />
         
         <div className="relative z-10">
           <div className="flex items-center justify-between border-b border-slate-800/60 pb-5 mb-5">
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-cyan-500 mb-1">Live & Upcoming</div>
-              <h2 className="text-2xl font-black text-white tracking-wide flex items-center gap-3">
-                <IconCalendar /> Upcoming Matches
-              </h2>
-            </div>
-            <div className="flex items-center gap-3 bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800">
-              <button 
-                onClick={() => setShowCountdown(!showCountdown)}
-                className={`w-10 h-5 rounded-full relative transition-colors duration-300 shadow-inner ${showCountdown ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-slate-700'}`}
-              >
-                <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] transition-transform duration-300 ${showCountdown ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-              </button>
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Countdown</span>
+            <div />
+            <div className="flex items-center gap-4">
+              {/* Scroll arrows */}
+              <div className="hidden md:flex items-center gap-2">
+                <button 
+                  onClick={() => scroll(-1)} 
+                  className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-90"
+                >
+                  <IconChevronLeft />
+                </button>
+                <button 
+                  onClick={() => scroll(1)} 
+                  className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-90"
+                >
+                  <IconChevronRight />
+                </button>
+              </div>
+              <div className="flex items-center gap-3 bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800">
+                <button 
+                  onClick={() => setShowCountdown(!showCountdown)}
+                  className={`w-10 h-5 rounded-full relative transition-colors duration-300 shadow-inner ${showCountdown ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-slate-700'}`}
+                >
+                  <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] transition-transform duration-300 ${showCountdown ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
+                </button>
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Countdown</span>
+              </div>
             </div>
           </div>
-          
-          <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 w-full" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <div className="relative z-10 w-full pt-4">
+          <div 
+            ref={scrollRef}
+            className="match-scroll-container snap-x snap-mandatory items-start w-full pb-4" 
+          >
             {d.liveMatches.map((match, idx) => (
               <MatchCard 
                 key={match.id || idx} 
                 match={{...match, countdown: `${idx + 1}d ${idx + 2}h 13m`, day: idx + 2}} 
                 showCountdown={showCountdown} 
                 game={game}
+                index={idx}
               />
             ))}
             <div className="min-w-[20px] shrink-0" />
           </div>
         </div>
-      </div>
+        </div>
+      </section>
       
-      <div className="flex flex-col xl:flex-row gap-6">
-        <div className="w-full xl:w-[280px] shrink-0 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col">
-          <div className="px-5 py-4 border-b border-slate-800/50 light:border-slate-200 flex items-center justify-between">
+      {/* Team Rankings Section */}
+      <section className="w-full flex flex-col gap-6">
+        <div className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col animate-fade-in-up stagger-1 w-full" style={{ padding: '24px 32px', boxSizing: 'border-box', marginBottom: '32px' }}>
+          <div className="pb-5 border-b border-slate-800/50 light:border-slate-200 flex items-center justify-between mb-4">
             <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-                Global
-              </div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-                Team Rankings
+              <h2 className="text-lg font-black uppercase tracking-widest text-white light:text-slate-900 flex items-center gap-3">
+                <IconTrophy /> Team Rankings
               </h2>
             </div>
-            <div className="text-slate-600">
+            <div className="text-slate-600 bg-slate-800/40 p-2 rounded-xl">
               <IconTrend />
             </div>
           </div>
-          <div className="flex-1 p-4 flex flex-col gap-1">
-            {d.rankings.map((team) => (
-              <div
-                key={team.rank}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-slate-800/50 light:hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-700/50 light:hover:border-slate-200"
-              >
-                <span className="w-5 text-right font-bold text-slate-500 light:text-slate-400 text-sm shrink-0">
-                  {team.rank}.
-                </span>
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-lg light:shadow-sm"
-                  style={{
-                    backgroundColor: team.color + "33",
-                    border: `1px solid ${team.color}55`,
-                  }}
-                >
-                  <span style={{ color: team.color }}>{team.abbr[0]}</span>
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-bold text-slate-200 light:text-slate-800 group-hover:text-cyan-400 light:group-hover:text-cyan-600 transition-colors truncate">
-                    {team.name}
-                  </span>
-                  <span className="text-[9px] font-bold text-slate-600 light:text-slate-400 tracking-widest uppercase">
-                    {game === "VALORANT" ? "VAL" : "CF"}
-                  </span>
-                </div>
-              </div>
-            ))}
-            <button className="mt-3 py-2.5 px-3 rounded-xl text-[10px] font-black tracking-widest uppercase text-cyan-500 border border-cyan-900/40 bg-cyan-900/10 hover:bg-cyan-900/30 hover:text-cyan-400 transition-all group">
-              View all Rankings{" "}
-              <span className="inline-block ml-1 group-hover:translate-x-1 transition-transform">
-                →
-              </span>
-            </button>
+          <div className="flex-1 overflow-auto max-h-[500px]" style={{ scrollbarWidth: "thin", scrollbarColor: "#334155 transparent" }}>
+            <table className="w-full text-left border-collapse min-w-[700px]">
+              <thead className="bg-[#1a2332] text-white sticky top-0 z-10 shadow-md">
+                <tr>
+                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase text-center w-20">Pos</th>
+                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase">Team</th>
+                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">W</th>
+                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">L</th>
+                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">D</th>
+                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">Pts</th>
+                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase text-center w-24">Form</th>
+                </tr>
+              </thead>
+              <tbody>
+                {d.rankings.map((team, idx) => {
+                  const isGold = team.rank === 1;
+                  const isSilver = team.rank === 2;
+                  const isBronze = team.rank === 3;
+                  
+                  // Dark theme compatible striping and medal colors
+                  const bgClass = isGold ? 'bg-yellow-500/10' : 
+                                  isSilver ? 'bg-slate-300/10' : 
+                                  isBronze ? 'bg-orange-500/10' : 
+                                  idx % 2 === 0 ? 'bg-slate-800/20' : 'bg-transparent';
+                                  
+                  const textColor = isGold ? 'text-yellow-500' : 
+                                    isSilver ? 'text-slate-300' : 
+                                    isBronze ? 'text-orange-400' : 
+                                    'text-slate-300';
+                                    
+                  const borderColor = isGold ? 'border-yellow-500/20' : 
+                                      isSilver ? 'border-slate-300/20' : 
+                                      isBronze ? 'border-orange-500/20' : 
+                                      'border-slate-800/50';
+
+                  return (
+                    <tr 
+                      key={team.rank}
+                      className={`${bgClass} ${textColor} hover:bg-slate-800/40 transition-all duration-200 border-b ${borderColor} last:border-0`}
+                    >
+                      <td className={`py-3 px-6 text-center font-black text-sm border-r ${borderColor} bg-black/20`}>
+                        {team.rank}
+                      </td>
+                      <td className="py-3 px-6 font-black text-sm tracking-wide uppercase">
+                        {team.name}
+                      </td>
+                      <td className="py-3 px-4 text-center font-bold text-sm">{20 - Math.floor(idx/3)}</td>
+                      <td className="py-3 px-4 text-center font-bold text-sm">{5 + Math.floor(idx/4)}</td>
+                      <td className="py-3 px-4 text-center font-bold text-sm">2</td>
+                      <td className="py-3 px-4 text-center font-black text-sm">{63 - idx}</td>
+                      <td className={`py-3 px-6 text-center text-sm font-black bg-black/20 border-l ${borderColor}`}>
+                        {idx % 4 !== 3 ? (
+                          <span className="text-emerald-500">▲</span>
+                        ) : (
+                          <span className="text-red-500">▼</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-      {}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
-        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-          <div className="px-5 py-4 border-b border-slate-800/50 light:border-slate-200">
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-              FPS Circuit
-            </div>
-            <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-              Snapshot: Valorant & Crossfire
-            </h2>
-          </div>
-          <div className="p-5 flex flex-col gap-6">
-            {}
-            <div>
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800/40 light:border-slate-100">
-                <ValorantLogo size={14} color="#ff4655" />
-                <span className="text-xs font-black tracking-widest uppercase text-white light:text-slate-800">
-                  VALORANT
-                </span>
-              </div>
-              <div className="flex flex-col gap-2">
-                {DATA.VALORANT.circuit.map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col gap-1 px-3 py-2.5 rounded-xl bg-slate-800/30 light:bg-slate-50 hover:bg-slate-800/60 light:hover:bg-slate-100 border-l-[3px] border-l-transparent hover:border-l-[#ff4655] transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${c.hot ? "bg-orange-500" : "bg-red-500"} animate-pulse mt-0.5 shrink-0`}
-                      />
-                      <span className="text-xs text-slate-400 light:text-slate-600 group-hover:text-slate-200 light:group-hover:text-slate-900 transition-colors leading-snug">
-                        <span className="text-slate-500 light:text-slate-500">
-                          {c.event}
-                        </span>{" "}
-                        —{" "}
-                        <span className="text-white light:text-slate-800 font-bold">
-                          {c.match}
-                        </span>
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-500 light:text-slate-400 pl-4.5">
-                      {c.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {}
-            <div>
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800/40 light:border-slate-100">
-                <CrossfireLogo size={14} color="#4c7fd6" />
-                <span className="text-xs font-black tracking-widest uppercase text-white light:text-slate-800">
-                  CROSSFIRE
-                </span>
-              </div>
-              <div className="flex flex-col gap-2">
-                {DATA.CROSSFIRE.circuit.map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col gap-1 px-3 py-2.5 rounded-xl bg-slate-800/30 light:bg-slate-50 hover:bg-slate-800/60 light:hover:bg-slate-100 border-l-[3px] border-l-transparent hover:border-l-[#4c7fd6] transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${c.hot ? "bg-blue-400" : "bg-slate-500"} animate-pulse mt-0.5 shrink-0`}
-                      />
-                      <span className="text-xs text-slate-400 light:text-slate-600 group-hover:text-slate-200 light:group-hover:text-slate-900 transition-colors leading-snug">
-                        <span className="text-slate-500 light:text-slate-500">
-                          {c.event}
-                        </span>{" "}
-                        —{" "}
-                        <span className="text-white light:text-slate-800 font-bold">
-                          {c.match}
-                        </span>
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-500 light:text-slate-400 pl-4.5">
-                      {c.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        {}
-        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm relative group">
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${d.colorClass} to-transparent opacity-30 group-hover:opacity-50 transition-opacity duration-500 pointer-events-none`}
-          />
-          <div
-            className="absolute right-0 bottom-0 w-64 h-64 opacity-5 blur-3xl rounded-full pointer-events-none"
-            style={{ backgroundColor: d.color }}
-          />
-          <div className="relative z-10 px-5 py-4 border-b border-slate-800/50 light:border-slate-200 flex items-center justify-between">
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-                FPS
-              </div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-                Open Qualifiers
-              </h2>
-            </div>
-            {game === "VALORANT" ? (
-              <ValorantLogo size={22} color={d.color} />
-            ) : (
-              <CrossfireLogo size={22} color={d.color} />
-            )}
-          </div>
-          <div className="relative z-10 p-5">
-            <div className="bg-[#080d14]/80 light:bg-white/80 backdrop-blur-sm rounded-xl border border-slate-700/50 light:border-slate-200 p-5 shadow-lg light:shadow-sm">
-              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-800/50 light:border-slate-200">
-                {game === "VALORANT" ? (
-                  <ValorantLogo size={20} color={d.color} />
-                ) : (
-                  <CrossfireLogo size={20} color={d.color} />
-                )}
-                <span className="font-black tracking-widest text-white light:text-slate-900 text-sm">
-                  {game}
-                </span>
-              </div>
-              <h3 className="font-black text-white light:text-slate-900 text-base mb-4 leading-snug">
-                {d.qualifier.title}
-              </h3>
-              <div className="space-y-2.5 mb-5 bg-slate-900/60 light:bg-slate-50 p-3.5 rounded-lg border border-slate-800/50 light:border-slate-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 light:text-slate-400 uppercase tracking-wider">
-                    Prize Pool
-                  </span>
-                  <span className="font-black text-emerald-400 text-sm">
-                    {d.qualifier.prize}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 light:text-slate-400 uppercase tracking-wider">
-                    Deadline
-                  </span>
-                  <span className="font-black text-white light:text-slate-900 text-sm">
-                    {d.qualifier.deadline}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 light:text-slate-400 uppercase tracking-wider">
-                    Slots Taken
-                  </span>
-                  <span className="font-black text-cyan-400 light:text-cyan-600 text-sm">
-                    {d.qualifier.slots}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() =>
-                  alert(`Redirecting to ${d.qualifier.title} registration...`)
-                }
-                className="w-full py-3 rounded-lg font-black tracking-widest text-xs uppercase transition-all duration-300 active:scale-95 hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]"
-                style={{
-                  background: `linear-gradient(135deg, ${d.color}22, #06b6d422)`,
-                  border: `1px solid ${d.color}44`,
-                  color: d.color,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = d.color;
-                  e.target.style.color = "#fff";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = `linear-gradient(135deg, ${d.color}22, #06b6d422)`;
-                  e.target.style.color = d.color;
-                }}
-              >
-                Register Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };
@@ -910,392 +872,259 @@ const ResultTab = ({ game, globalTournament }) => {
       )
       .catch(console.error);
   }, [game, globalTournament?.name]);
+
+  // Dynamically group matches by their league property
+  const groupedTimeline = (d.results?.timeline || []).reduce((acc, match) => {
+    const league = match.league || 'OTHER';
+    if (!acc[league]) {
+      acc[league] = [];
+    }
+    acc[league].push(match);
+    return acc;
+  }, {});
+
   return (
-    <div className="flex flex-col gap-6">
-      {" "}
-      {}{" "}
-      <div className="flex flex-col xl:flex-row gap-6">
-        {" "}
-        {}{" "}
-        <div className="flex-1 min-w-0 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-          {" "}
-          <div className="px-5 py-4 border-b border-slate-800/50 light:border-slate-200 flex items-center gap-3">
-            {" "}
-            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              {" "}
-              <IconTrophy />{" "}
-            </div>{" "}
-            <div>
-              {" "}
-              <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-                Tournament
-              </div>{" "}
-              <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-                Final Results & Key Stats
-              </h2>{" "}
-            </div>{" "}
-          </div>{" "}
-          <div className="overflow-x-auto">
-            {" "}
-            <table className="w-full text-left border-collapse min-w-[480px]">
-              {" "}
-              <thead>
-                {" "}
-                <tr className="text-[9px] uppercase tracking-widest text-slate-500 light:text-slate-600 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/40 light:bg-slate-50">
-                  {" "}
-                  <th className="px-4 py-3">Rank</th>{" "}
-                  <th className="px-4 py-3">Team</th>{" "}
-                  <th className="px-4 py-3 text-center">Prize</th>{" "}
-                  <th className="px-4 py-3 text-center">Record</th>{" "}
-                  <th className="px-4 py-3 text-center">Pts</th>{" "}
-                </tr>{" "}
-              </thead>{" "}
-              <tbody>
-                {" "}
-                {d.results.table.map((row) => (
-                  <tr
-                    key={row.rank}
-                    className="border-b border-slate-800/30 light:border-slate-200 hover:bg-slate-800/20 light:hover:bg-slate-50 transition-colors group"
-                  >
-                    {" "}
-                    <td className="px-4 py-3">
-                      {" "}
-                      {row.rank <= 3 ? (
-                        <div
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shadow-sm"
-                          style={{
-                            backgroundColor: medalColors[row.rank] + "20",
-                            color: medalColors[row.rank],
-                            border: `1px solid ${medalColors[row.rank]}40`,
-                          }}
-                        >
-                          {" "}
-                          {row.rank}{" "}
-                        </div>
-                      ) : (
-                        <span className="text-slate-500 light:text-slate-400 font-bold text-sm pl-2">
-                          {row.rank}
-                        </span>
-                      )}{" "}
-                    </td>{" "}
-                    <td className="px-4 py-3">
-                      {" "}
-                      <div className="flex items-center gap-2.5">
-                        {" "}
-                        <div
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black shadow-sm"
-                          style={{
-                            backgroundColor: row.color + "22",
-                            border: `1px solid ${row.color}44`,
-                            color: row.color,
-                          }}
-                        >
-                          {" "}
-                          {row.abbr}{" "}
-                        </div>{" "}
-                        <span className="text-sm font-bold text-slate-200 light:text-slate-800 group-hover:text-white light:group-hover:text-slate-900 transition-colors">
-                          {row.team}
-                        </span>{" "}
-                      </div>{" "}
-                    </td>{" "}
-                    <td className="px-4 py-3 text-center text-sm font-bold text-emerald-400 light:text-emerald-600">
-                      {row.prize}
-                    </td>{" "}
-                    <td className="px-4 py-3 text-center text-sm font-mono text-slate-400 light:text-slate-600">
-                      {row.record}
-                    </td>{" "}
-                    <td className="px-4 py-3 text-center">
-                      {" "}
-                      <span className="text-sm font-black text-white light:text-slate-800 bg-slate-800/60 light:bg-slate-100 px-2.5 py-0.5 rounded-full">
-                        {row.pts}
-                      </span>{" "}
-                    </td>{" "}
-                  </tr>
-                ))}{" "}
-              </tbody>{" "}
-            </table>{" "}
-          </div>{" "}
-        </div>{" "}
-        {}{" "}
-        <div className="w-full xl:w-[300px] shrink-0 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col">
-          {" "}
-          <div className="px-5 py-4 border-b border-slate-800/50 light:border-slate-200">
-            {" "}
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-              Playoff
-            </div>{" "}
-            <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-              Bracket Results
-            </h2>{" "}
-          </div>{" "}
-          <div className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
-            {" "}
-            {liveBrackets.map((b, i) => (
-              <div
-                key={i}
-                className="bg-slate-900/60 light:bg-slate-50 rounded-xl border border-slate-800/50 light:border-slate-200 p-3.5 hover:border-slate-700/70 light:hover:border-slate-300 transition-colors shadow-sm"
-              >
-                {" "}
-                <div className="flex justify-between items-center mb-2.5 text-[9px] uppercase tracking-widest font-bold text-slate-500 light:text-slate-400">
-                  {" "}
-                  <span>{b.round}</span>{" "}
-                  <span className="text-cyan-600 light:text-cyan-600">
-                    {b.bestOf}
-                  </span>{" "}
-                </div>{" "}
-                <div className="flex items-center justify-between gap-2">
-                  {" "}
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    {" "}
-                    <div className="w-9 h-9 rounded-lg bg-slate-800 light:bg-white border border-slate-700 light:border-slate-200 flex items-center justify-center text-xs font-black text-slate-400 light:text-slate-600 shadow-inner overflow-hidden">
-                      {b.team1Logo ? (
-                        <img
-                          src={b.team1Logo}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        b.team1[0]
-                      )}
-                    </div>{" "}
-                    <span className="text-[9px] font-bold text-slate-400 light:text-slate-600 text-center leading-tight">
-                      {b.team1}
-                    </span>{" "}
-                  </div>{" "}
-                  <div className="flex flex-col items-center gap-0.5">
-                    {" "}
-                    <div className="flex items-center gap-1.5">
-                      {" "}
-                      <span className="text-xl font-black text-white light:text-slate-900">
-                        {b.score1}
-                      </span>{" "}
-                      <span className="text-slate-600 light:text-slate-400 font-bold">
-                        –
-                      </span>{" "}
-                      <span className="text-xl font-black text-slate-400 light:text-slate-600">
-                        {b.score2}
-                      </span>{" "}
-                    </div>{" "}
-                    <span className="text-[8px] text-slate-600 light:text-slate-400 font-mono">
-                      {b.map}
-                    </span>{" "}
-                  </div>{" "}
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    {" "}
-                    <div className="w-9 h-9 rounded-lg bg-slate-800 light:bg-white border border-slate-700 light:border-slate-200 flex items-center justify-center text-xs font-black text-slate-400 light:text-slate-600 shadow-inner overflow-hidden">
-                      {b.team2Logo ? (
-                        <img
-                          src={b.team2Logo}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        b.team2[0]
-                      )}
-                    </div>{" "}
-                    <span className="text-[9px] font-bold text-slate-400 light:text-slate-600 text-center leading-tight">
-                      {b.team2}
-                    </span>{" "}
-                  </div>{" "}
-                </div>{" "}
+    <div className="dashboard-wrapper">
+      
+      {/* Top Left: Leaderboard Panel */}
+      <div className="glass-panel">
+        <h2 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+          <span className="text-yellow-500"><IconTrophy /></span> FINAL RESULTS & KEY STATS
+        </h2>
+        
+        <table className="stats-table">
+          <thead>
+            <tr>
+              <th className="text-left w-16">RANK</th>
+              <th className="text-left">TEAM</th>
+              <th className="text-center">PRIZE</th>
+              <th className="text-center">RECORD</th>
+              <th className="text-center">PTS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {d.results.table.map((row) => {
+              const rank = row.rank;
+              const rankClass = rank <= 3 ? `rank-${rank}` : 'text-gray-400';
+              
+              return (
+                <tr key={row.rank} className="rounded-lg">
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <span className={`rank-pill ${rankClass}`}>{rank}</span>
+                      {rank === 1 && <span className="text-yellow-500 text-sm">🏆</span>}
+                      {rank === 2 && <span className="text-gray-300 text-sm">🥈</span>}
+                      {rank === 3 && <span className="text-orange-400 text-sm">🥉</span>}
+                    </div>
+                  </td>
+                  <td className="text-white font-semibold flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-[10px] shadow-sm">
+                      {row.abbr}
+                    </div>
+                    {row.team}
+                  </td>
+                  <td className="text-center text-emerald-400 font-mono">
+                    {row.prize}
+                  </td>
+                  <td className="text-center text-slate-300 font-mono">{row.record}</td>
+                  <td className="text-center text-white font-bold">{row.pts}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Top Right: Bracket Visualization */}
+      <div className="bracket-panel">
+        <h2 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+          <span className="text-cyan-400"><IconTrend /></span> BRACKET RESULTS
+        </h2>
+        {liveBrackets.length > 0 ? (
+          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-4">
+             {liveBrackets.map((b, i) => (
+                <div
+                  key={i}
+                  className="bg-slate-900/40 rounded-xl border border-slate-800/50 p-4 transition-colors shadow-sm hover:border-slate-700/80"
+                >
+                  <div className="flex justify-between items-center mb-2.5 text-[9px] uppercase tracking-widest font-bold text-slate-400">
+                    <span>{b.round}</span>
+                    <span className="text-cyan-500">{b.bestOf}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                      <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
+                        {b.team1Logo ? <img src={b.team1Logo} className="w-full h-full object-contain"/> : b.team1[0]}
+                      </div>
+                      <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team1}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-lg font-black text-white">{b.score1}</span>
+                        <span className="text-slate-600 font-bold">–</span>
+                        <span className="text-lg font-black text-slate-400">{b.score2}</span>
+                      </div>
+                      <span className="text-[8px] text-slate-500 font-mono">{b.map}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                      <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
+                        {b.team2Logo ? <img src={b.team2Logo} className="w-full h-full object-contain"/> : b.team2[0]}
+                      </div>
+                      <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team2}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="empty-bracket-placeholder">
+            <span className="text-sm tracking-wider uppercase">
+              Bracket data pending
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Full Width: Timeline Section */}
+      <div className="glass-panel w-full" style={{ gridColumn: 'span 2' }}>
+        <div className="flex justify-between items-center" style={{ marginBottom: "40px" }}>
+          <h2 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-purple-400">🗓️</span> TOURNAMENT MATCH TIMELINE
+          </h2>
+          <button className="btn-glow-cyan flex items-center gap-2 text-[10px] uppercase tracking-widest">
+            <span className="mr-1">🔄</span> TOURNAMENT REPLAY
+          </button>
+        </div>
+
+        {/* Dynamically render a separate row for each league */}
+        <div className="flex flex-col gap-8">
+          {Object.entries(groupedTimeline).map(([league, matches]) => (
+            <div key={league} className="timeline-category">
+              {/* League Header */}
+              <div className="flex items-center gap-3 mb-3">
+                <span className={`league-indicator indicator-${league.toLowerCase()}`}></span>
+                <h3 className="text-sm text-slate-300 font-bold uppercase tracking-widest">
+                  {league} Timeline
+                </h3>
               </div>
-            ))}{" "}
-          </div>{" "}
-        </div>{" "}
-      </div>{" "}
-      {}{" "}
-      <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-        {" "}
-        <div className="px-5 py-4 border-b border-slate-800/50 light:border-slate-200 flex items-center justify-between">
-          {" "}
-          <div>
-            {" "}
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-500 light:text-slate-400 mb-0.5">
-              Match History
-            </div>{" "}
-            <h2 className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-              Tournament Match Timeline
-            </h2>{" "}
-          </div>{" "}
-          <button
-            onClick={() => alert("Opening tournament replay...")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-black tracking-widest uppercase transition-all hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95"
-            style={{
-              borderColor: "#06b6d480",
-              color: "#06b6d4",
-              backgroundColor: "#06b6d415",
-            }}
-          >
-            {" "}
-            <IconReplay /> Tournament Replay{" "}
-          </button>{" "}
-        </div>{" "}
-        <div className="p-5">
-          {" "}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {" "}
-            {}{" "}
-            <div>
-              {" "}
-              <div className="flex items-center gap-2 mb-3">
-                {" "}
-                <ValorantLogo size={14} color="#ff4655" />{" "}
-                <span className="text-xs font-black tracking-widest uppercase text-white light:text-slate-800">
-                  VCT
-                </span>{" "}
-              </div>{" "}
-              <div className="flex flex-col gap-2">
-                {" "}
-                {d.results.timeline
-                  .filter((t) => t.league === "VCT")
-                  .map((t, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between bg-slate-900/50 light:bg-slate-50 rounded-xl px-4 py-3 border border-slate-800/40 light:border-slate-200 hover:border-slate-700/50 light:hover:border-slate-300 transition-colors group cursor-pointer shadow-sm"
-                    >
-                      {" "}
-                      <div className="flex flex-col gap-0.5">
-                        {" "}
-                        <span className="text-[9px] uppercase tracking-widest text-slate-500 light:text-slate-400 font-bold">
-                          {t.stage}
-                        </span>{" "}
-                        <div className="flex items-center gap-2">
-                          {" "}
-                          <div className="w-7 h-7 rounded bg-slate-800 light:bg-white border light:border-slate-200 flex items-center justify-center text-[9px] font-black text-slate-400 light:text-slate-600 shadow-inner">
-                            {t.team1[0]}
-                          </div>{" "}
-                          <span className="text-sm font-black text-white light:text-slate-900">
-                            {t.score}
-                          </span>{" "}
-                          <div className="w-7 h-7 rounded bg-slate-800 light:bg-white border light:border-slate-200 flex items-center justify-center text-[9px] font-black text-slate-400 light:text-slate-600 shadow-inner">
-                            {t.team2[0]}
-                          </div>{" "}
-                        </div>{" "}
-                      </div>{" "}
-                      <div className="text-right">
-                        {" "}
-                        <div className="text-xs font-bold text-slate-300 light:text-slate-700">
-                          {t.team1}
-                        </div>{" "}
-                        <div className="text-[9px] text-slate-600 light:text-slate-400">
-                          vs {t.team2}
-                        </div>{" "}
-                      </div>{" "}
+
+              {/* Independent Horizontal Scroll */}
+              <div className="timeline-scroll-row">
+                {matches.map((match, idx) => (
+                  <div key={idx} className="timeline-card">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mb-2 block">
+                      {match.stage}
+                    </span>
+                    <div className="flex items-center gap-4 text-white font-bold text-xl">
+                      <div className="team-circle">{match.team1[0]}</div>
+                      <span className="text-cyan-400">{match.score}</span>
+                      <div className="team-circle">{match.team2[0]}</div>
                     </div>
-                  ))}{" "}
-              </div>{" "}
-            </div>{" "}
-            {}{" "}
-            <div>
-              {" "}
-              <div className="flex items-center gap-2 mb-3">
-                {" "}
-                <CrossfireLogo size={14} color="#4c7fd6" />{" "}
-                <span className="text-xs font-black tracking-widest uppercase text-white light:text-slate-800">
-                  CFPL
-                </span>{" "}
-              </div>{" "}
-              <div className="flex flex-col gap-2">
-                {" "}
-                {d.results.timeline
-                  .filter((t) => t.league === "CFPL")
-                  .map((t, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between bg-slate-900/50 light:bg-slate-50 rounded-xl px-4 py-3 border border-slate-800/40 light:border-slate-200 hover:border-slate-700/50 light:hover:border-slate-300 transition-colors group cursor-pointer shadow-sm"
-                    >
-                      {" "}
-                      <div className="flex flex-col gap-0.5">
-                        {" "}
-                        <span className="text-[9px] uppercase tracking-widest text-slate-500 light:text-slate-400 font-bold">
-                          {t.stage}
-                        </span>{" "}
-                        <div className="flex items-center gap-2">
-                          {" "}
-                          <div className="w-7 h-7 rounded bg-slate-800 light:bg-white border light:border-slate-200 flex items-center justify-center text-[9px] font-black text-slate-400 light:text-slate-600 shadow-inner">
-                            {t.team1[0]}
-                          </div>{" "}
-                          <span className="text-sm font-black text-white light:text-slate-900">
-                            {t.score}
-                          </span>{" "}
-                          <div className="w-7 h-7 rounded bg-slate-800 light:bg-white border light:border-slate-200 flex items-center justify-center text-[9px] font-black text-slate-400 light:text-slate-600 shadow-inner">
-                            {t.team2[0]}
-                          </div>{" "}
-                        </div>{" "}
-                      </div>{" "}
-                      <div className="text-right">
-                        {" "}
-                        <div className="text-xs font-bold text-slate-300 light:text-slate-700">
-                          {t.team1}
-                        </div>{" "}
-                        <div className="text-[9px] text-slate-600 light:text-slate-400">
-                          vs {t.team2}
-                        </div>{" "}
-                      </div>{" "}
+                    <div className="text-right text-[10px] text-slate-500 mt-2 flex flex-col items-end">
+                      <span>{match.team1} vs {match.team2}</span>
+                      <span>Map: {match.map}</span>
                     </div>
-                  ))}{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>{" "}
-        </div>{" "}
-      </div>{" "}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };
 const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
-  const days = ["M", "T", "W", "T", "F", "S", "S"];
-  const offset = 2;
-  const totalDays = 31;
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 6, 1)); // Default to July 2026
+  const daysOfWeek = ["M", "T", "W", "T", "F", "S", "S"];
+  
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  
+  let startDay = new Date(year, month, 1).getDay();
+  startDay = startDay === 0 ? 6 : startDay - 1; // Make Monday first day
+  
+  const monthName = currentDate.toLocaleString("default", { month: "long" });
+
   const cells = [];
-  for (let i = 0; i < offset; i++) cells.push(null);
+  for (let i = 0; i < startDay; i++) cells.push(null);
   for (let d = 1; d <= totalDays; d++) cells.push(d);
-  const today = 9;
+
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+  // Using 9 as static today for mockup purposes when in July 2026
+  const today = month === 6 && year === 2026 ? 9 : null; 
+
   return (
-    <div className="select-none">
-      {" "}
-      {}{" "}
-      <div className="flex items-center justify-between mb-4">
-        {" "}
-        <button className="text-slate-500 light:text-slate-400 hover:text-white light:hover:text-slate-700 transition-colors p-1 rounded">
-          <IconChevronLeft />
-        </button>{" "}
-        <span className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-          July 2026
-        </span>{" "}
-        <button className="text-slate-500 light:text-slate-400 hover:text-white light:hover:text-slate-700 transition-colors p-1 rounded">
-          <IconChevronRight />
-        </button>{" "}
-      </div>{" "}
-      {}{" "}
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {" "}
-        {days.map((d, i) => (
-          <div
-            key={i}
-            className="text-[9px] font-black text-slate-600 uppercase tracking-wider text-center"
-          >
-            {d}
-          </div>
-        ))}{" "}
-      </div>{" "}
-      {}{" "}
-      <div className="grid grid-cols-7 gap-1">
-        {" "}
-        {cells.map((day, i) => {
-          if (!day) return <div key={i} />;
-          const isToday = day === today;
-          const isHighlighted = highlightDays.includes(day);
-          const isSelected = selectedDay === day;
+    <div className="calendar-card">
+      <div className="calendar-header-wrapper">
+        {/* Subtitle */}
+        <div className="calendar-subtitle">
+          <IconCalendar /> SCHEDULE
+        </div>
+
+        {/* Month Navigation */}
+        <div className="calendar-month-nav">
+          <button onClick={prevMonth} className="nav-arrow">
+            <IconChevronLeft />
+          </button>
+          <h2 className="calendar-month-title">{monthName} {year}</h2>
+          <button onClick={nextMonth} className="nav-arrow">
+            <IconChevronRight />
+          </button>
+        </div>
+
+        {/* Days of the Week */}
+        <div className="calendar-days-row">
+          {daysOfWeek.map((day, idx) => (
+            <span key={idx}>{day}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Dates Grid */}
+      <div className="calendar-grid">
+        {cells.map((date, idx) => {
+          if (!date) return <div key={idx} className="date-cell empty"></div>;
+          
+          const isSelected = date === selectedDay;
+          const isToday = date === today;
+          const isMatchDay = highlightDays.includes(date);
+
           return (
-            <button
-              key={i}
-              onClick={() => onSelectDay(day === selectedDay ? null : day)}
-              className={`h-7 w-full rounded-lg text-[11px] font-bold transition-all flex items-center justify-center                ${isSelected ? "bg-cyan-500 text-white scale-110 shadow-[0_0_10px_rgba(6,182,212,0.5)]" : isToday ? "bg-blue-600 text-white ring-2 ring-blue-400/50" : isHighlighted ? "bg-pink-600/80 light:bg-pink-500 text-white hover:bg-pink-500" : "text-slate-400 light:text-slate-600 hover:bg-slate-800 light:hover:bg-slate-100 hover:text-white light:hover:text-slate-900"}              `}
+            <div 
+              key={idx} 
+              onClick={() => onSelectDay(date === selectedDay ? null : date)}
+              className={`date-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
             >
-              {" "}
-              {day}{" "}
-            </button>
+              {date}
+              {isMatchDay && <div className="match-dot"></div>}
+            </div>
           );
-        })}{" "}
-      </div>{" "}
+        })}
+      </div>
+
+      {/* Divider */}
+      <div className="w-full h-px bg-slate-700/50 my-4"></div>
+
+      {/* Legend */}
+      <div className="flex flex-col gap-3">
+        <div className="legend-item">
+          <div className="legend-dot bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+          TODAY
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot bg-[#ff0055] shadow-[0_0_8px_#ff0055]"></div>
+          MATCH DAY
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></div>
+          SELECTED
+        </div>
+      </div>
     </div>
   );
 };
@@ -1446,19 +1275,23 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
   };
 
   const inputClass = (val) =>
-    `w-full bg-slate-900/50 rounded px-3 py-2 text-white ${showErrors && !val && val !== 0 ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "border border-slate-800"}`;
+    `w-full bg-slate-900/50 rounded-xl px-4 py-3 text-white transition-all ${showErrors && !val && val !== 0 ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "border border-slate-800 focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] outline-none"}`;
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-6 shadow-xl">
-        <h2 className="text-xl font-black uppercase text-white light:text-slate-900 mb-6">
+    <div className="flex justify-center w-full mb-10">
+      <div className="flex flex-col w-full px-4 lg:px-8">
+      <div 
+        className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full"
+        style={{ padding: '32px', boxSizing: 'border-box', marginBottom: '24px', marginTop: '24px' }}
+      >
+        <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 text-center tracking-widest m-0" style={{ marginBottom: '32px' }}>
           Manage Brackets
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="md:col-span-2 grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
+        <div className="flex flex-col gap-8 mb-10 w-full">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
                 ROUND
               </label>
               <input
@@ -1470,8 +1303,8 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
                 disabled={isSubmitting}
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
+            <div className="flex-1">
+              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
                 BEST OF
               </label>
               <input
@@ -1483,8 +1316,8 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
                 disabled={isSubmitting}
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
+            <div className="flex-1">
+              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
                 MAP INFO
               </label>
               <input
@@ -1498,140 +1331,150 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border border-slate-800 p-4 rounded-xl">
-            <h3 className="font-bold text-cyan-500">TEAM A</h3>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                NAME
-              </label>
-              <input
-                type="text"
-                value={teamA}
-                onChange={(e) => setTeamA(e.target.value)}
-                className={inputClass(teamA)}
-                placeholder="e.g. All Gamers"
-                disabled={isSubmitting}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                LOGO
-              </label>
-              <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
+            <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team A</div>
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-[2]">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  NAME
+                </label>
                 <input
-                  type="file"
-                  accept="image/*"
+                  type="text"
+                  value={teamA}
+                  onChange={(e) => setTeamA(e.target.value)}
+                  className={inputClass(teamA)}
+                  placeholder="e.g. All Gamers"
                   disabled={isSubmitting}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      setTeamAFile(file);
-                      const reader = new FileReader();
-                      reader.onloadend = () => setTeamALogo(reader.result);
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded px-3 py-1 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400"
                 />
-                {teamALogo && (
-                  <img
-                    src={teamALogo}
-                    alt="Preview"
-                    className="w-8 h-8 object-contain rounded bg-slate-800"
-                  />
-                )}
               </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                SCORE
-              </label>
-              <input
-                type="number"
-                value={scoreA}
-                onChange={(e) => setScoreA(e.target.value)}
-                className={inputClass(scoreA)}
-                placeholder="0"
-                disabled={isSubmitting}
-              />
+              <div className="flex-[3]">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  LOGO
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isSubmitting}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setTeamAFile(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => setTeamALogo(reader.result);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                  />
+                  {teamALogo && (
+                    <img
+                      src={teamALogo}
+                      alt="Preview"
+                      className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  SCORE
+                </label>
+                <input
+                  type="number"
+                  value={scoreA}
+                  onChange={(e) => setScoreA(e.target.value)}
+                  className={inputClass(scoreA)}
+                  placeholder="0"
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border border-slate-800 p-4 rounded-xl">
-            <h3 className="font-bold text-cyan-500">TEAM B</h3>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                NAME
-              </label>
-              <input
-                type="text"
-                value={teamB}
-                onChange={(e) => setTeamB(e.target.value)}
-                className={inputClass(teamB)}
-                placeholder="e.g. Baisha Gaming"
-                disabled={isSubmitting}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                LOGO
-              </label>
-              <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
+            <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team B</div>
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-[2]">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  NAME
+                </label>
                 <input
-                  type="file"
-                  accept="image/*"
+                  type="text"
+                  value={teamB}
+                  onChange={(e) => setTeamB(e.target.value)}
+                  className={inputClass(teamB)}
+                  placeholder="e.g. Baisha Gaming"
                   disabled={isSubmitting}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      setTeamBFile(file);
-                      const reader = new FileReader();
-                      reader.onloadend = () => setTeamBLogo(reader.result);
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded px-3 py-1 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400"
                 />
-                {teamBLogo && (
-                  <img
-                    src={teamBLogo}
-                    alt="Preview"
-                    className="w-8 h-8 object-contain rounded bg-slate-800"
-                  />
-                )}
               </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">
-                SCORE
-              </label>
-              <input
-                type="number"
-                value={scoreB}
-                onChange={(e) => setScoreB(e.target.value)}
-                className={inputClass(scoreB)}
-                placeholder="0"
-                disabled={isSubmitting}
-              />
+              <div className="flex-[3]">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  LOGO
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isSubmitting}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setTeamBFile(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => setTeamBLogo(reader.result);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                  />
+                  {teamBLogo && (
+                    <img
+                      src={teamBLogo}
+                      alt="Preview"
+                      className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                  SCORE
+                </label>
+                <input
+                  type="number"
+                  value={scoreB}
+                  onChange={(e) => setScoreB(e.target.value)}
+                  className={inputClass(scoreB)}
+                  placeholder="0"
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
           </div>
         </div>
         {showErrors && (
-          <div className="text-red-500 text-xs font-bold mb-4 uppercase animate-pulse">
+          <div className="text-red-500 text-xs font-bold mb-6 text-center uppercase animate-pulse">
             Please fill in all required fields.
           </div>
         )}
-        <button
-          onClick={addBracket}
-          disabled={isSubmitting}
-          className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black uppercase rounded transition-colors shadow-[0_0_15px_rgba(6,182,212,0.4)] disabled:opacity-50"
-        >
-          {isSubmitting ? "Saving to Database..." : "Add Bracket"}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
+          <button
+            onClick={addBracket}
+            disabled={isSubmitting}
+            className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
+            style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
+          >
+            {isSubmitting ? "Saving..." : "Add Bracket"}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-6 shadow-xl">
-        <h3 className="text-sm font-black uppercase text-slate-400 mb-4">
+      <div 
+        className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl mt-6"
+        style={{ padding: '32px', boxSizing: 'border-box' }}
+      >
+        <h3 className="text-sm font-black uppercase text-slate-400 mb-4 mt-0">
           Current Brackets
         </h3>
         <div className="flex flex-col gap-2">
@@ -1684,6 +1527,7 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
@@ -1836,18 +1680,22 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
   };
 
   const inputClass = (val) =>
-    `w-full bg-slate-900/50 rounded px-3 py-2 text-white ${showErrors && !val ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "border border-slate-800"}`;
+    `w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-3 text-white text-sm transition-all ${showErrors && !val ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] outline-none"}`;
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-6 shadow-xl">
-        <h2 className="text-xl font-black uppercase text-white light:text-slate-900 mb-6">
+    <div className="flex justify-center w-full mb-10">
+      <div className="flex flex-col w-full px-4 lg:px-8">
+      <div 
+        className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full"
+        style={{ padding: '32px', boxSizing: 'border-box', marginBottom: '24px', marginTop: '24px' }}
+      >
+        <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 text-center tracking-widest m-0" style={{ marginBottom: '32px' }}>
           Manage Schedule
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" style={{ padding: '0 8px' }}>
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TEAM A NAME
             </label>
             <input
@@ -1860,7 +1708,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TEAM A LOGO
             </label>
             <div className="flex items-center gap-2">
@@ -1877,19 +1725,20 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
                     reader.readAsDataURL(file);
                   }
                 }}
-                className="w-full bg-slate-900/50 border border-slate-800 rounded px-3 py-1.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400"
+                className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
               />
               {teamALogo && (
                 <img
                   src={teamALogo}
                   alt="Preview"
-                  className="w-8 h-8 object-contain rounded bg-slate-800"
+                  className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
                 />
               )}
             </div>
           </div>
+
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TEAM B NAME
             </label>
             <input
@@ -1902,7 +1751,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TEAM B LOGO
             </label>
             <div className="flex items-center gap-2">
@@ -1919,19 +1768,20 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
                     reader.readAsDataURL(file);
                   }
                 }}
-                className="w-full bg-slate-900/50 border border-slate-800 rounded px-3 py-1.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400"
+                className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
               />
               {teamBLogo && (
                 <img
                   src={teamBLogo}
                   alt="Preview"
-                  className="w-8 h-8 object-contain rounded bg-slate-800"
+                  className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
                 />
               )}
             </div>
           </div>
+
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               DAY (JULY 2026)
             </label>
             <input
@@ -1943,7 +1793,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TIME
             </label>
             <input
@@ -1955,8 +1805,9 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
               disabled={isSubmitting}
             />
           </div>
+
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold text-slate-500 mb-1">
+            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
               TIMEZONE LABEL
             </label>
             <input
@@ -1970,21 +1821,27 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
           </div>
         </div>
         {showErrors && (
-          <div className="text-red-500 text-xs font-bold mb-4 uppercase animate-pulse">
+          <div className="text-red-500 text-xs font-bold mt-6 text-center uppercase animate-pulse">
             Please fill in all required fields.
           </div>
         )}
-        <button
-          onClick={addMatch}
-          disabled={isSubmitting}
-          className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black uppercase rounded transition-colors shadow-[0_0_15px_rgba(6,182,212,0.4)] disabled:opacity-50"
-        >
-          {isSubmitting ? "Saving to Database..." : "Add Match"}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
+          <button
+            onClick={addMatch}
+            disabled={isSubmitting}
+            className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
+            style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
+          >
+            {isSubmitting ? "Saving..." : "Add Match"}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-6 shadow-xl">
-        <h3 className="text-sm font-black uppercase text-slate-400 mb-4">
+      <div 
+        className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl mt-6"
+        style={{ padding: '32px', boxSizing: 'border-box' }}
+      >
+        <h3 className="text-sm font-black uppercase text-slate-400 mb-4 mt-0">
           Current Schedule
         </h3>
         <div className="flex flex-col gap-2">
@@ -2038,6 +1895,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
           ))}
         </div>
       </div>
+      </div>
     </div>
   );
 };
@@ -2069,96 +1927,57 @@ const ScheduleTab = ({ game, globalTournament }) => {
     setReminders((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
-      <div className="w-full lg:w-[280px] shrink-0 flex flex-col gap-4">
-        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-5 shadow-xl light:shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="text-slate-400">
-              <IconCalendar />
-            </div>
-            <span className="text-sm font-black uppercase tracking-widest text-white light:text-slate-900">
-              Schedule
-            </span>
-          </div>
-          <MiniCalendar
-            highlightDays={highlightDays}
-            selectedDay={selectedDay}
-            onSelectDay={setSelectedDay}
-          />
-
-          <div className="mt-4 pt-4 border-t border-slate-800/50 light:border-slate-200 flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-blue-600" />
-              <span className="text-[9px] text-slate-500 light:text-slate-400">
-                Today
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-pink-600" />
-              <span className="text-[9px] text-slate-500 light:text-slate-400">
-                Match day
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-cyan-500" />
-              <span className="text-[9px] text-slate-500 light:text-slate-400">
-                Selected
-              </span>
-            </div>
-          </div>
-        </div>
-        {}
-        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 p-4 shadow-xl light:shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black uppercase tracking-widest text-white light:text-slate-900">
-              Filter by Game
-            </span>
-            <button
-              onClick={() => setFilterByGame(!filterByGame)}
-              className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${filterByGame ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" : "bg-slate-700 light:bg-slate-300"}`}
-            >
-              <div
-                className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${filterByGame ? "translate-x-5" : "translate-x-0"}`}
-              />
-            </button>
-          </div>
-          {}
-          <div className="flex flex-col gap-2">
-            {["VALORANT", "CROSSFIRE"].map((g) => (
+    <div className="dashboard-section flex flex-col lg:flex-row gap-8 h-full">
+      <div className="w-full lg:w-[380px] shrink-0 flex flex-col gap-6">
+        <MiniCalendar
+          highlightDays={highlightDays}
+          selectedDay={selectedDay}
+          onSelectDay={setSelectedDay}
+        />
+        <div className="glass-panel">
+          <div className="filter-container">
+            {/* Header Row */}
+            <div className="filter-header-row">
+              <h3 className="filter-title">FILTER BY GAME</h3>
               <button
-                key={g}
-                onClick={() => setActiveGame(g)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all border ${
-                  activeGame === g
-                    ? "bg-slate-800/80 light:bg-slate-100 border-slate-600 light:border-slate-300 text-white light:text-slate-900"
-                    : "border-transparent text-slate-500 light:text-slate-400 hover:text-slate-300 light:hover:text-slate-600 hover:bg-slate-800/40 light:hover:bg-slate-50"
-                }`}
+                onClick={() => setFilterByGame(!filterByGame)}
+                className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${filterByGame ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" : "bg-slate-700 light:bg-slate-300"}`}
               >
                 <div
-                  className={`w-2.5 h-2.5 rounded-full ${activeGame === g ? "animate-pulse" : ""}`}
-                  style={{ backgroundColor: DATA[g].color }}
+                  className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${filterByGame ? "translate-x-5" : "translate-x-0"}`}
                 />
-                {g}
-                {activeGame === g && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                )}
               </button>
-            ))}
+            </div>
+
+            {/* Game List */}
+            <div className="filter-list">
+              {["VALORANT", "CROSSFIRE"].map((g) => {
+                const isActive = activeGame === g;
+                return (
+                  <div
+                    key={g}
+                    onClick={() => setActiveGame(g)}
+                    className={`game-filter-item ${isActive ? "active" : ""}`}
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: DATA[g].color, boxShadow: `0 0 8px ${DATA[g].color}` }}
+                    />
+                    <span className={`font-bold text-sm tracking-wide ${isActive ? "text-white" : "text-slate-400"}`}>
+                      {g}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
-      {}
-      <div className="flex-1 min-w-0 flex flex-col gap-4">
-        {}
+      <div className="glass-panel flex-1 min-w-0 flex flex-col gap-6">
         <div className="flex items-center gap-4">
-          {activeGame === "VALORANT" ? (
-            <ValorantLogo size={28} color={DATA[activeGame].color} />
-          ) : (
-            <CrossfireLogo size={28} color={DATA[activeGame].color} />
-          )}
           <div className="pb-1 border-b-2 border-slate-700/50 flex-1">
             <span
-              className="text-lg font-black uppercase tracking-widest"
+              className="text-xl font-black uppercase tracking-widest"
               style={{ color: DATA[activeGame].color }}
             >
               {activeGame}
@@ -2244,14 +2063,53 @@ const ScheduleTab = ({ game, globalTournament }) => {
 };
 const Tournament = ({ globalGame, globalTournament }) => {
   const activeGame = (globalGame || "VALORANT").toUpperCase();
-  const [activeTab, setActiveTab] = useState("SCHEDULE");
+  const [activeTab, setActiveTab] = useState("LIVE & UPCOMING");
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const tabsRef = useRef({});
+
+  useEffect(() => {
+    const activeTabElement = tabsRef.current[activeTab];
+    if (activeTabElement) {
+      setIndicatorStyle({
+        left: activeTabElement.offsetLeft,
+        width: activeTabElement.offsetWidth,
+      });
+    }
+  }, [activeTab]);
+  
   const tabs = [
-    "LIVE & UPCOMING",
-    "RESULT",
-    "SCHEDULE",
-    "MANAGE SCHEDULE",
-    "MANAGE BRACKET",
+    { 
+      key: "LIVE & UPCOMING", 
+      icon: (
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)]"></span>
+        </span>
+      ), 
+      label: "LIVE & UPCOMING" 
+    },
+    { 
+      key: "RESULT", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>, 
+      label: "RESULT" 
+    },
+    { 
+      key: "SCHEDULE", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>, 
+      label: "SCHEDULE" 
+    },
+    { 
+      key: "MANAGE SCHEDULE", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>, 
+      label: "MANAGE SCHEDULE" 
+    },
+    { 
+      key: "MANAGE BRACKET", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>, 
+      label: "MANAGE BRACKET" 
+    },
   ];
+  
   const renderTab = () => {
     switch (activeTab) {
       case "LIVE & UPCOMING":
@@ -2282,6 +2140,7 @@ const Tournament = ({ globalGame, globalTournament }) => {
         return null;
     }
   };
+  
   return (
     <div className="flex-1 bg-[#090e14] light:bg-[#f8fafc] text-white light:text-slate-900 flex flex-col h-full overflow-hidden">
       <style>{`
@@ -2293,45 +2152,41 @@ const Tournament = ({ globalGame, globalTournament }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
       {}
-      <div className="shrink-0 px-8 md:px-12 pt-6 pb-0 bg-[#090e14] light:bg-white flex flex-col items-center">
-        <div className="w-full max-w-[1400px]">
+      <div className="shrink-0 px-8 md:px-12 pt-6 pb-0 bg-gradient-to-b from-[#0a1018] to-[#090e14] light:from-white light:to-[#f8fafc] flex flex-col items-center relative overflow-hidden">
+        {/* Subtle ambient glow behind header */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[200px] bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[400px] h-[150px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
+        
+        <div className="w-full max-w-[1400px] relative z-10">
           {}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-1 h-8 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.8)]"
-                style={{
-                  background: "linear-gradient(180deg, #00ffcc, #3b82f6)",
-                }}
+          <div className="flex justify-center items-center w-full mb-6" style={{ padding: '16px 0' }}>
+            <div className="relative flex items-center justify-between max-w-[1200px] w-full gap-4 md:gap-12 overflow-x-auto scrollbar-hide pb-2 border-b border-slate-800/60 light:border-slate-200">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  ref={(el) => (tabsRef.current[tab.key] = el)}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-3 px-8 py-3 text-[0.85rem] md:text-[0.95rem] font-bold tracking-[0.1em] uppercase border-none bg-transparent cursor-pointer transition-all duration-300 shrink-0 z-10 ${
+                    activeTab === tab.key
+                      ? "text-white"
+                      : "text-[#94a3b8] hover:text-white"
+                  }`}
+                >
+                  <span className="opacity-80">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+
+              {/* The Sliding Bar */}
+              <div 
+                className="absolute bottom-[-1px] h-[3px] bg-cyan-400 rounded-full shadow-[0_0_12px_rgba(0,240,255,1)] pointer-events-none" 
+                style={{ 
+                  left: `${indicatorStyle.left}px`, 
+                  width: `${indicatorStyle.width}px`,
+                  transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
+                }} 
               />
-              <div>
-                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 light:text-slate-400 mb-0.5">
-                  Esport League
-                </div>
-                <h1 className="text-xl md:text-2xl font-black tracking-[0.15em] uppercase text-white light:text-slate-900">
-                  Tournaments
-                </h1>
-              </div>
             </div>
-          </div>
-          {}
-          <div className="flex items-center gap-6 border-b border-slate-800/60 light:border-slate-200">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative pb-4 text-[11px] font-black tracking-widest uppercase whitespace-nowrap transition-colors duration-200 ${
-                  activeTab === tab
-                    ? "text-white light:text-slate-900"
-                    : "text-slate-500 light:text-slate-400 hover:text-slate-300 light:hover:text-slate-600"
-                }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-sm bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                )}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -2343,3 +2198,4 @@ const Tournament = ({ globalGame, globalTournament }) => {
   );
 };
 export default Tournament;
+

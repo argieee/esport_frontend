@@ -291,35 +291,35 @@ const Leaderboards = ({ globalGame }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
       <div className="flex-1 overflow-y-auto custom-scrollbar px-8 lg:px-12 pb-16 pt-8 flex flex-col items-center">
-        <div className="w-full max-w-[1400px] space-y-12">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="w-full max-w-[1400px] flex flex-col" style={{ gap: '48px' }}>
+          <div className="grid grid-cols-1 xl:grid-cols-12" style={{ gap: '40px' }}>
             {}
-            <div className="xl:col-span-5 space-y-8 flex flex-col">
+            <div className="xl:col-span-5 flex flex-col" style={{ gap: '32px' }}>
               {}
               <div className="bg-[#121a25] rounded-xl overflow-hidden border border-[#232f40] shadow-xl">
-                <div className="bg-[#182331] py-4 text-center border-b border-[#232f40]">
+                <div className="bg-[#182331] text-center border-b border-[#232f40]" style={{ padding: '24px 32px' }}>
                   <h3 className="text-sm font-black tracking-[0.2em] text-gray-300 uppercase">Standings</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-base text-center">
                     <thead className="bg-[#151e2b] text-gray-400 font-bold text-xs tracking-wider border-b border-[#232f40]">
                       <tr>
-                        <th className="py-4 px-2 w-16">RANK</th>
-                        <th className="py-4 px-4 text-left">TEAM NAME</th>
-                        <th className="py-4 px-4 w-16 text-[#00ffcc]">W</th>
-                        <th className="py-4 px-4 w-16 text-[#ff4655]">L</th>
+                        <th className="w-16" style={{ padding: '16px 8px' }}>RANK</th>
+                        <th className="text-left" style={{ padding: '16px' }}>TEAM NAME</th>
+                        <th className="w-16 text-[#00ffcc]" style={{ padding: '16px' }}>W</th>
+                        <th className="w-16 text-[#ff4655]" style={{ padding: '16px' }}>L</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#1e2938]">
                       {standings.map((row) => (
                         <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer text-sm">
-                          <td className="py-4 px-2 font-mono text-gray-500 group-hover:text-white bg-[#151e2b]/50 transition-colors">{row.rank}</td>
-                          <td className="py-4 px-4 text-left font-bold flex items-center space-x-3 text-gray-200 group-hover:text-white transition-colors">
+                          <td className="font-mono text-gray-500 group-hover:text-white bg-[#151e2b]/50 transition-colors" style={{ padding: '16px 8px' }}>{row.rank}</td>
+                          <td className="text-left font-bold flex items-center space-x-3 text-gray-200 group-hover:text-white transition-colors" style={{ padding: '16px' }}>
                             <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#2a3a52] to-[#405470] flex-shrink-0 border border-white/5 shadow-sm"></div>
                             <span className="truncate">{row.team}</span>
                           </td>
-                          <td className="py-4 px-4 text-[#00ffcc] font-black bg-[#151e2b]/30">{row.w}</td>
-                          <td className="py-4 px-4 text-[#ff4655] font-black">{row.l}</td>
+                          <td className="text-[#00ffcc] font-black bg-[#151e2b]/30" style={{ padding: '16px' }}>{row.w}</td>
+                          <td className="text-[#ff4655] font-black" style={{ padding: '16px' }}>{row.l}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -327,32 +327,32 @@ const Leaderboards = ({ globalGame }) => {
                 </div>
               </div>
               {}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2" style={{ gap: '24px' }}>
                 <div className="bg-[#121a25] rounded-xl overflow-hidden border border-[#232f40] shadow-xl">
-                  <div className="bg-[#182331] py-3 text-center border-b border-[#232f40]">
+                  <div className="bg-[#182331] text-center border-b border-[#232f40]" style={{ padding: '20px 24px' }}>
                     <h3 className="text-xs font-bold tracking-[0.15em] text-gray-400 uppercase">Set Difference</h3>
                   </div>
                   <table className="w-full text-sm text-center">
                     <tbody className="divide-y divide-[#1e2938]">
                       {setDiff.map((row) => (
                         <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors cursor-pointer group">
-                          <td className="py-3 px-2 text-gray-500 w-12 border-r border-[#1e2938]">{row.rank}.</td>
-                          <td className="py-3 px-4 font-mono text-[#8a9db8] font-bold">{row.diff > 0 ? '+'+row.diff : row.diff}</td>
+                          <td className="text-gray-500 w-12 border-r border-[#1e2938]" style={{ padding: '12px 8px' }}>{row.rank}.</td>
+                          <td className="font-mono text-[#8a9db8] font-bold" style={{ padding: '12px 16px' }}>{row.diff > 0 ? '+'+row.diff : row.diff}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
                 <div className="bg-[#121a25] rounded-xl overflow-hidden border border-[#232f40] shadow-xl">
-                  <div className="bg-[#182331] py-3 text-center border-b border-[#232f40]">
+                  <div className="bg-[#182331] text-center border-b border-[#232f40]" style={{ padding: '20px 24px' }}>
                     <h3 className="text-xs font-bold tracking-[0.15em] text-gray-400 uppercase">Round Difference</h3>
                   </div>
                   <table className="w-full text-sm text-center">
                     <tbody className="divide-y divide-[#1e2938]">
                       {roundDiff.map((row) => (
                         <tr key={row.rank} onClick={() => setSelectedTeam(row)} className="hover:bg-[#1a2533] transition-colors cursor-pointer group">
-                          <td className="py-3 px-2 text-gray-500 w-12 border-r border-[#1e2938]">{row.rank}.</td>
-                          <td className="py-3 px-4 font-mono text-[#8a9db8] font-bold">{row.diff > 0 ? '+'+row.diff : row.diff}</td>
+                          <td className="text-gray-500 w-12 border-r border-[#1e2938]" style={{ padding: '12px 8px' }}>{row.rank}.</td>
+                          <td className="font-mono text-[#8a9db8] font-bold" style={{ padding: '12px 16px' }}>{row.diff > 0 ? '+'+row.diff : row.diff}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -362,7 +362,7 @@ const Leaderboards = ({ globalGame }) => {
               {}
               <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden flex flex-col">
                  <div className="grid grid-cols-[1fr_auto_1fr] items-stretch bg-[#151e2b] border-b border-[#232f40]">
-                    <div className="py-5 px-8 flex justify-between items-center transition-colors duration-500" style={{ background: `linear-gradient(to right, ${theme.leftAccent}1A, transparent)` }}>
+                     <div className="flex justify-between items-center transition-colors duration-500" style={{ padding: '32px 40px', background: `linear-gradient(to right, ${theme.leftAccent}1A, transparent)` }}>
                       <div className="flex flex-col">
                          <span style={{ color: theme.leftAccent }} className="text-xs font-bold tracking-widest uppercase mb-1">Best Player</span>
                          <span className="font-black text-white text-lg tracking-wide">{playerMatchup.playerLeft}</span>
@@ -373,7 +373,7 @@ const Leaderboards = ({ globalGame }) => {
                     <div className="px-6 flex items-center justify-center bg-[#0f1722] border-x border-[#232f40]">
                       <span className="text-sm font-black text-gray-600 italic tracking-widest">VS</span>
                     </div>
-                    <div className="py-5 px-8 flex justify-between items-center transition-colors duration-500" style={{ background: `linear-gradient(to left, ${theme.rightAccent}1A, transparent)` }}>
+                     <div className="flex justify-between items-center transition-colors duration-500" style={{ padding: '32px 40px', background: `linear-gradient(to left, ${theme.rightAccent}1A, transparent)` }}>
                       <div className="w-12 h-12 rounded-full bg-[#1e2938] border-2 shadow-lg relative overflow-hidden flex items-center justify-center" style={{ borderColor: theme.rightAccent, boxShadow: `0 0 15px ${theme.rightAccent}4D` }}>
                       </div>
                       <div className="flex flex-col text-right">
@@ -385,21 +385,21 @@ const Leaderboards = ({ globalGame }) => {
                  <table className="w-full text-center text-base">
                    <thead className="bg-[#0f1722] text-xs text-gray-500 font-bold tracking-[0.2em] uppercase">
                      <tr>
-                       <th className="py-4 border-r border-[#232f40] w-1/5">Rank</th>
-                       <th className="py-4 border-r border-[#232f40] w-1/5 text-gray-400">Value</th>
-                       <th className="py-4 border-r border-[#232f40] w-1/5 bg-[#151e2b] text-gray-300">Stats</th>
-                       <th className="py-4 border-r border-[#232f40] w-1/5">Rank</th>
-                       <th className="py-4 w-1/5 text-gray-400">Value</th>
+                       <th className="border-r border-[#232f40] w-1/5" style={{ padding: '16px 0' }}>Rank</th>
+                       <th className="border-r border-[#232f40] w-1/5 text-gray-400" style={{ padding: '16px 0' }}>Value</th>
+                       <th className="border-r border-[#232f40] w-1/5 bg-[#151e2b] text-gray-300" style={{ padding: '16px 0' }}>Stats</th>
+                       <th className="border-r border-[#232f40] w-1/5" style={{ padding: '16px 0' }}>Rank</th>
+                       <th className="w-1/5 text-gray-400" style={{ padding: '16px 0' }}>Value</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-[#1e2938]">
                      {playerMatchup.stats.map((row, i) => (
                        <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                         <td className="py-4 border-r border-[#232f40] text-gray-500 font-bold">{row.leftRank}</td>
-                         <td style={{ color: theme.leftAccent }} className="py-4 border-r border-[#232f40] font-black text-lg">{row.leftVal}</td>
-                         <td className="py-4 border-r border-[#232f40] bg-[#151e2b] text-gray-300 text-sm font-bold tracking-widest">{row.stat}</td>
-                         <td className="py-4 border-r border-[#232f40] text-gray-500 font-bold">{row.rightRank}</td>
-                         <td style={{ color: theme.rightAccent }} className="py-4 font-black text-lg">{row.rightVal}</td>
+                         <td className="border-r border-[#232f40] text-gray-500 font-bold" style={{ padding: '16px 0' }}>{row.leftRank}</td>
+                         <td className="border-r border-[#232f40] font-black text-lg" style={{ color: theme.leftAccent, padding: '16px 0' }}>{row.leftVal}</td>
+                         <td className="border-r border-[#232f40] bg-[#151e2b] text-gray-300 text-sm font-bold tracking-widest" style={{ padding: '16px 0' }}>{row.stat}</td>
+                         <td className="border-r border-[#232f40] text-gray-500 font-bold" style={{ padding: '16px 0' }}>{row.rightRank}</td>
+                         <td className="font-black text-lg" style={{ color: theme.rightAccent, padding: '16px 0' }}>{row.rightVal}</td>
                        </tr>
                      ))}
                    </tbody>
@@ -407,11 +407,11 @@ const Leaderboards = ({ globalGame }) => {
               </div>
             </div>
             {}
-            <div className="xl:col-span-7 space-y-8 flex flex-col">
+            <div className="xl:col-span-7 flex flex-col" style={{ gap: '32px' }}>
               {}
               <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden relative group">
                 <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-                <div className="flex justify-between items-center p-8 pb-4 relative z-10">
+                <div className="flex justify-between items-center relative z-10" style={{ padding: '40px', paddingBottom: '24px' }}>
                   <select 
                     value={h2hLeft} onChange={e => setH2hLeft(e.target.value)} 
                     className="bg-[#182331] border border-[#232f40] text-sm font-bold text-gray-200 rounded-lg py-2 px-4 focus:outline-none"
@@ -433,7 +433,7 @@ const Leaderboards = ({ globalGame }) => {
                     {standings.map(t => <option key={t.team} value={t.team}>{t.team}</option>)}
                   </select>
                 </div>
-                <div className="px-10 pb-10 pt-6 flex-1 flex flex-col justify-between space-y-8 relative z-10">
+                <div className="flex-1 flex flex-col justify-between space-y-8 relative z-10" style={{ padding: '24px 40px 40px 40px' }}>
                   {h2h.stats.map((stat, i) => {
                     const leftPercent = stat.max > 0 ? (stat.left / stat.max) * 100 : 0;
                     const rightPercent = stat.max > 0 ? (stat.right / stat.max) * 100 : 0;
@@ -457,19 +457,19 @@ const Leaderboards = ({ globalGame }) => {
                 </div>
               </div>
               {}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '32px' }}>
                 {}
-                <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden p-6 space-y-6">
-                  <h3 className="text-sm font-black tracking-widest text-gray-200 uppercase border-b border-[#232f40] pb-4">Map Analytics</h3>
+                <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden space-y-8" style={{ padding: '40px' }}>
+                  <h3 className="text-sm font-black tracking-widest text-gray-200 uppercase border-b border-[#232f40]" style={{ paddingBottom: '24px' }}>Map Analytics</h3>
                   <div className="space-y-4">
                      {mapAnalytics.winRates.slice(0,3).map((m, i) => (
-                       <div key={i} className="flex justify-between items-center bg-[#151e2b] p-4 rounded-lg border border-[#232f40]">
+                       <div key={i} className="flex justify-between items-center bg-[#151e2b] rounded-lg border border-[#232f40]" style={{ padding: '16px' }}>
                          <span className="font-bold text-gray-300 text-sm">{m.map}</span>
-                         <span className="font-black text-white text-base bg-[#4c7fd6]/20 text-[#4c7fd6] px-3 py-1 rounded-md">{m.overallWinRate.toFixed(0)}% Win Rate</span>
+                         <span className="font-black text-white text-base bg-[#4c7fd6]/20 text-[#4c7fd6] rounded-md" style={{ padding: '4px 12px' }}>{m.overallWinRate.toFixed(0)}% Win Rate</span>
                        </div>
                      ))}
                      {mapAnalytics.hottestMap && (
-                       <div className="bg-gradient-to-br from-[#1e3a8a]/40 to-transparent p-4 rounded-lg border border-[#4c7fd6]/30">
+                       <div className="bg-gradient-to-br from-[#1e3a8a]/40 to-transparent rounded-lg border border-[#4c7fd6]/30" style={{ padding: '16px' }}>
                          <p className="text-xs font-bold text-gray-400 uppercase mb-1">Hottest Map</p>
                          <p className="text-xl font-black text-white">{mapAnalytics.hottestMap.map} <span className="text-sm font-medium text-gray-400">({mapAnalytics.hottestMap.winRate})</span></p>
                        </div>
@@ -477,17 +477,17 @@ const Leaderboards = ({ globalGame }) => {
                   </div>
                 </div>
                 {}
-                <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden p-6 space-y-6">
-                  <h3 className="text-sm font-black tracking-widest text-gray-200 uppercase border-b border-[#232f40] pb-4">Team Rosters K/D</h3>
+                <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl overflow-hidden space-y-8" style={{ padding: '40px' }}>
+                  <h3 className="text-sm font-black tracking-widest text-gray-200 uppercase border-b border-[#232f40]" style={{ paddingBottom: '24px' }}>Team Rosters K/D</h3>
                   <div className="space-y-4 overflow-y-auto max-h-[250px] custom-scrollbar pr-2">
                      {Object.entries(teamRosters).map(([team, players], i) => (
-                       <div key={i} className="bg-[#151e2b] p-4 rounded-lg border border-[#232f40] space-y-3">
+                        <div key={i} className="bg-[#151e2b] rounded-lg border border-[#232f40] space-y-3" style={{ padding: '16px' }}>
                          <h4 className="font-black text-[#00d0eb] text-sm uppercase">{team}</h4>
                          <div className="space-y-2">
                            {players.slice(0,5).map(p => (
                              <div key={p.ign} className="flex justify-between text-sm">
                                <span className="font-semibold text-gray-300">{p.ign}</span>
-                               <span className="font-mono font-bold text-white bg-white/10 px-2 rounded">{p.kd}</span>
+                               <span className="font-mono font-bold text-white bg-white/10 rounded" style={{ padding: '0 8px' }}>{p.kd}</span>
                              </div>
                            ))}
                          </div>
@@ -499,11 +499,11 @@ const Leaderboards = ({ globalGame }) => {
             </div>
           </div>
           {}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 pb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 pb-8" style={{ gap: '32px' }}>
              {}
              <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl flex flex-col h-[500px] overflow-hidden">
-               <div className="p-6 border-b border-[#232f40] bg-gradient-to-b from-[#151e2b] to-[#121a25]">
-                 <div className="flex justify-between items-center mb-5">
+               <div className="border-b border-[#232f40] bg-gradient-to-b from-[#151e2b] to-[#121a25]" style={{ padding: '24px' }}>
+                 <div className="flex justify-between items-center" style={{ marginBottom: '20px' }}>
                    <h3 className="text-base font-black text-gray-200 uppercase tracking-widest">Daily Player Ranking</h3>
                  </div>
                  <div className="relative group">
@@ -517,26 +517,26 @@ const Leaderboards = ({ globalGame }) => {
                  <table className="w-full text-center text-sm">
                    <thead className="bg-[#182331] sticky top-0 text-gray-400 font-semibold shadow-md z-10 text-xs tracking-wider uppercase">
                      <tr>
-                       <th className="py-4 px-3 text-left pl-6">NAME</th>
-                       <th className="py-4 px-2">KILLS</th>
-                       <th className="py-4 px-2">DEATH</th>
-                       <th className="py-4 px-2">ROUND</th>
-                       <th className="py-4 px-2">K/D</th>
-                       <th className="py-4 px-2">K/R</th>
+                       <th className="text-left" style={{ padding: '16px 24px' }}>NAME</th>
+                       <th style={{ padding: '16px 12px' }}>KILLS</th>
+                       <th style={{ padding: '16px 12px' }}>DEATH</th>
+                       <th style={{ padding: '16px 12px' }}>ROUND</th>
+                       <th style={{ padding: '16px 12px' }}>K/D</th>
+                       <th style={{ padding: '16px 12px' }}>K/R</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-[#1e2938]">
                      {filteredDaily.map((p, i) => (
                        <tr key={i} onClick={() => setSelectedPlayer(p)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
-                         <td className="py-4 px-3 text-left pl-6 font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors">
+                         <td className="text-left font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors" style={{ padding: '16px 24px' }}>
                            <span className="text-gray-600 w-4 text-right font-mono">{p.rank}.</span>
                            <span className="truncate max-w-[150px]">{p.name}</span>
                          </td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.kills}</td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.deaths || p.death}</td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.rounds || p.round}</td>
-                         <td className="py-4 px-2 text-[#8a9db8] font-black">{p.kd}</td>
-                         <td className="py-4 px-2 text-[#8a9db8] font-black">{p.kr}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.kills}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.deaths || p.death}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.rounds || p.round}</td>
+                         <td className="text-[#8a9db8] font-black" style={{ padding: '16px 12px' }}>{p.kd}</td>
+                         <td className="text-[#8a9db8] font-black" style={{ padding: '16px 12px' }}>{p.kr}</td>
                        </tr>
                      ))}
                    </tbody>
@@ -545,8 +545,8 @@ const Leaderboards = ({ globalGame }) => {
              </div>
              {}
              <div className="bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl flex flex-col h-[500px] overflow-hidden">
-               <div className="p-6 border-b border-[#232f40] bg-gradient-to-b from-[#151e2b] to-[#121a25]">
-                 <div className="flex justify-between items-center mb-5">
+               <div className="border-b border-[#232f40] bg-gradient-to-b from-[#151e2b] to-[#121a25]" style={{ padding: '24px' }}>
+                 <div className="flex justify-between items-center" style={{ marginBottom: '20px' }}>
                    <h3 className="text-base font-black text-gray-200 uppercase tracking-widest">Weekly Player Ranking</h3>
                  </div>
                  <div className="relative group">
@@ -560,26 +560,26 @@ const Leaderboards = ({ globalGame }) => {
                  <table className="w-full text-center text-sm">
                    <thead className="bg-[#182331] sticky top-0 text-gray-400 font-semibold shadow-md z-10 text-xs tracking-wider uppercase">
                      <tr>
-                       <th className="py-4 px-3 text-left pl-6">NAME</th>
-                       <th className="py-4 px-2">KILLS</th>
-                       <th className="py-4 px-2">DEATH</th>
-                       <th className="py-4 px-2">ROUND</th>
-                       <th className="py-4 px-2">K/D</th>
-                       <th className="py-4 px-2">K/R</th>
+                       <th className="text-left" style={{ padding: '16px 24px' }}>NAME</th>
+                       <th style={{ padding: '16px 12px' }}>KILLS</th>
+                       <th style={{ padding: '16px 12px' }}>DEATH</th>
+                       <th style={{ padding: '16px 12px' }}>ROUND</th>
+                       <th style={{ padding: '16px 12px' }}>K/D</th>
+                       <th style={{ padding: '16px 12px' }}>K/R</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-[#1e2938]">
                      {filteredWeekly.map((p, i) => (
                        <tr key={i} onClick={() => setSelectedPlayer(p)} className="hover:bg-[#1a2533] transition-colors group cursor-pointer">
-                         <td className="py-4 px-3 text-left pl-6 font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors">
+                         <td className="text-left font-bold text-gray-300 flex items-center space-x-3 group-hover:text-white transition-colors" style={{ padding: '16px 24px' }}>
                            <span className="text-gray-600 w-4 text-right font-mono">{p.rank}.</span>
                            <span className="truncate max-w-[150px]">{p.name}</span>
                          </td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.kills}</td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.deaths || p.death}</td>
-                         <td className="py-4 px-2 text-gray-400 font-semibold">{p.rounds || p.round}</td>
-                         <td className="py-4 px-2 text-[#8a9db8] font-black">{p.kd}</td>
-                         <td className="py-4 px-2 text-[#8a9db8] font-black">{p.kr}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.kills}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.deaths || p.death}</td>
+                         <td className="text-gray-400 font-semibold" style={{ padding: '16px 12px' }}>{p.rounds || p.round}</td>
+                         <td className="text-[#8a9db8] font-black" style={{ padding: '16px 12px' }}>{p.kd}</td>
+                         <td className="text-[#8a9db8] font-black" style={{ padding: '16px 12px' }}>{p.kr}</td>
                        </tr>
                      ))}
                    </tbody>

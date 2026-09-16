@@ -145,7 +145,7 @@ const LiveMatchManager = ({ globalTournament, globalGame, teams }) => {
           {teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
         </select>
         <input placeholder="Map..." value={newMatch.map_name} onChange={e => setNewMatch({...newMatch, map_name: e.target.value})} className="w-20 bg-[#0f1722] border border-[#2a3648] rounded px-2 py-1 text-xs text-white" />
-        <button onClick={handleCreateMatch} className="bg-cyan-600 text-white font-bold text-xs px-3 py-1 rounded hover:bg-cyan-500">+</button>
+        <button onClick={handleCreateMatch} className="bg-cyan-600 text-white font-bold text-xs hover:bg-cyan-500" style={{ padding: "12px 24px", borderRadius: "9999px" }}>+</button>
       </div>
       <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
         {loading && <div className="text-center text-xs text-gray-500">Loading matches...</div>}
@@ -343,25 +343,33 @@ const Admin = ({ globalGame, globalTournament }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
       {}
-      <div className="flex-1 px-8 md:px-12 py-6 pb-16 flex flex-col items-center">
+      <div className="flex-1 pb-16 flex flex-col items-center" style={{ padding: "32px" }}>
         <div className="w-full max-w-[1400px] flex flex-col gap-6">
           {}
           {activeTournamentObj && (
-            <div className="bg-[#0f1722] rounded-xl border border-cyan-700/50 shadow-[0_0_15px_rgba(0,208,235,0.15)] p-4 flex items-center justify-between mb-2">
+            <div className="w-full flex items-center justify-between mb-4" style={{ borderRadius: "9999px", border: "1px solid #00c8c8", padding: "16px 48px", backgroundColor: "transparent" }}>
               <div className="flex items-center gap-4">
                 <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Active Folder:</span>
                 <span className="text-cyan-400 font-black text-xl tracking-wider">{activeTournamentObj.name}</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Game Title:</span>
-                <select 
-                  value={activeTournamentObj.game.toUpperCase()} 
-                  onChange={(e) => handleUpdateFolderGame(e.target.value)}
-                  className="bg-[#151e2b] border border-[#2a3648] text-cyan-400 text-sm font-bold rounded px-4 py-2 focus:outline-none focus:border-cyan-500 cursor-pointer hover:bg-[#1c2532] transition-colors"
-                >
-                  <option value="VALORANT">VALORANT</option>
-                  <option value="CROSSFIRE">CROSSFIRE</option>
-                </select>
+                <div className="relative">
+                  <select 
+                    value={activeTournamentObj.game.toUpperCase()} 
+                    onChange={(e) => handleUpdateFolderGame(e.target.value)}
+                    className="appearance-none bg-transparent border border-[#00c8c8] text-cyan-400 text-sm font-bold focus:outline-none cursor-pointer"
+                    style={{ borderRadius: "9999px", padding: "8px 48px 8px 24px" }}
+                  >
+                    <option value="VALORANT" className="bg-[#0f1722]">VALORANT</option>
+                    <option value="CROSSFIRE" className="bg-[#0f1722]">CROSSFIRE</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-cyan-400">
+                    <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -369,125 +377,132 @@ const Admin = ({ globalGame, globalTournament }) => {
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             {}
             <div className="xl:col-span-5 bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
-              <div className="p-4 border-b border-[#1c2532] bg-[#121a25]">
-                 <h2 className="text-sm font-bold text-gray-300 tracking-wide">League Quick Stats (PH Local Context)</h2>
+              <div className="border-b border-[#1c2532] bg-[#121a25]" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-sm font-bold text-gray-300 tracking-wide" style={{ paddingLeft: "12px" }}>League Quick Stats (PH Local Context)</h2>
               </div>
-              <div className="p-5 grid grid-cols-3 gap-4 flex-1">
+               <div className="grid grid-cols-2 flex-1" style={{ padding: "32px", gap: "24px" }}>
                  {}
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-lg p-3">
-                    <span className="text-xs text-gray-400 mb-2">Total Registered Players</span>
-                    <div className="flex items-center space-x-3 mb-1">
+                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Total Registered Players</span>
+                    <div className="flex items-center gap-6 mb-3">
                        <UsersIcon />
                        <div className="flex flex-col">
-                         <span className="text-2xl font-black text-cyan-400 leading-none">12,500</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase">Players</span>
+                         <span className="text-3xl font-black text-cyan-400 leading-none">12,500</span>
+                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Players</span>
                        </div>
                     </div>
-                    <span className="text-[9px] text-gray-500 mt-2 text-center">Verified (PH: 98%)</span>
+                    <span className="text-[10px] text-gray-500 mt-6 text-center">Verified (PH: 98%)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-lg p-3">
-                    <span className="text-xs text-gray-400 mb-2">Total Teams</span>
-                    <div className="flex items-center space-x-3 mb-1">
+                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Total Teams</span>
+                    <div className="flex items-center gap-6 mb-3">
                        <TrophyIcon />
                        <div className="flex flex-col">
-                         <span className="text-2xl font-black text-cyan-400 leading-none">620</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase">Teams</span>
+                         <span className="text-3xl font-black text-cyan-400 leading-none">620</span>
+                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Teams</span>
                        </div>
                     </div>
-                    <span className="text-[9px] text-gray-500 mt-2 text-center text-balance">Active Teams (Local Leagues)</span>
+                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Active Teams (Local Leagues)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-lg p-3">
-                    <span className="text-xs text-gray-400 mb-2">Active Tournaments</span>
-                    <div className="flex items-center space-x-3 mb-1">
+                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Active Tournaments</span>
+                    <div className="flex items-center gap-6 mb-3">
                        <CalendarIcon />
                        <div className="flex flex-col">
-                         <span className="text-2xl font-black text-orange-400 leading-none">15</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase">Tournaments</span>
+                         <span className="text-3xl font-black text-orange-400 leading-none">15</span>
+                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Tournaments</span>
                        </div>
                     </div>
-                    <span className="text-[9px] text-gray-500 mt-2 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
+                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
                  </div>
-                 {}
-                 <div className="col-span-2 flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-lg p-3">
-                    <span className="text-xs text-gray-400 mb-2">Pending Verifications</span>
-                    <div className="flex items-center space-x-4 mb-1">
+                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Pending Verifications</span>
+                    <div className="flex items-center gap-6 mb-3">
                        <ClipboardCheckIcon />
                        <div className="flex flex-col">
-                         <span className="text-2xl font-black text-orange-400 leading-none">45</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase">Verifications</span>
+                         <span className="text-3xl font-black text-orange-400 leading-none">45</span>
+                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Verifications</span>
                        </div>
                     </div>
-                    <span className="text-[9px] text-gray-500 mt-2">New Player IDs to review</span>
+                    <span className="text-[10px] text-gray-500 mt-6 text-center">New Player IDs to review</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-lg p-3">
-                    <span className="text-xs text-gray-400 mb-2">New Admin Logins</span>
-                    <div className="flex items-center space-x-3 mb-1">
+                 {}
+                 <div className="col-span-2 flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">New Admin Logins</span>
+                    <div className="flex items-center gap-6 mb-3">
                        <LockIcon />
                        <div className="flex flex-col">
-                         <span className="text-2xl font-black text-cyan-400 leading-none">12</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase">Admins</span>
+                         <span className="text-3xl font-black text-cyan-400 leading-none">12</span>
+                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Admins</span>
                        </div>
                     </div>
-                    <span className="text-[9px] text-gray-500 mt-2 text-center text-balance">Admins (Central & Local PH)</span>
+                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Admins (Central & Local PH)</span>
                  </div>
-              </div>
+               </div>
             </div>
             {}
             <div className="xl:col-span-7 bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
-              <div className="p-4 border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center">
-                 <div>
+              <div className="border-b border-[#1c2532] bg-[#121a25] flex flex-wrap justify-between items-center" style={{ padding: "24px 32px", gap: "24px" }}>
+                 <div className="flex flex-col flex-shrink-0 whitespace-nowrap" style={{ gap: "4px" }}>
                    <h2 className="text-sm font-bold text-gray-300 tracking-wide">Admin Accounts & User Directory</h2>
                    <span className="text-[10px] text-gray-500 font-mono italic">(System Access Hub)</span>
                  </div>
-                 <div className="flex space-x-2">
-                    <div className="relative w-48">
-                      <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                 <div className="flex items-center flex-wrap" style={{ gap: "16px" }}>
+                    <div className="relative flex-shrink-0" style={{ width: "256px" }}>
+                      <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: "12px" }}>
                         <SearchIcon />
                       </div>
                       <input 
                         type="text" 
                         placeholder="Search (IGN, Team, Location)" 
-                        className="w-full bg-[#151e2b] border border-[#2a3648] text-gray-300 text-xs rounded py-1.5 pl-8 pr-2 focus:outline-none focus:border-cyan-500"
+                        className="w-full bg-[#151e2b] border border-[#2a3648] text-gray-300 text-xs rounded-lg focus:outline-none focus:border-cyan-500 transition-colors"
+                        style={{ padding: "10px 16px 10px 40px" }}
                       />
                     </div>
-                    <SelectDropdown options={['Verification Status', 'Verified', 'Pending', 'Rejected']} />
+                    <div className="flex-shrink-0" style={{ width: "224px" }}>
+                      <SelectDropdown options={['Verification Status', 'Verified', 'Pending', 'Rejected']} />
+                    </div>
                  </div>
               </div>
               <div className="flex-1 overflow-auto custom-scrollbar">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#151e2b] text-gray-500 sticky top-0 shadow-sm z-10 border-b border-[#1c2532]">
                     <tr>
-                      <th className="px-4 py-3 font-semibold w-1/5">Username</th>
-                      <th className="px-4 py-3 font-semibold">Role</th>
-                      <th className="px-4 py-3 font-semibold">Super Admin</th>
-                      <th className="px-4 py-3 font-semibold">Permissions</th>
-                      <th className="px-4 py-3 font-semibold text-center w-20">Active</th>
+                      <th className="font-semibold w-1/5" style={{ padding: "24px 32px" }}>Username</th>
+                      <th className="font-semibold" style={{ padding: "24px 32px" }}>Role</th>
+                      <th className="font-semibold" style={{ padding: "24px 32px" }}>Super Admin</th>
+                      <th className="font-semibold" style={{ padding: "24px 32px" }}>Permissions</th>
+                      <th className="font-semibold text-center w-20" style={{ padding: "24px 32px" }}>Active</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#1c2532]">
                     {accounts.length === 0 ? (
-                      <tr><td colSpan="5" className="text-center py-4 text-gray-500 italic">No accounts found or loading...</td></tr>
+                      <tr><td colSpan="5" className="text-center py-6 text-gray-500 italic">No accounts found or loading...</td></tr>
                     ) : accounts.map((user, idx) => (
                       <tr key={idx} onClick={() => handleOpenEdit(user)} className="hover:bg-[#151e2b]/50 transition-colors cursor-pointer group">
-                        <td className="px-4 py-3 text-gray-300 font-medium group-hover:text-cyan-400">
-                           <div className="flex flex-col">
+                        <td className="text-gray-300 font-medium group-hover:text-cyan-400" style={{ padding: "20px 32px" }}>
+                           <div className="flex flex-col gap-1">
                              <span>{user.username}</span>
-                             {!user.is_super_admin && <span className="text-[9px] text-cyan-600/70 hidden group-hover:block italic mt-0.5">Click to edit</span>}
+                             <span className={`text-[9px] text-cyan-600/70 italic transition-opacity duration-200 ${!user.is_super_admin ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                               Click to edit
+                             </span>
                            </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-400">{user.role || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-400">
+                        <td className="text-gray-400" style={{ padding: "20px 32px" }}>{user.role || 'N/A'}</td>
+                        <td className="text-gray-400" style={{ padding: "20px 32px" }}>
                            {user.is_super_admin ? (
-                             <span className="bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">Yes</span>
+                             <span className="bg-cyan-500/20 text-cyan-400 rounded text-[10px] font-black uppercase tracking-wider" style={{ padding: "8px 24px", borderRadius: "9999px" }}>Yes</span>
                            ) : (
-                             <span className="text-gray-600 font-bold text-[10px] uppercase">No</span>
+                             <span className="bg-[#1c2532]/50 text-gray-500 rounded text-[10px] font-black uppercase tracking-wider border border-[#2a3648]/50" style={{ padding: "8px 24px", borderRadius: "9999px" }}>No</span>
                            )}
                         </td>
-                        <td className="px-4 py-3 text-gray-400 font-mono text-[9px] tracking-wide max-w-[150px] truncate">
+                        <td className="text-gray-400 font-mono text-[9px] tracking-wide max-w-[150px] truncate" style={{ padding: "20px 32px" }}>
                            {user.permissions ? JSON.stringify(user.permissions) : 'None'}
                         </td>
-                        <td className="px-4 py-3 text-center flex flex-col items-center justify-center">
-                            <svg className="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                        <td className="text-center" style={{ padding: "20px 32px" }}>
+                          <div className="flex items-center justify-center w-full h-full">
+                            <svg className="w-5 h-5 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -495,65 +510,72 @@ const Admin = ({ globalGame, globalTournament }) => {
                 </table>
               </div>
               {}
-              <div className="p-3 border-t border-[#1c2532] bg-[#121a25] flex justify-between items-center">
-                 <div className="flex items-center space-x-2 font-black text-xl italic tracking-wider text-orange-500 drop-shadow-md">
-                    <svg viewBox="0 0 100 100" className="w-6 h-6 fill-orange-500"><path d="M50 0L90 20v50L50 100 10 70V20z"/></svg>
+              <div className="border-t border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
+                 <div className="flex items-center gap-3 font-black text-xl italic tracking-wider text-orange-500 drop-shadow-md">
+                    <svg viewBox="0 0 100 100" className="w-8 h-8 fill-orange-500"><path d="M50 0L90 20v50L50 100 10 70V20z"/></svg>
                     <span>TNC Hub</span>
                  </div>
-                 <div className="flex space-x-3">
-                    <button onClick={() => setShowCreateModal(true)} className="px-4 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow-lg shadow-cyan-900/20">Create Admin</button>
-                    <button className="px-4 py-1.5 rounded bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors">Create New Player</button>
-                    <button className="px-4 py-1.5 rounded bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors">Import Teams via CSV</button>
+                 <div className="flex items-center gap-4">
+                    <button onClick={() => setShowCreateModal(true)} className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow-lg shadow-cyan-900/20" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Admin</button>
+                    <button className="bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create New Player</button>
+                    <button className="bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Import Teams via CSV</button>
                  </div>
               </div>
             </div>
           </div>
           {}
           <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="p-4 border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center">
+             <div className="border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
                  <h2 className="text-sm font-bold text-gray-300 tracking-wide">Rulebook Viewer</h2>
-                 <label className="px-3 py-1 rounded bg-transparent border border-[#2a3648] text-cyan-400 text-[10px] font-bold hover:bg-[#1c2532] transition-colors cursor-pointer">
+                 <label className="bg-transparent border border-[#2a3648] text-cyan-400 text-[10px] font-bold hover:bg-[#1c2532] transition-colors cursor-pointer" style={{ padding: "12px 24px", borderRadius: "9999px" }}>
                     Upload New Rulebook
                     <input type="file" className="hidden" accept="application/pdf,image/*" onChange={handleRulebookUpload} />
                  </label>
              </div>
-             <div className="p-6">
-                {rulebookUrl ? (
-                  <iframe src={rulebookUrl} className="w-full h-[500px] rounded border border-[#1c2532] bg-[#121a25]" title="Rulebook Viewer"></iframe>
-                ) : (
-                  <div className="flex items-center justify-center h-[300px] text-gray-500 font-mono text-sm border-2 border-dashed border-[#1c2532] rounded">
-                     No rulebook uploaded yet.
-                  </div>
-                )}
+             <div style={{ padding: "32px" }}>
+                 {rulebookUrl ? (
+                   <div className="bg-[#151e2b] rounded-lg border border-[#1c2532] flex flex-wrap items-center justify-between" style={{ padding: "24px", gap: "16px" }}>
+                     <div className="flex items-center" style={{ gap: "16px" }}>
+                       <div className="flex-shrink-0 w-12 h-12 rounded flex items-center justify-center bg-cyan-500/20 text-cyan-400">
+                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                       </div>
+                       <div className="flex flex-col" style={{ gap: "4px" }}>
+                         <span className="text-sm font-bold text-gray-300">Official League Rulebook</span>
+                         <span className="text-[10px] text-gray-500 font-mono">{rulebookUrl.split('/').pop()}</span>
+                       </div>
+                     </div>
+                     <div className="flex items-center" style={{ gap: "12px" }}>
+                       <a href={rulebookUrl} target="_blank" rel="noopener noreferrer" className="bg-transparent border border-cyan-700/50 text-cyan-400 text-xs font-bold hover:bg-cyan-900/30 transition-colors whitespace-nowrap" style={{ padding: "10px 24px", borderRadius: "9999px" }}>Open PDF in Browser</a>
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="flex items-center justify-center text-gray-500 font-mono text-sm border-2 border-dashed border-[#1c2532] rounded-lg" style={{ padding: "48px" }}>
+                      No rulebook uploaded yet.
+                   </div>
+                 )}
              </div>
           </div>
           {}
           <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="p-4 border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center">
-                 <h2 className="text-sm font-bold text-gray-300 tracking-wide">Admin and User Activity Audit Logs (PH Context)</h2>
-                 <button className="px-4 py-1.5 rounded bg-[#1c2532] border border-[#2a3648] text-cyan-400 text-xs font-bold hover:bg-[#232f40] transition-colors">Create Detailed Report</button>
+             <div className="border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-sm font-black text-gray-300 tracking-widest uppercase">Recently Record <span className="text-red-500">(Super Admin Logs)</span></h2>
+                 <button className="bg-[#1c2532] border border-[#2a3648] text-cyan-400 text-xs font-bold hover:bg-[#232f40] transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Detailed Report</button>
              </div>
-             <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#151e2b] text-gray-500 border-b border-[#1c2532]">
-                    <tr>
-                      <th className="px-6 py-3 font-semibold w-32">Timestamp</th>
-                      <th className="px-6 py-3 font-semibold w-48">Admin/System IGN</th>
-                      <th className="px-6 py-3 font-semibold w-48">Action Type</th>
-                      <th className="px-6 py-3 font-semibold">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1c2532]">
-                    {auditLogsData.map((log, idx) => (
-                      <tr key={idx} className="hover:bg-[#151e2b]/50 transition-colors cursor-pointer group">
-                        <td className="px-6 py-3 text-gray-400 font-mono tracking-wide group-hover:text-cyan-400">{log.time}</td>
-                        <td className="px-6 py-3 text-gray-300 font-medium">{log.ign}</td>
-                        <td className="px-6 py-3 text-gray-400">{log.type}</td>
-                        <td className="px-6 py-3 text-gray-400">{log.details}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+             <div className="flex flex-col" style={{ padding: "32px", gap: "16px" }}>
+                {auditLogsData.map((log, idx) => (
+                  <div key={idx} className="bg-[#151e2b] rounded-xl border border-[#1c2532] flex flex-col md:flex-row md:items-center justify-between transition-colors hover:border-cyan-500/30 hover:bg-[#1a2533]" style={{ padding: "20px 24px", gap: "24px" }}>
+                     <div className="flex flex-col" style={{ gap: "8px", minWidth: "200px" }}>
+                        <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{log.type}</span>
+                        <span className="text-sm font-bold text-gray-200">{log.ign}</span>
+                     </div>
+                     <div className="flex-1 md:px-4">
+                        <span className="text-xs text-gray-400 leading-relaxed">{log.details}</span>
+                     </div>
+                     <div className="flex items-center justify-end" style={{ minWidth: "150px" }}>
+                        <span className="text-[10px] text-gray-500 font-mono bg-[#0b1018] rounded border border-[#1c2532]" style={{ padding: "8px 12px" }}>{log.time}</span>
+                     </div>
+                  </div>
+                ))}
              </div>
           </div>
         </div>
@@ -616,24 +638,24 @@ const Admin = ({ globalGame, globalTournament }) => {
       {}
       {editingUser && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0f1722] p-8 rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
-            <button onClick={() => setEditingUser(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+          <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200" style={{ padding: "32px" }}>
+            <button onClick={() => setEditingUser(null)} className="absolute text-gray-500 hover:text-white transition-colors" style={{ top: "16px", right: "16px" }}>
               <svg xmlns="http://www.w3.org/w0000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <div className="flex items-center space-x-3 mb-6">
+            <div className="flex items-center" style={{ gap: "12px", marginBottom: "24px" }}>
               <LockIcon />
               <h3 className="text-xl font-black text-white uppercase tracking-widest">Edit Permissions</h3>
             </div>
-            <div className="space-y-6">
-              <div className="bg-[#151e2b] p-4 rounded-lg border border-[#1c2532]">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">User</label>
+            <div className="flex flex-col" style={{ gap: "24px" }}>
+              <div className="bg-[#151e2b] rounded-lg border border-[#1c2532]" style={{ padding: "16px" }}>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block" style={{ marginBottom: "4px" }}>User</label>
                 <div className="text-cyan-400 font-bold text-base">{editingUser.username} <span className="text-gray-500 text-sm font-normal ml-1">({editingUser.role})</span></div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">Permissions</label>
-                <div className="grid grid-cols-2 gap-3">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block" style={{ marginBottom: "12px" }}>Permissions</label>
+                <div className="grid grid-cols-2" style={{ gap: "12px" }}>
                    {['view', 'edit', 'full', 'manage_folders'].map((perm) => (
-                      <label key={perm} className="flex items-center space-x-3 cursor-pointer group bg-[#151e2b] p-3 rounded-lg border border-[#1c2532] hover:border-cyan-500/50 transition-all">
+                      <label key={perm} className="flex items-center cursor-pointer group bg-[#151e2b] rounded-lg border border-[#1c2532] hover:border-cyan-500/50 transition-all" style={{ padding: "12px", gap: "12px" }}>
                         <div className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded border ${editPermissions[perm] ? 'bg-cyan-500 border-cyan-500' : 'bg-[#0f1722] border-gray-600 group-hover:border-gray-500'} transition-colors`}>
                            {editPermissions[perm] && <svg className="w-3.5 h-3.5 text-[#090e14]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                         </div>
@@ -651,7 +673,8 @@ const Admin = ({ globalGame, globalTournament }) => {
               <button
                 onClick={handleUpdatePermissions}
                 disabled={isUpdatingPermissions}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#090e14] font-black uppercase tracking-widest py-3.5 rounded-lg mt-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20"
+                className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#090e14] font-black uppercase tracking-widest rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20"
+                style={{ padding: "14px", marginTop: "8px" }}
               >
                 {isUpdatingPermissions ? 'Saving...' : 'Save Permissions'}
               </button>
