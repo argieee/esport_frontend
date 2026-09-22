@@ -3,7 +3,7 @@ import { apiFetch } from "../../utils/api";
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
-    className="h-4 w-4 text-gray-500"
+    className="h-4 w-4 text-theme-text-faint"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -19,7 +19,7 @@ const SearchIcon = () => (
 const ChevronDown = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
-    className="h-4 w-4 text-gray-400"
+    className="h-4 w-4 text-theme-text-muted"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -36,7 +36,7 @@ const Tooltip = ({ x, y, content, visible }) => {
   if (!visible) return null;
   return (
     <div
-      className="absolute z-50 bg-[#0a0f16] border border-[#2a3648] text-white text-xs p-3 rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.8)] pointer-events-none transform -translate-x-1/2 -translate-y-full backdrop-blur-md"
+      className="absolute z-50 bg-bg-100 border border-[#2a3648] text-theme-text-base text-xs p-3 rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.8)] pointer-events-none transform -translate-x-1/2 -translate-y-full backdrop-blur-md"
       style={{ left: x, top: y - 10, transition: "all 0.1s ease-out" }}
     >
       {content}
@@ -45,10 +45,10 @@ const Tooltip = ({ x, y, content, visible }) => {
 };
 const Card = ({ title, children, className = "" }) => (
   <div
-    className={`bg-[#121a25] rounded-xl border border-[#232f40] shadow-xl flex flex-col overflow-hidden relative group ${className}`}
+    className={`bg-bg-300 rounded-xl border border-[#232f40] shadow-xl flex flex-col overflow-hidden relative group ${className}`}
   >
     <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none z-0"></div>
-    <div className="border-b border-[#232f40] bg-[#151e2b] relative z-10 flex justify-between items-center shrink-0" style={{ padding: "16px" }}>
+    <div className="border-b border-[#232f40] bg-bg-300 relative z-10 flex justify-between items-center shrink-0" style={{ padding: "16px" }}>
       <h3 className="text-sm font-bold tracking-wider text-gray-200">
         {title}
       </h3>
@@ -141,10 +141,10 @@ const RadarChart = ({ data, axes, onSelect }) => {
                 className="transition-all duration-300 hover:fill-opacity-40 cursor-pointer drop-shadow-md"
                 onClick={() => onSelect(player)}
                 onMouseMove={(e) => {
-                  const rect = e.target.getBoundingClientRect();
+                  const rect = e.target.closest('.relative').getBoundingClientRect();
                   setTooltip({
                     visible: true,
-                    x: e.clientX - rect.left + 80,
+                    x: e.clientX - rect.left,
                     y: e.clientY - rect.top,
                     content: (
                       <div className="flex flex-col gap-1">
@@ -159,13 +159,13 @@ const RadarChart = ({ data, axes, onSelect }) => {
                             key={i}
                             className="flex justify-between gap-4 text-[10px]"
                           >
-                            <span className="text-gray-400">{ax}</span>
-                            <span className="font-bold text-white">
+                            <span className="text-theme-text-muted">{ax}</span>
+                            <span className="font-bold text-theme-text-base">
                               {player.stats[i]}
                             </span>
                           </div>
                         ))}
-                        <div className="text-[9px] text-gray-500 mt-1 text-center italic">
+                        <div className="text-[9px] text-theme-text-faint mt-1 text-center italic">
                           Click for detailed overview
                         </div>
                       </div>
@@ -192,14 +192,14 @@ const RadarChart = ({ data, axes, onSelect }) => {
       </svg>
       <Tooltip {...tooltip} />
       {}
-      <div className="absolute right-0 top-0 flex flex-col space-y-2 bg-[#121a25]/80 rounded-lg border border-[#232f40] backdrop-blur-sm" style={{ padding: "8px" }}>
+      <div className="absolute right-0 top-0 flex flex-col space-y-2 bg-bg-300/80 rounded-lg border border-[#232f40] backdrop-blur-sm" style={{ padding: "8px" }}>
         {data.length === 0 ? (
-          <span className="text-xs text-gray-500">No players found</span>
+          <span className="text-xs text-theme-text-faint">No players found</span>
         ) : null}
         {data.map((p, i) => (
           <div
             key={i}
-            className="flex items-center space-x-2 text-[10px] text-gray-300 font-bold tracking-wider"
+            className="flex items-center space-x-2 text-[10px] text-theme-text-base font-bold tracking-wider"
           >
             <div
               className="w-4 h-[2px] rounded-full shadow-[0_0_5px_currentColor]"
@@ -317,14 +317,14 @@ const EconChart = ({ data, theme, onSelect }) => {
               className="cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => onSelect(d)}
               onMouseMove={(e) => {
-                const rect = e.target.parentElement.getBoundingClientRect();
+                const rect = e.target.closest('.relative').getBoundingClientRect();
                 setTooltip({
                   visible: true,
                   x: e.clientX - rect.left,
                   y: e.clientY - rect.top,
                   content: (
                     <div className="flex flex-col gap-1">
-                      <div className="font-black text-white border-b border-gray-700 pb-1 uppercase tracking-wider">
+                      <div className="font-black text-theme-text-base border-b border-gray-700 pb-1 uppercase tracking-wider">
                         Round {d.round}
                       </div>
                       <div style={{ color: theme.color1 }}>
@@ -336,7 +336,7 @@ const EconChart = ({ data, theme, onSelect }) => {
                       <div style={{ color: theme.color3 }}>
                         Win Prob: {d.prob}%
                       </div>
-                      <div className="text-[9px] text-gray-500 mt-1 text-center italic">
+                      <div className="text-[9px] text-theme-text-faint mt-1 text-center italic">
                         Click for economy details
                       </div>
                     </div>
@@ -404,7 +404,7 @@ const EconChart = ({ data, theme, onSelect }) => {
       </svg>
       <Tooltip {...tooltip} />
       {}
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex space-x-4 text-[10px] font-bold text-gray-300 tracking-wider">
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex space-x-4 text-[10px] font-bold text-theme-text-base tracking-wider">
         <div className="flex items-center space-x-1">
           <div
             className="w-3 h-3 rounded-sm"
@@ -446,7 +446,7 @@ const BubbleChart = ({ data, theme, onSelect }) => {
   const maps = [...new Set(data.map((d) => d.map))];
   if (agents.length === 0 || maps.length === 0) {
     return (
-      <div className="flex w-full h-full items-center justify-center text-gray-500 font-bold">
+      <div className="flex w-full h-full items-center justify-center text-theme-text-faint font-bold">
         No synergies found for your search.
       </div>
     );
@@ -539,19 +539,19 @@ const BubbleChart = ({ data, theme, onSelect }) => {
               style={{ color }}
               onClick={() => onSelect(d)}
               onMouseMove={(e) => {
-                const rect = e.target.parentElement.getBoundingClientRect();
+                const rect = e.target.closest('.relative').getBoundingClientRect();
                 setTooltip({
                   visible: true,
                   x: e.clientX - rect.left,
                   y: e.clientY - rect.top,
                   content: (
                     <div className="flex flex-col gap-1">
-                      <div className="font-black text-white border-b border-gray-700 pb-1">
+                      <div className="font-black text-theme-text-base border-b border-gray-700 pb-1">
                         {d.agent} on {d.map}
                       </div>
-                      <div className="text-gray-300">
+                      <div className="text-theme-text-base">
                         Pick Rate:{" "}
-                        <span className="font-bold text-white">
+                        <span className="font-bold text-theme-text-base">
                           {d.pickRate}
                         </span>
                       </div>
@@ -559,7 +559,7 @@ const BubbleChart = ({ data, theme, onSelect }) => {
                         Win Rate:{" "}
                         <span className="font-bold">{d.winRate}%</span>
                       </div>
-                      <div className="text-[9px] text-gray-500 mt-1 text-center italic">
+                      <div className="text-[9px] text-theme-text-faint mt-1 text-center italic">
                         Click for map synergy details
                       </div>
                     </div>
@@ -572,26 +572,26 @@ const BubbleChart = ({ data, theme, onSelect }) => {
       </svg>
       <Tooltip {...tooltip} />
       {}
-      <div className="absolute left-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-[10px] font-black tracking-widest text-gray-500 uppercase">
+      <div className="absolute left-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-[10px] font-black tracking-widest text-theme-text-faint uppercase">
         Agents
       </div>
-      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-[10px] font-black tracking-widest text-gray-500 uppercase">
+      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-[10px] font-black tracking-widest text-theme-text-faint uppercase">
         Maps
       </div>
       {}
-      <div className="absolute right-0 top-0 flex flex-col bg-[#121a25]/90 rounded border border-[#232f40] backdrop-blur-sm pointer-events-none" style={{ padding: "8px" }}>
-        <span className="text-[9px] font-bold text-gray-400 mb-1">
+      <div className="absolute right-0 top-0 flex flex-col bg-bg-300/90 rounded border border-[#232f40] backdrop-blur-sm pointer-events-none" style={{ padding: "8px" }}>
+        <span className="text-[9px] font-bold text-theme-text-muted mb-1">
           Pick Rate
         </span>
         <div className="flex items-center space-x-2 mb-1">
           <circle cx="4" cy="4" r="4" fill="#4b5563" />
-          <span className="text-[9px] text-gray-300">200+</span>
+          <span className="text-[9px] text-theme-text-base">200+</span>
         </div>
         <div className="flex items-center space-x-2 mb-2">
           <circle cx="3" cy="3" r="3" fill="#4b5563" />
-          <span className="text-[9px] text-gray-300">100+</span>
+          <span className="text-[9px] text-theme-text-base">100+</span>
         </div>
-        <span className="text-[9px] font-bold text-gray-400 mb-1">
+        <span className="text-[9px] font-bold text-theme-text-muted mb-1">
           Win Rate
         </span>
         <div className="flex items-center space-x-2 mb-1">
@@ -599,14 +599,14 @@ const BubbleChart = ({ data, theme, onSelect }) => {
             className="w-2 h-2"
             style={{ backgroundColor: theme.color3 }}
           ></div>
-          <span className="text-[9px] text-gray-300">High</span>
+          <span className="text-[9px] text-theme-text-base">High</span>
         </div>
         <div className="flex items-center space-x-2">
           <div
             className="w-2 h-2"
             style={{ backgroundColor: theme.color1 }}
           ></div>
-          <span className="text-[9px] text-gray-300">Low</span>
+          <span className="text-[9px] text-theme-text-base">Low</span>
         </div>
       </div>
     </div>
@@ -674,7 +674,7 @@ const StrategyMap = ({
         <select
           value={selectedMap}
           onChange={(e) => setSelectedMap(e.target.value)}
-          className="bg-[#121a25]/90 backdrop-blur border border-[#232f40] text-sm font-black text-white tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer appearance-none"
+          className="bg-bg-300/90 backdrop-blur border border-[#232f40] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer appearance-none"
           style={{ padding: "4px 8px" }}
         >
           {availableMaps && availableMaps.length > 0 ? (
@@ -688,7 +688,7 @@ const StrategyMap = ({
           )}
         </select>
       </div>
-      <div className="relative w-full max-w-[800px] aspect-[4/3] bg-[#0a0f16] rounded-xl border border-[#2a3648] overflow-hidden shadow-2xl flex items-center justify-center group-hover:border-blue-500 transition-all">
+      <div className="relative w-full max-w-[800px] aspect-[4/3] bg-bg-100 rounded-xl border border-[#2a3648] overflow-hidden shadow-2xl flex items-center justify-center group-hover:border-blue-500 transition-all">
         <img
           src={
             selectedMap
@@ -709,7 +709,7 @@ const StrategyMap = ({
             style={{ left: `${h.coord_x}%`, top: `${h.coord_y}%` }}
             onMouseMove={(e) => {
               e.stopPropagation();
-              const rect = e.target.parentElement.getBoundingClientRect();
+              const rect = e.target.closest('.relative').getBoundingClientRect();
               setTooltip({
                 visible: true,
                 x: e.clientX - rect.left,
@@ -721,8 +721,8 @@ const StrategyMap = ({
                     >
                       {h.event_type}
                     </div>
-                    <div className="text-gray-300 font-bold">
-                      Round <span className="text-white">{h.round_number}</span>
+                    <div className="text-theme-text-base font-bold">
+                      Round <span className="text-theme-text-base">{h.round_number}</span>
                     </div>
                   </div>
                 ),
@@ -735,31 +735,31 @@ const StrategyMap = ({
       </div>
       {}
       <div
-        className="absolute bottom-4 right-4 bg-[#0a0f16]/90 rounded-lg border border-[#232f40] flex flex-col items-start backdrop-blur-md pointer-events-none shadow-xl min-w-[140px]"
+        className="absolute bottom-4 right-4 bg-bg-100/90 rounded-lg border border-[#232f40] flex flex-col items-start backdrop-blur-md pointer-events-none shadow-xl min-w-[140px]"
         style={{ padding: "12px" }}
       >
-        <span className="text-[10px] font-bold text-white mb-3 uppercase tracking-widest">
+        <span className="text-[10px] font-bold text-theme-text-base mb-3 uppercase tracking-widest">
           Legend
         </span>
         <div className="flex items-center justify-between w-full mb-2">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] border border-white shrink-0"></div>
-            <span className="text-[10px] font-bold text-slate-300 uppercase">
+            <span className="text-[10px] font-bold text-theme-text-base uppercase">
               Plant
             </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400">
+          <span className="text-[10px] font-bold text-theme-text-muted">
             {plantPct}%
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6] border border-white shrink-0"></div>
-            <span className="text-[10px] font-bold text-slate-300 uppercase">
+            <span className="text-[10px] font-bold text-theme-text-base uppercase">
               Defuse
             </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400">
+          <span className="text-[10px] font-bold text-theme-text-muted">
             {defusePct}%
           </span>
         </div>
@@ -768,7 +768,7 @@ const StrategyMap = ({
   );
 };
 const Analytics = ({ globalGame, globalTournament }) => {
-  const [activeGame, setActiveGame] = useState("VALORANT");
+  const activeGame = globalGame || "VALORANT";
   const [dataType, setDataType] = useState("ALL PLAYERS");
   const [searchQuery, setSearchQuery] = useState("");
   const [modalData, setModalData] = useState(null);
@@ -820,6 +820,37 @@ const Analytics = ({ globalGame, globalTournament }) => {
       if (r.map && r.map !== "TBD" && r.map !== "-") maps.add(r.map);
     });
     return Array.from(maps);
+  }, [matchRecords, activeGame]);
+
+  const dynamicSynergy = useMemo(() => {
+    const gameUpper = activeGame.toUpperCase();
+    const gameRecords = matchRecords.filter((r) => r.game.toUpperCase() === gameUpper);
+    
+    const synergyMap = {};
+    gameRecords.forEach((r) => {
+      const agent = r.group_label || r.agent;
+      if (!agent || agent === "-" || agent === "Unknown" || agent === "null") return;
+      
+      const mapName = r.map;
+      if (!mapName || mapName === "TBD" || mapName === "-") return;
+      
+      const key = `${agent}_${mapName}`;
+      if (!synergyMap[key]) {
+        synergyMap[key] = { agent, map: mapName, picks: 0, wins: 0 };
+      }
+      synergyMap[key].picks += 1;
+      const isWin = String(r.win).toLowerCase() === 'true' || r.win === 1;
+      if (isWin) synergyMap[key].wins += 1;
+    });
+
+    const synergyArr = Object.values(synergyMap).map((s) => ({
+      agent: s.agent,
+      map: s.map,
+      pickRate: s.picks,
+      winRate: s.picks > 0 ? Math.round((s.wins / s.picks) * 100) : 0
+    })).sort((a, b) => b.pickRate - a.pickRate);
+
+    return synergyArr;
   }, [matchRecords, activeGame]);
   // --- MOCK DATA ---
   const valorantTheme = {
@@ -921,12 +952,14 @@ const Analytics = ({ globalGame, globalTournament }) => {
     ],
   };
   const currentData = activeGame === "VALORANT" ? valData : cfData;
+  const activeSynergyData = dynamicSynergy;
+  
   // Filter Data based on Search Query
   const sq = searchQuery.toLowerCase();
   const filteredRadar = currentData.radar.filter((p) =>
     p.name.toLowerCase().includes(sq),
   );
-  const filteredSynergy = currentData.synergy.filter(
+  const filteredSynergy = activeSynergyData.filter(
     (s) =>
       s.agent.toLowerCase().includes(sq) || s.map.toLowerCase().includes(sq),
   );
@@ -963,7 +996,7 @@ const Analytics = ({ globalGame, globalTournament }) => {
     });
   };
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full custom-scrollbar relative">
+    <div className="flex-1 bg-bg-100 text-theme-text-base overflow-y-auto flex flex-col h-full custom-scrollbar relative">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -971,39 +1004,17 @@ const Analytics = ({ globalGame, globalTournament }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
       {}
-      <div className="bg-[#0f1722]/80 backdrop-blur-xl border-b border-[#1c2532] shadow-xl relative z-30 flex flex-col items-center" style={{ padding: "16px 32px" }}>
+      <div className="bg-bg-300/80 backdrop-blur-xl border-b border-[#1c2532] shadow-xl relative z-30 flex flex-col items-center" style={{ padding: "16px 32px" }}>
         <div className="w-full max-w-[1400px] flex items-center justify-between">
           {}
           <div className="flex" style={{ gap: "48px" }}>
             <div className="flex flex-col">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                Game:
-              </label>
-              <div className="relative group cursor-pointer">
-                <select
-                  className="appearance-none bg-[#121a25] border border-[#2a3648] text-white font-bold tracking-wider rounded-lg focus:outline-none focus:border-[#406899] hover:bg-[#1a2533] transition-colors shadow-inner"
-                  style={{ padding: "8px 40px 8px 16px" }}
-                  value={activeGame}
-                  onChange={(e) => {
-                    setActiveGame(e.target.value);
-                    setSearchQuery(""); // Reset search on game change
-                  }}
-                >
-                  <option value="VALORANT">VALORANT</option>
-                  <option value="CROSSFIRE">CROSSFIRE</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <ChevronDown />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+              <label className="text-[10px] font-black text-theme-text-faint uppercase tracking-widest mb-1">
                 Data Type:
               </label>
               <div className="relative group cursor-pointer">
                 <select
-                  className="appearance-none bg-[#121a25] border border-[#2a3648] text-white font-bold tracking-wider rounded-lg focus:outline-none focus:border-[#406899] hover:bg-[#1a2533] transition-colors shadow-inner"
+                  className="appearance-none bg-bg-300 border border-[#2a3648] text-theme-text-base font-bold tracking-wider rounded-lg focus:outline-none focus:border-[#406899] hover:bg-bg-400 transition-colors shadow-inner"
                   style={{ padding: "8px 40px 8px 16px" }}
                   value={dataType}
                   onChange={(e) => setDataType(e.target.value)}
@@ -1028,7 +1039,7 @@ const Analytics = ({ globalGame, globalTournament }) => {
               placeholder="Filter by Player, Agent, or Map..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#e2e8f0] text-gray-900 font-medium rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner transition-all placeholder-gray-500"
+              className="w-full bg-slate-200 text-gray-900 font-medium rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner transition-all placeholder-gray-500"
               style={{ padding: "10px 16px 10px 48px" }}
             />
           </div>
@@ -1045,20 +1056,24 @@ const Analytics = ({ globalGame, globalTournament }) => {
               onSelect={openRadarOverview}
             />
           </Card>
-          <Card title="Economic Efficiency over Rounds">
-            <EconChart
-              data={currentData.econ}
-              theme={currentData.theme}
-              onSelect={openEconOverview}
-            />
-          </Card>
-          <Card title="Agent/Map Synergies" className="min-h-[350px]">
-            <BubbleChart
-              data={filteredSynergy}
-              theme={currentData.theme}
-              onSelect={openSynergyOverview}
-            />
-          </Card>
+          {activeGame.toUpperCase() !== "CROSSFIRE" && (
+            <>
+              <Card title="Economic Efficiency over Rounds">
+                <EconChart
+                  data={currentData.econ}
+                  theme={currentData.theme}
+                  onSelect={openEconOverview}
+                />
+              </Card>
+              <Card title="Agent/Map Synergies" className="min-h-[350px]">
+                <BubbleChart
+                  data={filteredSynergy}
+                  theme={currentData.theme}
+                  onSelect={openSynergyOverview}
+                />
+              </Card>
+            </>
+          )}
           <Card
             title={`${activeGame === "VALORANT" ? "Valorant" : "Crossfire"} Team Round-Start Strategy Heatmap`}
             className="min-h-[350px]"
@@ -1081,17 +1096,17 @@ const Analytics = ({ globalGame, globalTournament }) => {
           onClick={() => setModalData(null)}
         >
           <div
-            className={`bg-[#121a25] border border-[#232f40] rounded-xl w-full shadow-2xl transform transition-all scale-100 opacity-100 ${modalData.data?.type === "Heatmap" ? "max-w-4xl" : "max-w-md"}`}
+            className={`bg-bg-300 border border-[#232f40] rounded-xl w-full shadow-2xl transform transition-all scale-100 opacity-100 ${modalData.data?.type === "Heatmap" ? "max-w-4xl" : "max-w-md"}`}
             style={{ padding: "32px" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4 border-b border-[#232f40] pb-2">
-              <h2 className="text-xl font-black text-white">
+              <h2 className="text-xl font-black text-theme-text-base">
                 {modalData.title}
               </h2>
               <button
                 onClick={() => setModalData(null)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-theme-text-muted hover:text-theme-text-base transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -1108,11 +1123,11 @@ const Analytics = ({ globalGame, globalTournament }) => {
                 </svg>
               </button>
             </div>
-            <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+            <p className="text-theme-text-base text-sm mb-6 leading-relaxed">
               {modalData.description}
             </p>
             {modalData.data?.type === "Heatmap" ? (
-              <div className="relative w-full aspect-[4/3] bg-[#0a0f16] rounded-xl border border-[#2a3648] overflow-hidden shadow-inner flex items-center justify-center mt-4">
+              <div className="relative w-full aspect-[4/3] bg-bg-100 rounded-xl border border-[#2a3648] overflow-hidden shadow-inner flex items-center justify-center mt-4">
                 <img
                   src={
                     modalData.data.area && modalData.data.area !== "No Data"
@@ -1142,8 +1157,7 @@ const Analytics = ({ globalGame, globalTournament }) => {
                         style={{ left: `${h.coord_x}%`, top: `${h.coord_y}%` }}
                         onMouseMove={(e) => {
                           e.stopPropagation();
-                          const rect =
-                            e.target.parentElement.getBoundingClientRect();
+                          const rect = e.target.closest('.relative').getBoundingClientRect();
                           setModalTooltip({
                             visible: true,
                             x: e.clientX - rect.left,
@@ -1155,9 +1169,9 @@ const Analytics = ({ globalGame, globalTournament }) => {
                                 >
                                   {h.event_type}
                                 </div>
-                                <div className="text-gray-300 font-bold">
+                                <div className="text-theme-text-base font-bold">
                                   Round{" "}
-                                  <span className="text-white">
+                                  <span className="text-theme-text-base">
                                     {h.round_number}
                                   </span>
                                 </div>
@@ -1170,27 +1184,27 @@ const Analytics = ({ globalGame, globalTournament }) => {
                     ))}
                 <Tooltip {...modalTooltip} />
                 {}
-                <div className="absolute bottom-6 right-6 bg-[#0a0f16]/90 p-4 rounded-xl border border-[#232f40] flex flex-col items-start backdrop-blur-md shadow-2xl">
-                  <span className="text-xs font-black text-white mb-4 uppercase tracking-widest">
+                <div className="absolute bottom-6 right-6 bg-bg-100/90 p-4 rounded-xl border border-[#232f40] flex flex-col items-start backdrop-blur-md shadow-2xl">
+                  <span className="text-xs font-black text-theme-text-base mb-4 uppercase tracking-widest">
                     Legend
                   </span>
                   <div className="flex items-center gap-4 mb-3">
                     <div className="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444] border-2 border-white shrink-0"></div>
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-theme-text-base uppercase tracking-wider">
                       Plant
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] border-2 border-white shrink-0"></div>
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-theme-text-base uppercase tracking-wider">
                       Defuse
                     </span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-[#0f1722] rounded-lg border border-[#1c2532] overflow-x-auto" style={{ padding: "16px" }}>
-                <div className="text-[10px] font-black tracking-widest text-gray-500 mb-2 uppercase">
+              <div className="bg-bg-300 rounded-lg border border-[#1c2532] overflow-x-auto" style={{ padding: "16px" }}>
+                <div className="text-[10px] font-black tracking-widest text-theme-text-faint mb-2 uppercase">
                   Raw Analytic Node Data
                 </div>
                 <pre className="text-xs font-mono text-blue-400">
@@ -1200,7 +1214,7 @@ const Analytics = ({ globalGame, globalTournament }) => {
             )}
             <button
               onClick={() => setModalData(null)}
-              className="mt-6 w-full py-3 bg-[#1e293b] hover:bg-[#2a3648] border border-[#334155] rounded-lg text-white font-bold tracking-wider transition-colors"
+              className="mt-6 w-full py-3 bg-bg-400 hover:bg-bg-500 border border-[#334155] rounded-lg text-theme-text-base font-bold tracking-wider transition-colors"
             >
               Close Analysis
             </button>

@@ -2,11 +2,19 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 
 function useStickyState(defaultValue, key) {
   const [value, setValue] = React.useState(() => {
-    const stickyValue = window.sessionStorage.getItem(key);
-    return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
+    try {
+      const stickyValue = window.sessionStorage.getItem(key);
+      return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
+    } catch (e) {
+      return defaultValue;
+    }
   });
   React.useEffect(() => {
-    window.sessionStorage.setItem(key, JSON.stringify(value));
+    try {
+      window.sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('Could not save sticky state (quota exceeded?):', key);
+    }
   }, [key, value]);
   return [value, setValue];
 }
@@ -631,6 +639,43 @@ const CrossfireLogo = ({ size = 20, color = "#4c7fd6" }) => (
     <line x1="0" y1="50" x2="100" y2="50" stroke={color} strokeWidth="8" />
   </svg>
 );
+
+const getMatchCountdown = (match) => {
+  if (match.countdown) return match.countdown;
+  if (!match.day || !match.time) return 'TBD';
+
+  const now = new Date();
+  
+  // Parse time like "8:51 PM" or "20:51"
+  const timeRegex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
+  const matchTimeStr = String(match.time).trim();
+  const timeMatch = matchTimeStr.match(timeRegex);
+  
+  if (!timeMatch) return `Starts at ${match.time}`;
+  
+  let hours = parseInt(timeMatch[1], 10);
+  const minutes = parseInt(timeMatch[2], 10);
+  const ampm = timeMatch[3]?.toUpperCase();
+  
+  if (ampm === 'PM' && hours < 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+
+  const matchDate = new Date(now.getFullYear(), now.getMonth(), parseInt(match.day, 10));
+  matchDate.setHours(hours, minutes, 0, 0);
+
+  const diffMs = matchDate.getTime() - now.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  if (diffHours > 0 && diffHours <= 24) {
+    const h = Math.floor(diffHours);
+    const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (h > 0) return `Starts in ${h}h ${m}m`;
+    return `Starts in ${m}m`;
+  }
+  
+  return `Starts at ${match.time}`;
+};
+
 const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
   const isLive = match.isLive;
   return (
@@ -650,7 +695,7 @@ const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
         ) : showCountdown ? (
           <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 text-slate-200 text-[10px] font-black px-2.5 py-1 rounded-lg shadow-inner group-hover:text-white transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            {match.countdown || "2h 13m"}
+            {match.countdown || getMatchCountdown(match)}
           </div>
         ) : null}
       </div>
@@ -689,11 +734,55 @@ const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
     </div>
   );
 };
-const LiveUpcomingTab = ({ game }) => {
+const LiveUpcomingTab = ({ game, globalTournament }) => {
+  const [matches, setMatches] = React.useState([]);
+  React.useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/matches?tournament=${globalTournament?.name || "Default"}`);
+        if (res.ok) {
+          const data = await res.json();
+          const mapped = data.map(m => ({
+            id: m.match_id,
+            team1: m.team_a?.team_name || "TBD",
+            team1Logo: m.team_a?.logo_url,
+            team2: m.team_b?.team_name || "TBD",
+            team2Logo: m.team_b?.logo_url,
+            score: `${m.score_a || 0}-${m.score_b || 0}`,
+            isLive: m.is_live,
+            day: m.match_day ? (m.match_day.includes("-") ? parseInt(m.match_day.split("-")[2], 10) : parseInt(m.match_day, 10)) : undefined,
+            time: m.match_time
+          }));
+          mapped.sort((a, b) => {
+            if (a.isLive !== b.isLive) return a.isLive ? -1 : 1;
+            
+            const dayA = a.day || 999;
+            const dayB = b.day || 999;
+            if (dayA !== dayB) return dayA - dayB;
+
+            const parseTime = (t) => {
+              const m = String(t || "").trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+              if (!m) return 9999;
+              let h = parseInt(m[1], 10);
+              const min = parseInt(m[2], 10);
+              const ampm = m[3]?.toUpperCase();
+              if (ampm === 'PM' && h < 12) h += 12;
+              if (ampm === 'AM' && h === 12) h = 0;
+              return h * 60 + min;
+            };
+            return parseTime(a.time) - parseTime(b.time);
+          });
+          setMatches(mapped);
+        }
+      } catch (e) { console.error(e); }
+    };
+    fetchMatches();
+  }, [globalTournament?.name]);
+
   const d = DATA[game];
-  const [showCountdown, setShowCountdown] = useState(true);
-  const [showAllRankings, setShowAllRankings] = useState(false);
-  const scrollRef = useRef(null);
+  const [showCountdown, setShowCountdown] = React.useState(true);
+  const [showAllRankings, setShowAllRankings] = React.useState(false);
+  const scrollRef = React.useRef(null);
   
   const scroll = (dir) => {
     if (scrollRef.current) {
@@ -750,10 +839,14 @@ const LiveUpcomingTab = ({ game }) => {
             ref={scrollRef}
             className="match-scroll-container snap-x snap-mandatory items-start w-full pb-4" 
           >
-            {d.liveMatches.map((match, idx) => (
+            {matches.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center py-10 text-slate-500 font-bold tracking-widest uppercase text-sm w-full">
+                No upcoming matches
+              </div>
+            ) : matches.map((match, idx) => (
               <MatchCard 
                 key={match.id || idx} 
-                match={{...match, countdown: `${idx + 1}d ${idx + 2}h 13m`, day: idx + 2}} 
+                match={{...match, day: match.day || "TBD"}} 
                 showCountdown={showCountdown} 
                 game={game}
                 index={idx}
@@ -1036,7 +1129,7 @@ const ResultTab = ({ game, globalTournament }) => {
   );
 };
 const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 6, 1)); // Default to July 2026
+  const [currentDate, setCurrentDate] = useState(new Date());
   const daysOfWeek = ["M", "T", "W", "T", "F", "S", "S"];
   
   const year = currentDate.getFullYear();
@@ -1055,8 +1148,8 @@ const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
-  // Using 9 as static today for mockup purposes when in July 2026
-  const today = month === 6 && year === 2026 ? 9 : null; 
+  const todayObj = new Date();
+    const today = month === todayObj.getMonth() && year === todayObj.getFullYear() ? todayObj.getDate() : null; 
 
   return (
     <div className="calendar-card">
@@ -1550,7 +1643,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
   const [teamBLogo, setTeamBLogo] = useStickyState("", `${key}_teamBLogo`);
   const [teamBFile, setTeamBFile] = useState(null);
 
-  const [day, setDay] = useStickyState("2026-07-09", `${key}_day`);
+  const [day, setDay] = useStickyState(new Date().toISOString().split("T")[0], `${key}_day`);
   const [time, setTime] = useStickyState("14:00", `${key}_time`);
   const [timezone, setTimezone] = useStickyState(
     "20:00 PST",
@@ -1782,7 +1875,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
 
           <div>
             <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              DAY (JULY 2026)
+              DATE
             </label>
             <input
               type="date"
@@ -1911,7 +2004,47 @@ const ScheduleTab = ({ game, globalTournament }) => {
     ? globalTournament.name.replace(/[^a-zA-Z0-9]/g, "_")
     : "default";
   const key = `tourney_schedule_${safeFolder}_${activeGame}`;
-  const [scheduleData] = useStickyState([], key);
+  const [scheduleData, setScheduleData] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/matches?tournament=${globalTournament?.name || "Default"}`);
+        if (res.ok) {
+          const data = await res.json();
+          const mapped = data.map((m) => {
+            let dayNum = 1;
+            if (m.match_day) {
+              if (m.match_day.includes("-")) {
+                dayNum = parseInt(m.match_day.split("-")[2], 10);
+              } else {
+                dayNum = parseInt(m.match_day, 10);
+              }
+            }
+            return {
+              id: m.match_id,
+              teamA: m.team_a?.team_name || "TBD",
+              teamALogo: m.team_a?.logo_url,
+              teamB: m.team_b?.team_name || "TBD",
+              teamBLogo: m.team_b?.logo_url,
+              score: `${m.score_a || 0}-${m.score_b || 0}`,
+              isLive: m.is_live,
+              day: dayNum,
+              time: m.match_time || "00:00",
+              timezone: m.match_timezone || "PST",
+              reminded: false,
+              stage: m.round || "Match",
+              map: m.map_info || "TBD",
+            };
+          });
+          setScheduleData(mapped);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchMatches();
+  }, [globalTournament?.name]);
 
   const highlightDays = useMemo(
     () => scheduleData.map((m) => m.day),
@@ -2113,7 +2246,7 @@ const Tournament = ({ globalGame, globalTournament }) => {
   const renderTab = () => {
     switch (activeTab) {
       case "LIVE & UPCOMING":
-        return <LiveUpcomingTab game={activeGame} />;
+        return <LiveUpcomingTab game={activeGame} globalTournament={globalTournament} />;
       case "RESULT":
         return (
           <ResultTab game={activeGame} globalTournament={globalTournament} />

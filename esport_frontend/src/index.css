@@ -22,9 +22,81 @@
   --theme-hue: 0deg;
 }
 
-/* Safeguard images and specific SVGs from being hue-rotated with the theme */
-img, video {
-  filter: hue-rotate(calc(-1 * var(--theme-hue, 0deg)));
+@theme {
+  /* Accent Colors (Cyan / Blue palettes mapped to user's picked accent) */
+  --color-cyan-50: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 10%, white);
+  --color-cyan-100: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 20%, white);
+  --color-cyan-200: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 40%, white);
+  --color-cyan-300: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 60%, white);
+  --color-cyan-400: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 60%, var(--theme-text-base, white));
+  --color-cyan-500: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 85%, black);
+  --color-cyan-600: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 70%, black);
+  --color-cyan-700: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 55%, black);
+  --color-cyan-800: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 40%, black);
+  --color-cyan-900: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 25%, black);
+  --color-cyan-950: color-mix(in srgb, var(--theme-accent-base, #06b6d4) 15%, black);
+
+  --color-blue-50: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 10%, white);
+  --color-blue-100: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 20%, white);
+  --color-blue-200: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 40%, white);
+  --color-blue-300: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 60%, white);
+  --color-blue-400: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 60%, var(--theme-text-base, white));
+  --color-blue-500: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 80%, var(--theme-text-base, white));
+  --color-blue-600: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 85%, black);
+  --color-blue-700: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 70%, black);
+  --color-blue-800: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 55%, black);
+  --color-blue-900: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 40%, black);
+  --color-blue-950: color-mix(in srgb, var(--theme-accent-base, #3b82f6) 25%, black);
+
+  /* Adaptive Readable Alert Colors */
+  --color-red-400: color-mix(in srgb, #f87171 60%, var(--theme-text-base, white));
+  --color-red-500: color-mix(in srgb, #ef4444 60%, var(--theme-text-base, white));
+  --color-green-400: color-mix(in srgb, #34d399 60%, var(--theme-text-base, white));
+  --color-green-500: color-mix(in srgb, #10b981 60%, var(--theme-text-base, white));
+  --color-yellow-400: color-mix(in srgb, #facc15 60%, var(--theme-text-base, white));
+  --color-yellow-500: color-mix(in srgb, #eab308 60%, var(--theme-text-base, white));
+  --color-purple-400: color-mix(in srgb, #c084fc 60%, var(--theme-text-base, white));
+  --color-purple-500: color-mix(in srgb, #a855f7 60%, var(--theme-text-base, white));
+
+  /* Dynamic Background Colors (Mapped to user's picked background) */
+  --color-bg-base: var(--theme-bg-base, #040814);
+  --color-bg-100: color-mix(in srgb, var(--theme-bg-base, #040814) 96%, white);
+  --color-bg-200: color-mix(in srgb, var(--theme-bg-base, #040814) 92%, white);
+  --color-bg-300: color-mix(in srgb, var(--theme-bg-base, #040814) 88%, white);
+  --color-bg-400: color-mix(in srgb, var(--theme-bg-base, #040814) 84%, white);
+  --color-bg-500: color-mix(in srgb, var(--theme-bg-base, #040814) 80%, white);
+  --color-bg-600: color-mix(in srgb, var(--theme-bg-base, #040814) 75%, white);
+  --color-bg-700: color-mix(in srgb, var(--theme-bg-base, #040814) 70%, white);
+  --color-bg-800: color-mix(in srgb, var(--theme-bg-base, #040814) 65%, white);
+  --color-bg-900: color-mix(in srgb, var(--theme-bg-base, #040814) 55%, white);
+
+  /* Dynamic Text Colors */
+  --theme-text-base: #ffffff; /* Explicitly define in theme to prevent static compilation */
+  --color-theme-text-base: var(--theme-text-base, #ffffff);
+  --color-theme-text-muted: color-mix(in srgb, var(--theme-text-base, #ffffff) 70%, transparent);
+  --color-theme-text-faint: color-mix(in srgb, var(--theme-text-base, #ffffff) 45%, transparent);
+}
+
+/* 120fps Realtime Color Picker Performance */
+body.picking-color * {
+  transition: none !important;
+}
+
+/* Ensure text classes are never statically compiled */
+@utility text-theme-text-base {
+  color: var(--theme-text-base) !important;
+}
+@utility text-theme-text-muted {
+  color: color-mix(in srgb, var(--theme-text-base) 70%, transparent) !important;
+}
+@utility text-theme-text-faint {
+  color: color-mix(in srgb, var(--theme-text-base) 45%, transparent) !important;
+}
+@utility bg-theme-input {
+  background-color: color-mix(in srgb, var(--theme-text-base) 10%, transparent) !important;
+}
+@utility border-theme-input {
+  border-color: color-mix(in srgb, var(--theme-text-base) 20%, transparent) !important;
 }
 
 /* ─── Reset & Base ─── */
@@ -43,8 +115,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  filter: hue-rotate(var(--theme-hue, 0deg));
-  transition: filter 0.5s ease-out;
 }
 
 /* ─── Custom Scrollbar for sidebar navigation */
@@ -97,15 +167,13 @@ button {
 input {
   width: 100%;
   padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background-color: var(--bg-primary);
   color: var(--text-primary);
-  outline: none;
 }
 
-input:focus {
-  border-color: var(--accent-blue);
+/* Base Element Styling */
+option {
+  background-color: var(--color-bg-100);
+  color: var(--theme-text-base);
 }
 
 /* Layout & Components */
@@ -537,8 +605,8 @@ input:focus {
 .match-card {
   min-width: 280px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(30, 38, 49, 0.9) 0%, rgba(18, 24, 33, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-300);
+  border: 1px solid color-mix(in srgb, var(--theme-text-base) 10%, transparent);
   padding: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -578,8 +646,8 @@ input:focus {
 
 /* Glassmorphism Cards */
 .glass-panel {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%);
-  border: 1px solid rgba(0, 240, 255, 0.15); /* Subtle cyan border */
+  background: color-mix(in srgb, var(--color-bg-300) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-text-base) 10%, transparent);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.05);
@@ -592,8 +660,8 @@ input:focus {
   display: flex;
   flex-direction: column;
   
-  background: linear-gradient(145deg, rgba(15, 23, 34, 0.8) 0%, rgba(10, 15, 24, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--color-bg-300) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-text-base) 10%, transparent);
   border-radius: 12px;
   padding: 24px;
 }
@@ -604,7 +672,7 @@ input:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border: 1px dashed color-mix(in srgb, var(--theme-text-base) 20%, transparent);
   border-radius: 8px;
   margin-top: 16px;
   color: rgba(255, 255, 255, 0.3);
@@ -724,8 +792,8 @@ input:focus {
 
 /* Calendar Widget */
 .calendar-card {
-  background: linear-gradient(145deg, rgba(15, 23, 34, 0.8) 0%, rgba(10, 15, 24, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--color-bg-300) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-text-base) 10%, transparent);
   border-radius: 16px;
   padding: 32px;
   width: 100%;
@@ -749,7 +817,7 @@ input:focus {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 2px;
-  color: #94a3b8;
+  color: var(--theme-text-muted);
   text-transform: uppercase;
 }
 
@@ -764,11 +832,11 @@ input:focus {
 .calendar-month-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--theme-text-base);
 }
 
 .nav-arrow {
-  color: #64748b;
+  color: var(--theme-text-muted);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -778,7 +846,7 @@ input:focus {
 }
 
 .nav-arrow:hover {
-  color: #ffffff;
+  color: var(--theme-text-base);
 }
 
 /* 3. "M T W T F S S" Row */
@@ -788,7 +856,7 @@ input:focus {
   text-align: center;
   font-size: 0.75rem;
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--color-blue-400);
   margin-top: 8px;
 }
 
@@ -809,7 +877,7 @@ input:focus {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  color: #e2e8f0;
+  color: var(--theme-text-base);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -827,15 +895,15 @@ input:focus {
 
 /* Active States */
 .date-cell.selected {
-  background-color: #00f0ff;
-  color: #000;
+  background-color: var(--theme-accent-base);
+  color: white;
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--theme-accent-base) 50%, transparent);
 }
 
 .date-cell.today {
-  border: 1px solid #3b82f6;
-  color: #3b82f6;
+  border: 1px solid var(--color-blue-400);
+  color: var(--color-blue-400);
 }
 
 /* Match Day Dot Indicator */
@@ -905,7 +973,7 @@ input:focus {
 }
 
 .game-filter-item.active {
-  border: 1px solid rgba(0, 240, 255, 0.4);
+  border: 1px solid color-mix(in srgb, var(--theme-accent-base) 40%, transparent);
   background-color: rgba(255, 255, 255, 0.05);
 }
 
@@ -966,3 +1034,12 @@ input:focus {
   box-sizing: border-box !important;
   width: 100% !important;
 }
+/* Hide number input spinners globally */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

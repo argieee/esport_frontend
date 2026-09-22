@@ -7,13 +7,13 @@ const Card = ({ title, children, className = "" }) => {
   const [filterValue, setFilterValue] = useState("Last 7 Days");
 
   return (
-    <div className={`bg-[#0d131c]/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-[0_0_30px_rgba(6,182,212,0.05)] hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all duration-500 flex flex-col overflow-hidden relative group ${className}`}>
+    <div className={`bg-bg-200/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-[0_0_30px_color-mix(in_srgb,var(--color--)_%,transparent)] hover:shadow-[0_0_30px_color-mix(in_srgb,var(--color--)_%,transparent)] transition-all duration-500 flex flex-col overflow-hidden relative group ${className}`}>
       <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-      <div className="border-b border-white/5 bg-[#151A22]/50 relative z-50 flex justify-end items-center shrink-0" style={{ padding: "24px 32px" }}>
+      <div className="border-b border-white/5 bg-bg-300/50 relative z-50 flex justify-end items-center shrink-0" style={{ padding: "24px 32px" }}>
         <div className="flex items-center relative">
           <button 
             onClick={() => setFilterOpen(!filterOpen)}
-            className="flex items-center bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 text-xs font-bold text-slate-300 transition-colors shadow-sm cursor-pointer"
+            className="flex items-center bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 text-xs font-bold text-theme-text-base transition-colors shadow-sm cursor-pointer"
             style={{ padding: "10px 24px", borderRadius: "12px", gap: "8px" }}
           >
             <Filter size={14} /> {filterValue} <ChevronDown size={14} />
@@ -24,7 +24,7 @@ const Card = ({ title, children, className = "" }) => {
                 <button 
                   key={opt}
                   onClick={() => { setFilterValue(opt); setFilterOpen(false); }}
-                  className="w-full text-left text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+                  className="w-full text-left text-xs font-bold text-theme-text-base hover:bg-slate-700 hover:text-theme-text-base transition-colors cursor-pointer"
                   style={{ padding: "12px 16px" }}
                 >
                   {opt}
@@ -53,14 +53,14 @@ const MapBpResults = ({ globalGame, globalTournament }) => {
   }, [globalTournament, activeGame]);
 
   return (
-    <div className="flex-1 bg-[#05080f] text-white overflow-y-auto flex flex-col h-full custom-scrollbar relative" style={{ padding: "32px" }}>
+    <div className="flex-1 bg-bg-base text-theme-text-base overflow-y-auto flex flex-col h-full custom-scrollbar relative" style={{ padding: "32px" }}>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-10 bg-cyan-500 pointer-events-none z-0"></div>
       <div className="w-full max-w-[1600px] mx-auto pb-16 h-full flex flex-col relative z-10">
         <Card title="Map BP Results" className="w-full flex-1">
           <div className="overflow-x-auto flex-1 custom-scrollbar">
             <table className="w-full table-fixed text-center text-sm whitespace-nowrap">
               <thead>
-                <tr className="border-b border-white/5 text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase bg-[#090D14]/80">
+                <tr className="border-b border-white/5 text-[10px] font-bold tracking-[0.2em] text-theme-text-muted uppercase bg-bg-100/80">
                   <th style={{ padding: "24px 16px" }}>Team 1</th>
                   <th style={{ padding: "24px 16px" }}>Team 2</th>
                   <th className="bg-rose-500/5" style={{ padding: "24px 16px" }}>Ban 1</th>
@@ -96,11 +96,11 @@ const MapBpResults = ({ globalGame, globalTournament }) => {
           {dbVetoes.length === 0 && (
             <div className="absolute top-[80px] left-0 right-0 bottom-0 flex flex-col items-center justify-center pointer-events-none">
               <div className="flex flex-col items-center justify-center pointer-events-auto">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-b from-cyan-500/20 to-transparent flex items-center justify-center border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)]" style={{ marginBottom: "32px" }}>
-                  <Map size={48} strokeWidth={1.5} className="text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="w-24 h-24 rounded-full bg-gradient-to-b from-cyan-500/20 to-transparent flex items-center justify-center border border-cyan-500/30 shadow-[0_0_30px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ marginBottom: "32px" }}>
+                  <Map size={48} strokeWidth={1.5} className="text-cyan-400 drop-shadow-[0_0_8px_color-mix(in_srgb,var(--color--)_%,transparent)]" />
                 </div>
-                <div className="text-white text-xl font-black tracking-wider uppercase mb-2 text-center">No Map Veto Results Found</div>
-                <div className="text-slate-400 text-sm font-medium max-w-md mx-auto text-center">The veto data for this tournament is either unavailable or the matches have not yet concluded. Check back soon.</div>
+                <div className="text-theme-text-base text-xl font-black tracking-wider uppercase mb-2 text-center">No Map Veto Results Found</div>
+                <div className="text-theme-text-muted text-sm font-medium max-w-md mx-auto text-center">The veto data for this tournament is either unavailable or the matches have not yet concluded. Check back soon.</div>
               </div>
             </div>
           )}

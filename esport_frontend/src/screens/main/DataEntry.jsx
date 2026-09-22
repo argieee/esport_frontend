@@ -551,6 +551,26 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     const matchHeader = { league, week, day, match, setNum, mapName };
     if (game === "Crossfire") {
       setIsSubmitting(true);
+
+        // Finish Live Match if broadcasting
+        if (broadcast) {
+           try {
+             await apiFetch('/api/matches/finish-live', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 tournament_name: globalTournament || "Default",
+                 team_a_name: teamA.name,
+                 team_b_name: teamB.name,
+                 team_a_score: scoreA,
+                 team_b_score: scoreB
+               })
+             });
+           } catch (e) {
+             console.error('Failed to finish live match', e);
+           }
+        }
+
       try {
         const payloadMap = {};
         const rawEntries = [];
@@ -678,6 +698,26 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       }
     } else {
       setIsSubmitting(true);
+
+        // Finish Live Match if broadcasting
+        if (broadcast) {
+           try {
+             await apiFetch('/api/matches/finish-live', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 tournament_name: globalTournament || "Default",
+                 team_a_name: teamA.name,
+                 team_b_name: teamB.name,
+                 team_a_score: scoreA,
+                 team_b_score: scoreB
+               })
+             });
+           } catch (e) {
+             console.error('Failed to finish live match', e);
+           }
+        }
+
       try {
         const payloadMap = {};
         const extractNewStats = (p, teamName, isWin) => {
@@ -879,7 +919,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             </div>
           </div>
           {/* ── Row 1: Match Header + Teams ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: '48px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: "24px" }}>
             {/* Match Header */}
             <div className="lg:col-span-2 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
               <SectionHeader
@@ -887,7 +927,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 label="Main Match Header"
                 sub="Configuration"
               />
-              <div className="grid grid-cols-2 lg:grid-cols-4" style={{ padding: '56px 24px', gap: '32px' }}>
+              <div className="grid grid-cols-2 lg:grid-cols-4" style={{ padding: "24px", gap: "20px" }}>
                 <Field label="League/Tournament:">
                   <input
                     type="text"
@@ -969,7 +1009,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Matchup"
                 accent="#6366f1"
               />
-              <div className="flex flex-col" style={{ padding: '56px 24px', gap: '48px' }}>
+              <div className="flex flex-col" style={{ padding: "24px", gap: "24px" }}>
                 {/* Team A & B side by side */}
                 <div className="flex" style={{ display: 'flex', gap: '24px' }}>
                   <div className="flex-1 bg-blue-900/10 border border-blue-900/30 rounded-xl hover:border-blue-700/40 transition-colors" style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
@@ -1100,31 +1140,29 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Visible because valorant is selected"
                 accent="#f59e0b"
               />
-              <div style={{ padding: '56px 24px' }}>
+              <div style={{ padding: "24px" }}>
                 {/* Score */}
                 <div className="flex flex-wrap items-end gap-4 mb-6">
-                  <div>
-                    <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1.5">
-                      Score
+                  <div className="w-full max-w-xl">
+                    <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 text-center">
+                      Win Probability
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-lg px-3 py-2">
-                      <input
-                        type="number"
-                        className="bg-transparent text-white light:text-slate-900 text-sm font-black w-10 text-center outline-none"
-                        value={scoreA}
-                        onChange={(e) => setScoreA(Number(e.target.value) || 0)}
-                        min="0"
-                        max="99"
-                      />
-                      <span className="text-slate-500 font-black">—</span>
-                      <input
-                        type="number"
-                        className="bg-transparent text-white light:text-slate-900 text-sm font-black w-10 text-center outline-none"
-                        value={scoreB}
-                        onChange={(e) => setScoreB(Number(e.target.value) || 0)}
-                        min="0"
-                        max="99"
-                      />
+                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                           <span className="text-3xl font-black text-blue-100">{Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-blue-500">%</span></span>
+                        </div>
+                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
+                        <div className="flex flex-col items-end">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                           <span className="text-3xl font-black text-red-100">{Math.max(0, Math.min(100, 100 - Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-red-500">%</span></span>
+                        </div>
+                      </div>
+
+                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-hidden mt-2 group shadow-inner">
+                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}%` }} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1141,30 +1179,47 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 sub="Visible because crossfire is selected"
                 accent="#f59e0b"
               />
-              <div style={{ padding: '56px 24px' }}>
+              <div style={{ padding: "24px" }}>
                 <div className="flex flex-wrap items-end gap-8">
-                  <div>
-                    <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1.5">
-                      Score
+                  <div className="w-full max-w-xl">
+                    <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 text-center">
+                      Win Probability
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/70 rounded-lg px-3 py-2">
-                      <input
-                        type="number"
-                        className="bg-transparent text-white text-sm font-black w-10 text-center outline-none"
-                        value={scoreA}
-                        onChange={(e) => setScoreA(Number(e.target.value) || 0)}
-                        min="0"
-                        max="99"
-                      />
-                      <span className="text-slate-500 font-black">—</span>
-                      <input
-                        type="number"
-                        className="bg-transparent text-white text-sm font-black w-10 text-center outline-none"
-                        value={scoreB}
-                        onChange={(e) => setScoreB(Number(e.target.value) || 0)}
-                        min="0"
-                        max="99"
-                      />
+                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                           <span className="text-3xl font-black text-blue-100">{scoreA}<span className="text-xl text-blue-500">%</span></span>
+                        </div>
+                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
+                        <div className="flex flex-col items-end">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                           <span className="text-3xl font-black text-red-100">{scoreB}<span className="text-xl text-red-500">%</span></span>
+                        </div>
+                      </div>
+
+                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-visible mt-2 group">
+                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-l-full pointer-events-none transition-all duration-150" style={{ width: `${scoreA}%` }} />
+                         <div className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 to-red-400 rounded-r-full pointer-events-none transition-all duration-150" style={{ width: `${scoreB}%` }} />
+                         
+                         <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={scoreA}
+                            onChange={(e) => {
+                               const val = Number(e.target.value);
+                               setScoreA(val);
+                               setScoreB(100 - val);
+                            }}
+                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-0 cursor-pointer h-10 z-10"
+                         />
+                         
+                         <div 
+                            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)] pointer-events-none transition-all duration-150 group-hover:scale-125 group-active:scale-95 border-2 border-slate-800"
+                            style={{ left: `calc(${scoreA}% - 12px)` }}
+                         />
+                      </div>
                     </div>
                   </div>
                   {/* Live Win Probability Assessment */}
@@ -1207,7 +1262,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Tracker"
               accent="#ec4899"
             />
-            <div className="overflow-x-auto de-scroll" style={{ padding: '56px 24px' }}>
+            <div className="overflow-x-auto de-scroll" style={{ padding: "24px" }}>
               <table className="w-full text-center border-collapse min-w-[1200px] text-[10px] font-black uppercase tracking-wider text-slate-300 light:text-slate-600">
                 <thead>
                   <tr className="bg-slate-800/80 light:bg-slate-100 border-b border-slate-700/50 light:border-slate-300">
@@ -1503,7 +1558,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 </tbody>
               </table>
               {/* Timeouts and Current Round Display */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', marginTop: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: "20px", marginTop: '32px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', overflow: 'hidden', width: '192px' }}>
                   <div className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase text-center border-b border-amber-500/30" style={{ padding: '8px' }}>
                     Timeout Indicator
@@ -2165,7 +2220,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Event Coordinate Plotting"
               accent="#06b6d4"
             />
-            <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: '32px' }}>
+            <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: "20px" }}>
               {}
               <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
                 <Field label="Target Round">
@@ -2310,7 +2365,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Match Commentary"
               accent="#10b981"
             />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '56px 32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: "20px", padding: '56px 32px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
                 <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
                   Notes:

@@ -3,7 +3,7 @@ import { apiFetch } from "../../utils/api";
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
-    className="h-5 w-5 text-slate-400"
+    className="h-5 w-5 text-theme-text-muted"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -35,7 +35,7 @@ const DownloadIcon = () => (
 const UploadIcon = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
-    className="h-8 w-8 text-slate-400 mb-2"
+    className="h-8 w-8 text-theme-text-muted mb-2"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -67,7 +67,7 @@ const ExclamationIcon = () => (
 const ToggleSwitch = ({ enabled, onChange }) => (
   <button
     onClick={() => onChange(!enabled)}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shadow-inner ${enabled ? "bg-[#00ffcc]" : "bg-slate-700"}`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shadow-inner ${enabled ? "bg-cyan-400" : "bg-slate-700"}`}
   >
     <span
       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`}
@@ -81,7 +81,8 @@ const Mapping = ({ globalGame, globalTournament }) => {
   const [teamB, setTeamB] = useState("Team B");
   const [dbTeams, setDbTeams] = useState([]);
   useEffect(() => {
-    apiFetch(`/api/teams?tournament=${encodeURIComponent(globalTournament)}`)
+    const tName = typeof globalTournament === 'string' ? globalTournament : (globalTournament?.name || "Default");
+    apiFetch(`/api/teams?tournament=${encodeURIComponent(tName)}`)
       .then((r) => r.json())
       .then((data) => {
         if (data && data.length > 0) {
@@ -436,7 +437,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
       );
       const payload = {
         game,
-        tournament_name: globalTournament,
+        tournament_name: globalTournament?.name || globalTournament || "Default",
         stage: "",
         week: "",
         day: "",
@@ -521,7 +522,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 <select
                   value={teamA}
                   onChange={(e) => setTeamA(e.target.value)}
-                  className="bg-[#1d4ed8]/20 border border-[#1d4ed8]/50 text-white text-base font-black rounded-xl outline-none text-center w-36 focus:border-[#60a5fa] transition-colors focus:bg-[#1d4ed8]/40 shadow-[0_0_15px_rgba(29,78,216,0.2)]"
+                  className="bg-blue-700/20 border border-[#1d4ed8]/50 text-theme-text-base text-base font-black rounded-xl outline-none text-center w-36 focus:border-[#60a5fa] transition-colors focus:bg-blue-700/40 shadow-[0_0_15px_rgba(29,78,216,0.2)]"
                   style={{ padding: "12px 16px" }}
                 >
                   {" "}
@@ -529,7 +530,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                     <option
                       key={`a-${t.team_name}`}
                       value={t.team_name}
-                      className="bg-slate-900 text-white"
+                      className="bg-slate-900 text-theme-text-base"
                     >
                       {t.team_name}
                     </option>
@@ -575,11 +576,11 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   <div className="absolute flex flex-col items-center">
                     {" "}
                     <span
-                      className={`text-3xl font-black ${isTimeLow ? "text-red-500" : "text-white"}`}
+                      className={`text-3xl font-black ${isTimeLow ? "text-red-500" : "text-theme-text-base"}`}
                     >
                       {timeLeft}
                     </span>{" "}
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest -mt-1">
+                    <span className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest -mt-1">
                       Sec
                     </span>{" "}
                   </div>{" "}
@@ -594,7 +595,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 <select
                   value={teamB}
                   onChange={(e) => setTeamB(e.target.value)}
-                  className="bg-[#b91c1c]/20 border border-[#b91c1c]/50 text-white text-base font-black rounded-xl outline-none text-center w-36 focus:border-[#f87171] transition-colors focus:bg-[#b91c1c]/40 shadow-[0_0_15px_rgba(185,28,28,0.2)]"
+                  className="bg-red-700/20 border border-[#b91c1c]/50 text-theme-text-base text-base font-black rounded-xl outline-none text-center w-36 focus:border-[#f87171] transition-colors focus:bg-red-700/40 shadow-[0_0_15px_rgba(185,28,28,0.2)]"
                   style={{ padding: "12px 16px" }}
                 >
                   {" "}
@@ -602,7 +603,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                     <option
                       key={`b-${t.team_name}`}
                       value={t.team_name}
-                      className="bg-slate-900 text-white"
+                      className="bg-slate-900 text-theme-text-base"
                     >
                       {t.team_name}
                     </option>
@@ -616,7 +617,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               {currentPhase ? (
                 <span className="text-[12px] font-black uppercase tracking-[0.25em]">
                   {" "}
-                  <span className="text-slate-400">TURN: </span>{" "}
+                  <span className="text-theme-text-muted">TURN: </span>{" "}
                   <span
                     className={
                       currentPhase.team === "A"
@@ -629,7 +630,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   </span>{" "}
                 </span>
               ) : (
-                <span className="text-[12px] font-black uppercase tracking-[0.25em] text-[#00ffcc]">
+                <span className="text-[12px] font-black uppercase tracking-[0.25em] text-cyan-400">
                   DECIDER
                 </span>
               )}{" "}
@@ -651,7 +652,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               <button
                 onClick={toggleVeto}
                 disabled={!currentPhase}
-                className={`text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-lg border ${!currentPhase ? "bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed" : vetoActive ? "bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]" : "bg-[#00ffcc]/10 text-[#00ffcc] border-[#00ffcc]/30 hover:bg-[#00ffcc]/20 shadow-[0_0_20px_rgba(0,255,204,0.2)]"}`}
+                className={`text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-lg border ${!currentPhase ? "bg-slate-800 text-theme-text-muted border-slate-700 cursor-not-allowed" : vetoActive ? "bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]" : "bg-cyan-400/10 text-cyan-400 border-cyan-400/30 hover:bg-cyan-400/20 shadow-[0_0_20px_color-mix(in_srgb,var(--color--)_%,transparent)]"}`}
                 style={{ padding: "14px 32px", borderRadius: "12px" }}
               >
                 {" "}
@@ -664,7 +665,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
             )}{" "}
             <button
               onClick={resetVeto}
-              className="text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50"
+              className="text-[13px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 bg-slate-800/50 text-theme-text-muted hover:text-theme-text-base hover:bg-slate-700 border border-slate-700/50"
               style={{ padding: "14px 32px", borderRadius: "12px" }}
             >
               {" "}
@@ -697,11 +698,11 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>
             ))}{" "}
             <div
-              className={`flex items-center justify-center transition-colors border ${!currentPhase ? "bg-[#00ffcc]/20 border-[#00ffcc]/50 shadow-[0_0_15px_rgba(0,255,204,0.3)]" : "bg-transparent border-transparent opacity-40"}`}
+              className={`flex items-center justify-center transition-colors border ${!currentPhase ? "bg-cyan-400/20 border-cyan-400/50 shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" : "bg-transparent border-transparent opacity-40"}`}
               style={{ padding: "8px 16px", borderRadius: "12px" }}
             >
               {" "}
-              <span className="text-[11px] font-black tracking-widest text-[#00ffcc]">
+              <span className="text-[11px] font-black tracking-widest text-cyan-400">
                 DECIDER
               </span>{" "}
             </div>{" "}
@@ -746,7 +747,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   <div className="absolute bottom-4 left-4 z-10">
                     {" "}
                     <span
-                      className={`px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-[0.3em] backdrop-blur-md shadow-lg border ${m.status === "decider" ? "bg-amber-400 text-amber-950 border-amber-300" : "bg-black/60 text-white border-white/10"}`}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-[0.3em] backdrop-blur-md shadow-lg border ${m.status === "decider" ? "bg-amber-400 text-amber-950 border-amber-300" : "bg-black/60 text-theme-text-base border-white/10"}`}
                     >
                       {" "}
                       {m.name}{" "}
@@ -759,7 +760,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px] z-20">
                         {" "}
                         <div
-                          className={`px-6 py-3 rounded-xl border-2 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ${currentPhase.action === "ban" ? (currentPhase.team === "A" ? "bg-blue-600/90 border-blue-400 text-white" : "bg-red-600/90 border-red-400 text-white") : currentPhase.team === "A" ? "bg-blue-500/90 border-blue-300 text-white" : "bg-red-500/90 border-red-300 text-white"}`}
+                          className={`px-6 py-3 rounded-xl border-2 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ${currentPhase.action === "ban" ? (currentPhase.team === "A" ? "bg-blue-600/90 border-blue-400 text-theme-text-base" : "bg-red-600/90 border-red-400 text-theme-text-base") : currentPhase.team === "A" ? "bg-blue-500/90 border-blue-300 text-theme-text-base" : "bg-red-500/90 border-red-300 text-theme-text-base"}`}
                         >
                           {" "}
                           <span className="text-sm font-black uppercase tracking-[0.2em]">
@@ -773,10 +774,10 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   {m.side && (
                     <div className="absolute top-4 left-4 z-30">
                       {" "}
-                      <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-slate-900/90 border border-slate-700 text-white shadow-lg">
+                      <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-slate-900/90 border border-slate-700 text-theme-text-base shadow-lg">
                         {" "}
                         SIDE:{" "}
-                        <span className="text-[#00ffcc]">{m.side}</span>{" "}
+                        <span className="text-cyan-400">{m.side}</span>{" "}
                       </span>{" "}
                     </div>
                   )}{" "}
@@ -793,7 +794,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                       <div className="absolute top-4 right-4">
                         {" "}
                         <span
-                          className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${m.byTeam === "A" ? "bg-blue-600/90 text-white border-blue-400" : "bg-red-600/90 text-white border-red-400"}`}
+                          className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${m.byTeam === "A" ? "bg-blue-600/90 text-theme-text-base border-blue-400" : "bg-red-600/90 text-theme-text-base border-red-400"}`}
                         >
                           {" "}
                           BANNED BY {m.byTeam === "A" ? teamA : teamB}{" "}
@@ -813,7 +814,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                       <div className="absolute top-4 right-4">
                         {" "}
                         <span
-                          className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${m.byTeam === "A" ? "bg-blue-600/90 text-white border-blue-400" : "bg-red-600/90 text-white border-red-400"}`}
+                          className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase shadow-xl tracking-[0.2em] border ${m.byTeam === "A" ? "bg-blue-600/90 text-theme-text-base border-blue-400" : "bg-red-600/90 text-theme-text-base border-red-400"}`}
                         >
                           {" "}
                           PICKED BY {m.byTeam === "A" ? teamA : teamB}{" "}
@@ -841,10 +842,10 @@ const Mapping = ({ globalGame, globalTournament }) => {
           {vetoActive && currentPhase?.action === "side" && showSideOverlay && (
             <div
               key={`side-overlay-${phaseIndex}`}
-              className="absolute inset-0 z-50 flex items-center justify-center bg-[#040814]/85 backdrop-blur-md rounded-2xl border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.8)]"
+              className="absolute inset-0 z-50 flex items-center justify-center bg-bg-100/85 backdrop-blur-md rounded-2xl border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.8)]"
             >
               {" "}
-              <div className="bg-[#0b121e] border border-slate-700/60 p-8 rounded-3xl flex flex-col items-center shadow-2xl min-w-[550px] relative overflow-hidden">
+              <div className="bg-bg-200 border border-slate-700/60 p-8 rounded-3xl flex flex-col items-center shadow-2xl min-w-[550px] relative overflow-hidden">
                 {" "}
                 {}{" "}
                 {targetSideMap && (
@@ -857,7 +858,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0b121e] via-black/40 to-transparent"></div>{" "}
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-4 z-10">
                       {" "}
-                      <span className="text-xl font-black tracking-[0.4em] uppercase text-white drop-shadow-[0_4px_10px_rgba(0,0,0,1)]">
+                      <span className="text-xl font-black tracking-[0.4em] uppercase text-theme-text-base drop-shadow-[0_4px_10px_rgba(0,0,0,1)]">
                         {" "}
                         {targetSideMap.name}{" "}
                       </span>{" "}
@@ -866,7 +867,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 )}{" "}
                 <div className="animate-slide-up-fade flex flex-col items-center gap-6 w-full">
                   {" "}
-                  <h3 className="text-2xl font-black uppercase tracking-widest text-white text-center">
+                  <h3 className="text-2xl font-black uppercase tracking-widest text-theme-text-base text-center">
                     {" "}
                     <span
                       className={
@@ -878,7 +879,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                       {currentPhase.team === "A" ? teamA : teamB}
                     </span>{" "}
                     <br />{" "}
-                    <span className="text-slate-400 text-lg mt-1 inline-block">
+                    <span className="text-theme-text-muted text-lg mt-1 inline-block">
                       SELECT STARTING SIDE
                     </span>{" "}
                   </h3>{" "}
@@ -949,7 +950,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
             <h2 className="text-2xl font-black tracking-widest uppercase">
               Map Pool Settings
             </h2>{" "}
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-theme-text-muted text-sm mt-1">
               Configure which maps are available for the veto process in {game}.
             </p>{" "}
           </div>{" "}
@@ -981,7 +982,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 e.currentTarget.style.boxShadow =
                   "0 4px 0 #1e293b, 0 6px 12px rgba(0,0,0,0.3)";
               }}
-              className="bg-slate-800 text-slate-200 text-xs font-bold tracking-wide transition-all cursor-pointer border border-slate-600/50 hover:bg-slate-700"
+              className="bg-slate-800 text-theme-text-base text-xs font-bold tracking-wide transition-all cursor-pointer border border-slate-600/50 hover:bg-slate-700"
             >
               Select All
             </button>
@@ -1012,13 +1013,13 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 e.currentTarget.style.boxShadow =
                   "0 4px 0 #1e293b, 0 6px 12px rgba(0,0,0,0.3)";
               }}
-              className="bg-slate-800 text-slate-200 text-xs font-bold tracking-wide transition-all cursor-pointer border border-slate-600/50 hover:bg-slate-700"
+              className="bg-slate-800 text-theme-text-base text-xs font-bold tracking-wide transition-all cursor-pointer border border-slate-600/50 hover:bg-slate-700"
             >
               Deselect All
             </button>
             <button
               style={{
-                boxShadow: "0 4px 0 #065f46, 0 6px 16px rgba(0,255,204,0.15)",
+                boxShadow: "0 4px 0 #065f46, 0 6px 16px color-mix(in_srgb,var(--color--)_%,transparent)",
                 transform: "translateY(0)",
                 padding: "12px 24px",
                 borderRadius: "12px",
@@ -1026,19 +1027,19 @@ const Mapping = ({ globalGame, globalTournament }) => {
               onMouseDown={(e) => {
                 e.currentTarget.style.transform = "translateY(3px)";
                 e.currentTarget.style.boxShadow =
-                  "0 1px 0 #065f46, 0 2px 4px rgba(0,255,204,0.1)";
+                  "0 1px 0 #065f46, 0 2px 4px color-mix(in_srgb,var(--color--)_%,transparent)";
               }}
               onMouseUp={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 4px 0 #065f46, 0 6px 16px rgba(0,255,204,0.15)";
+                  "0 4px 0 #065f46, 0 6px 16px color-mix(in_srgb,var(--color--)_%,transparent)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow =
-                  "0 4px 0 #065f46, 0 6px 16px rgba(0,255,204,0.15)";
+                  "0 4px 0 #065f46, 0 6px 16px color-mix(in_srgb,var(--color--)_%,transparent)";
               }}
-              className="bg-[#00ffcc]/15 text-[#00ffcc] text-xs font-bold tracking-wide transition-all cursor-pointer border border-[#00ffcc]/40 hover:bg-[#00ffcc]/25"
+              className="bg-cyan-400/15 text-cyan-400 text-xs font-bold tracking-wide transition-all cursor-pointer border border-cyan-400/40 hover:bg-cyan-400/25"
             >
               Save Configuration
             </button>
@@ -1119,10 +1120,10 @@ const Mapping = ({ globalGame, globalTournament }) => {
           {" "}
           <div>
             {" "}
-            <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-1">
+            <h2 className="text-2xl font-black text-theme-text-base uppercase tracking-wider mb-1">
               Veto History Log
             </h2>{" "}
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-theme-text-muted">
               Review past map vetoes, bans, and picks.
             </p>{" "}
           </div>{" "}
@@ -1133,7 +1134,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               {" "}
               {/* Absolute position keeps the icon on the left */}{" "}
               <svg 
-                className="absolute left-3 w-4 h-4 text-gray-400 pointer-events-none" 
+                className="absolute left-3 w-4 h-4 text-theme-text-muted pointer-events-none" 
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1143,7 +1144,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               <input 
                 type="text" 
                 placeholder="Search team or map..." 
-                className="w-64 text-sm text-gray-200 bg-[#0B0F19] border border-gray-700 focus:outline-none focus:border-blue-500"
+                className="w-64 text-sm text-gray-200 bg-bg-200 border border-gray-700 focus:outline-none focus:border-blue-500"
                 style={{ padding: "12px 16px 12px 40px", borderRadius: "12px" }}
               />
             </div>
@@ -1168,7 +1169,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
             {" "}
             <thead>
               {" "}
-              <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+              <tr className="border-b border-gray-800 text-xs text-theme-text-faint uppercase tracking-wider">
                 {" "}
                 <th className="font-semibold" style={{ padding: "20px 16px" }}>Date</th>{" "}
                 <th className="font-semibold" style={{ padding: "20px 16px" }}>Game</th>{" "}
@@ -1178,7 +1179,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                 <th className="font-semibold text-right" style={{ padding: "20px 16px" }}>Actions</th>{" "}
               </tr>{" "}
             </thead>{" "}
-            <tbody className="text-sm text-gray-300 divide-y divide-gray-800/50">
+            <tbody className="text-sm text-theme-text-base divide-y divide-gray-800/50">
               {" "}
               {history.map((row) => (
                 <tr
@@ -1196,7 +1197,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   </td>{" "}
                   <td style={{ padding: "24px 16px" }}>
                     <span className="font-bold text-gray-100">{row.teamA}</span>{" "}
-                    <span className="text-gray-500 text-xs mx-1">vs</span>{" "}
+                    <span className="text-theme-text-faint text-xs mx-1">vs</span>{" "}
                     <span className="font-bold text-gray-100">{row.teamB}</span>
                   </td>{" "}
                   <td className="font-bold text-teal-400 tracking-wide" style={{ padding: "24px 16px" }}>
@@ -1212,7 +1213,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   </td>{" "}
                   <td className="text-right" style={{ padding: "24px 16px" }}>
                     {" "}
-                    <button className="text-gray-500 hover:text-gray-300 transition-colors font-black text-lg pb-2">
+                    <button className="text-theme-text-faint hover:text-theme-text-base transition-colors font-black text-lg pb-2">
                       ...
                     </button>{" "}
                   </td>{" "}
@@ -1233,7 +1234,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
           <h2 className="text-2xl font-black tracking-widest uppercase">
             Team Settings
           </h2>{" "}
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-theme-text-muted text-sm mt-1">
             Configure team identities, logos, and accent colors for the veto
             interface.
           </p>{" "}
@@ -1251,20 +1252,20 @@ const Mapping = ({ globalGame, globalTournament }) => {
               {" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Display Name
                 </label>{" "}
                 <select
                   value={teamA}
                   onChange={(e) => setTeamA(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-theme-text-base focus:outline-none focus:border-blue-500 transition-colors"
                 >
                   {" "}
                   {dbTeams.map((t) => (
                     <option
                       key={`set-a-${t.team_name}`}
                       value={t.team_name}
-                      className="bg-slate-900 text-white"
+                      className="bg-slate-900 text-theme-text-base"
                     >
                       {t.team_name}
                     </option>
@@ -1273,7 +1274,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>{" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Accent Color
                 </label>{" "}
                 <div className="flex space-x-3">
@@ -1285,7 +1286,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>{" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Team Logo
                 </label>{" "}
                 <div className="border-2 border-dashed border-slate-700 bg-slate-800/50 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-blue-500 hover:bg-slate-800 transition-colors cursor-pointer">
@@ -1294,7 +1295,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   <span className="text-sm text-blue-400 font-bold">
                     Click to upload logo
                   </span>{" "}
-                  <span className="text-[10px] text-slate-500 mt-1">
+                  <span className="text-[10px] text-theme-text-muted mt-1">
                     PNG, JPG up to 2MB (Square aspect ratio recommended)
                   </span>{" "}
                 </div>{" "}
@@ -1312,20 +1313,20 @@ const Mapping = ({ globalGame, globalTournament }) => {
               {" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Display Name
                 </label>{" "}
                 <select
                   value={teamB}
                   onChange={(e) => setTeamB(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-theme-text-base focus:outline-none focus:border-red-500 transition-colors"
                 >
                   {" "}
                   {dbTeams.map((t) => (
                     <option
                       key={`set-b-${t.team_name}`}
                       value={t.team_name}
-                      className="bg-slate-900 text-white"
+                      className="bg-slate-900 text-theme-text-base"
                     >
                       {t.team_name}
                     </option>
@@ -1334,7 +1335,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>{" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Accent Color
                 </label>{" "}
                 <div className="flex space-x-3">
@@ -1346,7 +1347,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>{" "}
               <div>
                 {" "}
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
                   Team Logo
                 </label>{" "}
                 <div className="border-2 border-dashed border-slate-700 bg-slate-800/50 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-red-500 hover:bg-slate-800 transition-colors cursor-pointer">
@@ -1355,7 +1356,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
                   <span className="text-sm text-red-400 font-bold">
                     Click to upload logo
                   </span>{" "}
-                  <span className="text-[10px] text-slate-500 mt-1">
+                  <span className="text-[10px] text-theme-text-muted mt-1">
                     PNG, JPG up to 2MB (Square aspect ratio recommended)
                   </span>{" "}
                 </div>{" "}
@@ -1365,7 +1366,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
         </div>{" "}
         <div className="flex justify-center" style={{ marginTop: "48px" }}>
           {" "}
-          <button className="bg-[#00ffcc]/20 text-[#00ffcc] border border-[#00ffcc]/30 hover:bg-[#00ffcc] hover:text-black font-black uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(0,255,204,0.2)]" style={{ padding: "14px 48px", borderRadius: "12px" }}>
+          <button className="bg-cyan-400/20 text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400 hover:text-black font-black uppercase tracking-widest transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "14px 48px", borderRadius: "12px" }}>
             SAVE
           </button>{" "}
         </div>{" "}
@@ -1381,7 +1382,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
           <h2 className="text-2xl font-black tracking-widest uppercase">
             Admin Veto Tools
           </h2>{" "}
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-theme-text-muted text-sm mt-1">
             Powerful overrides and match controls. Use with caution.
           </p>{" "}
         </div>{" "}
@@ -1391,15 +1392,15 @@ const Mapping = ({ globalGame, globalTournament }) => {
             {" "}
             <div>
               {" "}
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-bold text-theme-text-base uppercase tracking-wider mb-2">
                 Reverse Last Action
               </h3>{" "}
-              <p className="text-xs text-slate-500 mb-6">
+              <p className="text-xs text-theme-text-muted mb-6">
                 Undo the last map ban or pick. Restores the timer and phase
                 state to the previous turn.
               </p>{" "}
             </div>{" "}
-            <button className="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors" style={{ padding: "12px 24px", borderRadius: "12px" }}>
+            <button className="w-full bg-slate-800 hover:bg-slate-700 text-theme-text-base text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors" style={{ padding: "12px 24px", borderRadius: "12px" }}>
               Undo Action
             </button>{" "}
           </div>{" "}
@@ -1407,18 +1408,18 @@ const Mapping = ({ globalGame, globalTournament }) => {
             {" "}
             <div>
               {" "}
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-bold text-theme-text-base uppercase tracking-wider mb-2">
                 Override Turn Timer
               </h3>{" "}
-              <p className="text-xs text-slate-500 mb-6">
+              <p className="text-xs text-theme-text-muted mb-6">
                 Manually adjust the current turn's timer countdown.
               </p>{" "}
               <div className="flex mb-4" style={{ gap: "12px" }}>
                 {" "}
-                <button className="flex-1 bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700" style={{ padding: "10px", borderRadius: "8px" }}>
+                <button className="flex-1 bg-slate-800 text-xs font-bold text-theme-text-base hover:bg-slate-700" style={{ padding: "10px", borderRadius: "8px" }}>
                   +10s
                 </button>{" "}
-                <button className="flex-1 bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700" style={{ padding: "10px", borderRadius: "8px" }}>
+                <button className="flex-1 bg-slate-800 text-xs font-bold text-theme-text-base hover:bg-slate-700" style={{ padding: "10px", borderRadius: "8px" }}>
                   +30s
                 </button>{" "}
                 <button className="flex-1 bg-slate-800 text-xs font-bold text-red-400 hover:bg-slate-700" style={{ padding: "10px", borderRadius: "8px" }}>
@@ -1431,14 +1432,14 @@ const Mapping = ({ globalGame, globalTournament }) => {
             {" "}
             <div>
               {" "}
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-bold text-theme-text-base uppercase tracking-wider mb-2">
                 Manual Map Status Override
               </h3>{" "}
-              <p className="text-xs text-slate-500 mb-6">
+              <p className="text-xs text-theme-text-muted mb-6">
                 Force a specific map to be banned, picked, or selected as the
                 decider.
               </p>{" "}
-              <select className="w-full bg-slate-800 border border-slate-700 text-slate-300 text-xs mb-2 focus:outline-none" style={{ padding: "10px 16px", borderRadius: "8px" }}>
+              <select className="w-full bg-slate-800 border border-slate-700 text-theme-text-base text-xs mb-2 focus:outline-none" style={{ padding: "10px 16px", borderRadius: "8px" }}>
                 {" "}
                 <option>Select Map...</option>{" "}
                 {currentMaps.map((m) => (
@@ -1460,10 +1461,10 @@ const Mapping = ({ globalGame, globalTournament }) => {
             {" "}
             <div>
               {" "}
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-bold text-theme-text-base uppercase tracking-wider mb-2">
                 Match Format Setup
               </h3>{" "}
-              <p className="text-xs text-slate-500 mb-6">
+              <p className="text-xs text-theme-text-muted mb-6">
                 Change the veto format sequence. This can only be changed before
                 the veto starts.
               </p>{" "}
@@ -1473,7 +1474,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               <button
                 onClick={() => !vetoActive && setVetoFormat("BO3")}
                 disabled={vetoActive && phaseIndex > 0}
-                className={`flex-1 text-xs font-bold transition-colors ${vetoFormat === "BO3" ? "bg-[#00ffcc]/20 text-[#00ffcc] border border-[#00ffcc]/30" : "bg-slate-800 text-slate-500 hover:text-slate-300 border border-slate-700"} ${vetoActive && phaseIndex > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`flex-1 text-xs font-bold transition-colors ${vetoFormat === "BO3" ? "bg-cyan-400/20 text-cyan-400 border border-cyan-400/30" : "bg-slate-800 text-theme-text-muted hover:text-theme-text-base border border-slate-700"} ${vetoActive && phaseIndex > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
                 style={{ padding: "10px", borderRadius: "8px" }}
               >
                 {" "}
@@ -1482,7 +1483,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               <button
                 onClick={() => !vetoActive && setVetoFormat("BO5")}
                 disabled={vetoActive && phaseIndex > 0}
-                className={`flex-1 text-xs font-bold transition-colors ${vetoFormat === "BO5" ? "bg-[#00ffcc]/20 text-[#00ffcc] border border-[#00ffcc]/30" : "bg-slate-800 text-slate-500 hover:text-slate-300 border border-slate-700"} ${vetoActive && phaseIndex > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`flex-1 text-xs font-bold transition-colors ${vetoFormat === "BO5" ? "bg-cyan-400/20 text-cyan-400 border border-cyan-400/30" : "bg-slate-800 text-theme-text-muted hover:text-theme-text-base border border-slate-700"} ${vetoActive && phaseIndex > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
                 style={{ padding: "10px", borderRadius: "8px" }}
               >
                 {" "}
@@ -1502,7 +1503,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
             </p>{" "}
             <button
               onClick={resetVeto}
-              className="bg-red-600 text-white font-black uppercase tracking-widest shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:bg-red-500 hover:scale-105 transition-all"
+              className="bg-red-600 text-theme-text-base font-black uppercase tracking-widest shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:bg-red-500 hover:scale-105 transition-all"
               style={{ padding: "14px 48px", borderRadius: "12px" }}
             >
               Hard Reset Match Data
@@ -1513,7 +1514,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
     );
   };
   return (
-    <div className="flex-1 bg-[#040814] overflow-y-auto w-full h-full text-white font-sans custom-scrollbar flex flex-col items-center">
+    <div className="flex-1 bg-bg-100 overflow-y-auto w-full h-full text-theme-text-base font-sans custom-scrollbar flex flex-col items-center">
       {" "}
       <div className="w-full max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8">
         {" "}
@@ -1530,20 +1531,20 @@ const Mapping = ({ globalGame, globalTournament }) => {
               onClick={() => setActiveTab(tab)}
               className={`relative flex-1 whitespace-nowrap transition-all duration-300 text-[11px] lg:text-[13px] font-black uppercase tracking-widest overflow-hidden ${
                 activeTab === tab
-                  ? "text-[#00ffcc] shadow-[0_8px_25px_rgba(0,255,204,0.15)] scale-[1.02] border border-[#00ffcc]/30 bg-[#00ffcc]/10 z-10"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-600/50"
+                  ? "text-cyan-400 shadow-[0_8px_25px_color-mix(in_srgb,var(--color--)_%,transparent)] scale-[1.02] border border-cyan-400/30 bg-cyan-400/10 z-10"
+                  : "text-theme-text-muted hover:text-theme-text-base hover:bg-slate-800/80 border border-transparent hover:border-slate-600/50"
               }`}
               style={{ padding: "12px 24px", borderRadius: "12px" }}
             >
               <span className="relative z-10">{tab}</span>
               {activeTab === tab && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00ffcc]/5 to-transparent animate-[fadeInScale_0.3s_ease-out]"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/5 to-transparent animate-[fadeInScale_0.3s_ease-out]"></div>
               )}
             </button>
           ))}
         </div>
         {}
-        <div className="mapping-card-container bg-[#0B1120] rounded-2xl border border-slate-800/60 shadow-2xl mb-12 min-h-[600px]">
+        <div className="mapping-card-container bg-bg-200 rounded-2xl border border-slate-800/60 shadow-2xl mb-12 min-h-[600px]">
           {activeTab === "CURRENT MATCH" && renderCurrentMatch()}
           {activeTab === "MAP POOL SETTINGS" && renderMapPoolSettings()}
           {activeTab === "BAN HISTORY" && renderBanHistory()}

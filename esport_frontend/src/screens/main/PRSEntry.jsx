@@ -42,7 +42,7 @@ function useStickyState(defaultValue, key) {
 }
 
 const SectionHeader = ({ icon, label, sub, accent = "#00ffcc" }) => (
-  <div className="px-6 py-4 border-b border-slate-800/60 flex items-center gap-4 bg-slate-900/40 backdrop-blur-md relative overflow-hidden">
+  <div className="px-6 py-4 border-b border-theme-input flex items-center gap-4 bg-bg-300 backdrop-blur-md relative overflow-hidden">
     <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: accent, boxShadow: `0 0 15px ${accent}80` }}></div>
     <div
       className="p-2 rounded-xl flex-shrink-0"
@@ -55,11 +55,11 @@ const SectionHeader = ({ icon, label, sub, accent = "#00ffcc" }) => (
     </div>
     <div>
       {sub && (
-        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-0.5">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-theme-text-muted mb-0.5">
           {sub}
         </div>
       )}
-      <h2 className="text-sm font-black text-white uppercase tracking-[0.15em] drop-shadow-sm">
+      <h2 className="text-sm font-black text-theme-text-base uppercase tracking-[0.15em] drop-shadow-sm">
         {label}
       </h2>
     </div>
@@ -77,10 +77,10 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
 
   if (globalGame !== "CROSSFIRE") {
     return (
-      <div className="p-8 w-full h-full flex flex-col items-center justify-center animate-fade-in text-white bg-[#040814]">
-        <div className="p-6 border border-slate-800/50 bg-slate-900/40 rounded-3xl backdrop-blur-sm text-center">
-          <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-slate-400">Not Available</h2>
-          <p className="text-sm text-slate-500 mt-3 font-medium tracking-wide">PRS Per-Round Entry is only available for CROSSFIRE matches.</p>
+      <div className="p-8 w-full h-full flex flex-col items-center justify-center animate-fade-in text-theme-text-base bg-bg-100">
+        <div className="p-6 border border-theme-input bg-bg-200 rounded-3xl backdrop-blur-sm text-center">
+          <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-theme-text-muted">Not Available</h2>
+          <p className="text-sm text-theme-text-muted mt-3 font-medium tracking-wide">PRS Per-Round Entry is only available for CROSSFIRE matches.</p>
         </div>
       </div>
     );
@@ -107,22 +107,22 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
   const displayPlayersB = getTeamPlayers(playersB);
 
   return (
-    <div className="p-8 w-full h-full flex flex-col items-center animate-fade-in text-white bg-[#040814] overflow-y-auto custom-scrollbar">
+    <div className="p-8 w-full h-full flex flex-col items-center animate-fade-in text-theme-text-base bg-bg-100 overflow-y-auto custom-scrollbar">
       <div className="w-full">
         {/* Header Section */}
         <div className="flex flex-col items-start w-full mb-8">
-          <div className="w-16 h-1 bg-gradient-to-r from-[#00ffcc] to-transparent mb-4 opacity-70"></div>
-          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.2em] drop-shadow-lg text-white mb-2">
+          <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-transparent mb-4 opacity-70"></div>
+          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.2em] drop-shadow-lg text-theme-text-base mb-2">
             PRS System
           </h1>
-          <p className="text-slate-400 font-bold tracking-widest text-xs uppercase flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#00ffcc] animate-pulse"></span>
+          <p className="text-theme-text-muted font-bold tracking-widest text-xs uppercase flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             Advanced Per-Round Analytics
           </p>
         </div>
 
         {/* Spreadsheet Container */}
-        <div className="bg-[#0b1120]/80 backdrop-blur-xl rounded-3xl border border-slate-800/60 overflow-hidden shadow-2xl mb-10">
+        <div className="bg-bg-200/80 backdrop-blur-xl rounded-3xl border border-theme-input overflow-hidden shadow-2xl mb-10">
           <SectionHeader
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -137,25 +137,25 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
           <div className="overflow-x-auto custom-scrollbar relative p-1 pb-4">
             <table className="w-full text-center border-collapse min-w-[2200px]">
               <thead>
-                <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-700/60 bg-slate-900/80 relative z-20">
-                  <th className="px-4 py-4 border-r border-slate-800/50 sticky left-0 bg-slate-900/95 z-30 min-w-[90px]">Match</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 sticky left-[90px] bg-slate-900/95 z-30 min-w-[70px]">Team</th>
-                  <th className="px-6 py-4 border-r border-slate-800/50 sticky left-[160px] bg-slate-900/95 z-30 min-w-[130px] text-[#00ffcc]">Player</th>
-                  <th className="px-3 py-4 border-r-4 border-[#0b1120] sticky left-[290px] bg-slate-900/95 z-30 min-w-[70px]">Stat</th>
+                <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-text-muted border-b border-theme-input bg-bg-200 relative z-20">
+                  <th className="px-4 py-4 border-r border-theme-input sticky left-0 bg-bg-200 z-30 min-w-[90px]">Match</th>
+                  <th className="px-3 py-4 border-r border-theme-input sticky left-[90px] bg-bg-200 z-30 min-w-[70px]">Team</th>
+                  <th className="px-6 py-4 border-r border-theme-input sticky left-[160px] bg-bg-200 z-30 min-w-[130px] text-cyan-400">Player</th>
+                  <th className="px-3 py-4 border-r-4 border-theme-input sticky left-[290px] bg-bg-200 z-30 min-w-[70px]">Stat</th>
                   
                   {Array.from({length: 25}).map((_, i) => (
-                    <th key={i} className={`px-1 py-4 ${(i === 8 || i === 17 || i === 24) ? 'border-r-2 border-slate-600/50' : 'border-r border-slate-800/50'} text-slate-300 w-[55px]`}>
+                    <th key={i} className={`px-1 py-4 ${(i === 8 || i === 17 || i === 24) ? 'border-r-2 border-theme-input' : 'border-r border-theme-input'} text-theme-text-base w-[55px]`}>
                       R{i+1}
                     </th>
                   ))}
                   
                   {/* Right Side Calculated Headers */}
-                  <th className="px-3 py-4 border-r border-slate-800/50 bg-slate-800/60 text-white min-w-[60px]">TOTAL</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 bg-slate-800/60 text-yellow-400 min-w-[70px]">ROUNDS</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 text-slate-300 min-w-[60px]">+/-</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 text-emerald-400 min-w-[60px]">K/D</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 text-blue-400 min-w-[60px]">K/R</th>
-                  <th className="px-3 py-4 border-r border-slate-800/50 text-purple-400 min-w-[60px]">H/K</th>
+                  <th className="px-3 py-4 border-r border-theme-input bg-bg-200 text-theme-text-base min-w-[60px]">TOTAL</th>
+                  <th className="px-3 py-4 border-r border-theme-input bg-bg-200 text-yellow-400 min-w-[70px]">ROUNDS</th>
+                  <th className="px-3 py-4 border-r border-theme-input text-theme-text-base min-w-[60px]">+/-</th>
+                  <th className="px-3 py-4 border-r border-theme-input text-emerald-400 min-w-[60px]">K/D</th>
+                  <th className="px-3 py-4 border-r border-theme-input text-blue-400 min-w-[60px]">K/R</th>
+                  <th className="px-3 py-4 border-r border-theme-input text-purple-400 min-w-[60px]">H/K</th>
                 </tr>
               </thead>
               <tbody>
@@ -215,26 +215,26 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
                         const isFirstGroup = groupIdx === 0;
 
                         // Stat visual styling
-                        const statColor = statName === 'Kill' ? 'text-emerald-400' : statName === 'Death' ? 'text-red-400' : statName === 'Assist' ? 'text-amber-400' : 'text-[#00ffcc]';
+                        const statColor = statName === 'Kill' ? 'text-emerald-400' : statName === 'Death' ? 'text-red-400' : statName === 'Assist' ? 'text-amber-400' : 'text-cyan-400';
 
                         return (
-                          <tr key={`${group.teamKey}-${pIdx}-${statName}`} className={`border-b border-slate-800/40 transition-colors ${group.bgTheme}`}>
+                          <tr key={`${group.teamKey}-${pIdx}-${statName}`} className={`border-b border-theme-input transition-colors ${group.bgTheme}`}>
                             
                             {/* Match (Row span entire table = 40 rows) */}
                             {isFirstGroup && isFirstPlayer && isFirstStat && (
-                              <td rowSpan={40} className="border-r border-slate-800/60 sticky left-0 bg-[#0a0e17] z-10 p-4">
+                              <td rowSpan={40} className="border-r border-theme-input sticky left-0 bg-bg-100 z-10 p-4">
                                 <div className="flex flex-col items-center justify-center gap-1">
-                                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Match</span>
-                                  <span className="text-sm font-black text-white">{matchHeader}</span>
-                                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-2">Set</span>
-                                  <span className="text-xs font-black text-slate-300">{setNum}</span>
+                                  <span className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest">Match</span>
+                                  <span className="text-sm font-black text-theme-text-base">{matchHeader}</span>
+                                  <span className="text-[9px] font-bold text-theme-text-muted uppercase tracking-widest mt-2">Set</span>
+                                  <span className="text-xs font-black text-theme-text-base">{setNum}</span>
                                 </div>
                               </td>
                             )}
 
                             {/* Team (Row span half table = 20 rows) */}
                             {isFirstPlayer && isFirstStat && (
-                              <td rowSpan={20} className="border-r border-slate-800/60 sticky left-[90px] bg-[#0c121e] z-10">
+                              <td rowSpan={20} className="border-r border-theme-input sticky left-[90px] bg-bg-200 z-10">
                                 <div className="flex items-center justify-center h-full w-full">
                                   <span className={`text-sm font-black uppercase tracking-wider ${group.textTheme} transform -rotate-90 whitespace-nowrap`}>
                                     {group.name}
@@ -245,15 +245,15 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
 
                             {/* Player (Row span 4 rows) */}
                             {isFirstStat && (
-                              <td rowSpan={4} className="border-r border-slate-800/60 sticky left-[160px] bg-[#0f1725] z-10 px-4">
-                                <span className="text-xs font-bold text-slate-200 tracking-wide block truncate max-w-[100px]">
+                              <td rowSpan={4} className="border-r border-theme-input sticky left-[160px] bg-bg-300 z-10 px-4">
+                                <span className="text-xs font-bold text-theme-text-base tracking-wide block truncate max-w-[100px]">
                                   {p.ign}
                                 </span>
                               </td>
                             )}
 
                             {/* Stat Name */}
-                            <td className={`border-r-4 border-[#0b1120] sticky left-[290px] bg-[#131c2e] z-10 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest ${statColor}`}>
+                            <td className={`border-r-4 border-theme-input sticky left-[290px] bg-bg-300 z-10 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest ${statColor}`}>
                               {statName}
                             </td>
 
@@ -262,10 +262,10 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
                               const val = p[`r${i+1}_${statKey}`];
                               const hasVal = val !== undefined && val !== "";
                               return (
-                              <td key={i} className={`p-0 ${(i === 8 || i === 17 || i === 24) ? 'border-r-2 border-slate-600/50' : 'border-r border-slate-800/40'}`}>
+                              <td key={i} className={`p-0 ${(i === 8 || i === 17 || i === 24) ? 'border-r-2 border-theme-input' : 'border-r border-theme-input'}`}>
                                   <input 
                                     type="text"
-                                    className={`w-[55px] h-10 text-center text-[13px] font-bold outline-none transition-all duration-200 ${hasVal ? 'bg-white/5 text-white' : 'bg-transparent text-slate-500'} focus:bg-[#00ffcc]/10 focus:text-[#00ffcc] focus:shadow-[inset_0_0_8px_rgba(0,255,204,0.3)]`}
+                                    className={`w-[55px] h-10 text-center text-[13px] font-bold rounded-md outline-none transition-all duration-200 bg-transparent ${hasVal ? 'text-theme-text-base' : 'text-theme-text-muted'} focus:bg-cyan-400/10 focus:text-cyan-400 focus:shadow-[inset_0_0_8px_var(--color-cyan-500)]`}
                                     value={val !== undefined ? val : ""}
                                     onChange={(e) => handleInputChange(group.teamKey, pIdx, i+1, statKey, e.target.value)}
                                   />
@@ -274,28 +274,28 @@ const PRSEntry = ({ globalGame, globalTournament }) => {
                             })}
 
                             {/* Stat Total */}
-                            <td className="border-l-4 border-[#0b1120] border-r border-slate-800/60 bg-slate-800/30">
-                              <span className="text-xs font-black text-white">{totals[statKey]}</span>
+                            <td className="border-l-4 border-theme-input border-r border-theme-input bg-bg-400">
+                              <span className="text-xs font-black text-theme-text-base">{totals[statKey]}</span>
                             </td>
 
                             {/* Merged Calculated Columns */}
                             {isFirstStat && (
                               <>
-                                <td rowSpan={4} className="border-r border-slate-800/60 bg-slate-800/50">
+                                <td rowSpan={4} className="border-r border-theme-input bg-bg-400">
                                   <span className="text-[13px] font-black text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.4)]">{roundsPlayed}</span>
                                 </td>
-                                <td rowSpan={4} className="border-r border-slate-800/60">
-                                  <span className={`text-xs font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                                <td rowSpan={4} className="border-r border-theme-input">
+                                  <span className={`text-xs font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-400' : 'text-theme-text-muted'}`}>
                                     {diff > 0 ? `+${diff}` : diff}
                                   </span>
                                 </td>
-                                <td rowSpan={4} className="border-r border-slate-800/60">
+                                <td rowSpan={4} className="border-r border-theme-input">
                                   <span className="text-xs font-bold text-emerald-300">{kd}</span>
                                 </td>
-                                <td rowSpan={4} className="border-r border-slate-800/60">
+                                <td rowSpan={4} className="border-r border-theme-input">
                                   <span className="text-xs font-bold text-blue-300">{kr}</span>
                                 </td>
-                                <td rowSpan={4} className="border-r border-slate-800/60">
+                                <td rowSpan={4} className="border-r border-theme-input">
                                   <span className="text-xs font-bold text-purple-300">{hk}</span>
                                 </td>
                               </>

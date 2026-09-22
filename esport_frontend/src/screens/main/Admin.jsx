@@ -26,12 +26,12 @@ const LockIcon = () => (
   </svg>
 );
 const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4 text-theme-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
   </svg>
 );
 const ChevronDownIcon = () => (
-  <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4 text-theme-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
   </svg>
 );
@@ -52,7 +52,7 @@ const auditLogsData = [
 const modes = ['Single Elimination', 'Round Robin'];
 const ToggleSwitch = ({ enabled, onChange }) => (
   <button 
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${enabled ? 'bg-cyan-500' : 'bg-[#1c2532] border border-[#2a3648]'}`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${enabled ? 'bg-cyan-500' : 'bg-bg-400 border border-[#2a3648]'}`}
     onClick={() => onChange(!enabled)}
   >
     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -63,7 +63,7 @@ const SelectDropdown = ({ label, options, defaultValue, value, onChange }) => (
     <select 
       value={value !== undefined ? value : defaultValue} 
       onChange={onChange} 
-      className="appearance-none w-full bg-[#121a25] border border-[#2a3648] text-gray-300 font-medium text-xs rounded py-2 pl-3 pr-8 focus:outline-none focus:border-cyan-500 transition-colors"
+      className="appearance-none w-full bg-bg-300 border border-[#2a3648] text-theme-text-base font-medium text-xs rounded py-2 pl-3 pr-8 focus:outline-none focus:border-cyan-500 transition-colors"
     >
       {options.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
     </select>
@@ -132,27 +132,27 @@ const LiveMatchManager = ({ globalTournament, globalGame, teams }) => {
     } catch (e) { console.error(e); }
   };
   return (
-    <div className="mt-4 border border-[#2a3648] bg-[#151e2b] rounded-lg p-4 relative">
-      <span className="absolute -top-2 left-3 bg-[#151e2b] px-1 text-[9px] font-bold text-cyan-400 uppercase tracking-widest">Live Match Controller</span>
+    <div className="mt-4 border border-[#2a3648] bg-bg-300 rounded-lg p-4 relative">
+      <span className="absolute -top-2 left-3 bg-bg-300 px-1 text-[9px] font-bold text-cyan-400 uppercase tracking-widest">Live Match Controller</span>
       <div className="flex items-center gap-2 mb-4 mt-1">
-        <select value={newMatch.team_a_id} onChange={e => setNewMatch({...newMatch, team_a_id: e.target.value})} className="flex-1 bg-[#0f1722] border border-[#2a3648] rounded px-2 py-1 text-xs text-white">
+        <select value={newMatch.team_a_id} onChange={e => setNewMatch({...newMatch, team_a_id: e.target.value})} className="flex-1 bg-bg-300 border border-[#2a3648] rounded px-2 py-1 text-xs text-theme-text-base">
           <option value="">Select Team A</option>
           {teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
         </select>
-        <span className="text-xs text-gray-500 font-black">VS</span>
-        <select value={newMatch.team_b_id} onChange={e => setNewMatch({...newMatch, team_b_id: e.target.value})} className="flex-1 bg-[#0f1722] border border-[#2a3648] rounded px-2 py-1 text-xs text-white">
+        <span className="text-xs text-theme-text-faint font-black">VS</span>
+        <select value={newMatch.team_b_id} onChange={e => setNewMatch({...newMatch, team_b_id: e.target.value})} className="flex-1 bg-bg-300 border border-[#2a3648] rounded px-2 py-1 text-xs text-theme-text-base">
           <option value="">Select Team B</option>
           {teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
         </select>
-        <input placeholder="Map..." value={newMatch.map_name} onChange={e => setNewMatch({...newMatch, map_name: e.target.value})} className="w-20 bg-[#0f1722] border border-[#2a3648] rounded px-2 py-1 text-xs text-white" />
-        <button onClick={handleCreateMatch} className="bg-cyan-600 text-white font-bold text-xs hover:bg-cyan-500" style={{ padding: "12px 24px", borderRadius: "9999px" }}>+</button>
+        <input placeholder="Map..." value={newMatch.map_name} onChange={e => setNewMatch({...newMatch, map_name: e.target.value})} className="w-20 bg-bg-300 border border-[#2a3648] rounded px-2 py-1 text-xs text-theme-text-base" />
+        <button onClick={handleCreateMatch} className="bg-cyan-600 text-theme-text-base font-bold text-xs hover:bg-cyan-500" style={{ padding: "12px 24px", borderRadius: "9999px" }}>+</button>
       </div>
       <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-        {loading && <div className="text-center text-xs text-gray-500">Loading matches...</div>}
+        {loading && <div className="text-center text-xs text-theme-text-faint">Loading matches...</div>}
         {matches.map(m => (
-          <div key={m.match_id} className="bg-[#0f1722] border border-[#2a3648] rounded p-2 flex flex-col gap-2">
+          <div key={m.match_id} className="bg-bg-300 border border-[#2a3648] rounded p-2 flex flex-col gap-2">
             <div className="flex justify-between items-center">
-               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{m.map_name || 'TBD'}</span>
+               <span className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest">{m.map_name || 'TBD'}</span>
                <select value={m.status} onChange={e => updateStatus(m.match_id, e.target.value)} className="bg-transparent text-[10px] font-black uppercase outline-none border border-gray-700 rounded px-1" style={{ color: m.status === 'live' ? '#ef4444' : '#64748b' }}>
                  <option value="scheduled">Scheduled</option>
                  <option value="live">Live</option>
@@ -161,22 +161,22 @@ const LiveMatchManager = ({ globalTournament, globalGame, teams }) => {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <button onClick={() => updateScore(m.match_id, 'a', m.team_a_score, -1)} className="text-gray-500 hover:text-white px-1">-</button>
-                <span className="text-lg font-black w-6 text-center text-white">{m.team_a_score || 0}</span>
-                <button onClick={() => updateScore(m.match_id, 'a', m.team_a_score, 1)} className="text-gray-500 hover:text-white px-1">+</button>
-                <span className="text-xs font-bold w-24 truncate text-white">{m.team_a?.team_name || 'TBD'}</span>
+                <button onClick={() => updateScore(m.match_id, 'a', m.team_a_score, -1)} className="text-theme-text-faint hover:text-theme-text-base px-1">-</button>
+                <span className="text-lg font-black w-6 text-center text-theme-text-base">{m.team_a_score || 0}</span>
+                <button onClick={() => updateScore(m.match_id, 'a', m.team_a_score, 1)} className="text-theme-text-faint hover:text-theme-text-base px-1">+</button>
+                <span className="text-xs font-bold w-24 truncate text-theme-text-base">{m.team_a?.team_name || 'TBD'}</span>
               </div>
               <span className="text-xs text-gray-600 font-black">VS</span>
               <div className="flex items-center gap-2 flex-row-reverse">
-                <button onClick={() => updateScore(m.match_id, 'b', m.team_b_score, -1)} className="text-gray-500 hover:text-white px-1">-</button>
-                <span className="text-lg font-black w-6 text-center text-white">{m.team_b_score || 0}</span>
-                <button onClick={() => updateScore(m.match_id, 'b', m.team_b_score, 1)} className="text-gray-500 hover:text-white px-1">+</button>
-                <span className="text-xs font-bold w-24 truncate text-right text-white">{m.team_b?.team_name || 'TBD'}</span>
+                <button onClick={() => updateScore(m.match_id, 'b', m.team_b_score, -1)} className="text-theme-text-faint hover:text-theme-text-base px-1">-</button>
+                <span className="text-lg font-black w-6 text-center text-theme-text-base">{m.team_b_score || 0}</span>
+                <button onClick={() => updateScore(m.match_id, 'b', m.team_b_score, 1)} className="text-theme-text-faint hover:text-theme-text-base px-1">+</button>
+                <span className="text-xs font-bold w-24 truncate text-right text-theme-text-base">{m.team_b?.team_name || 'TBD'}</span>
               </div>
             </div>
           </div>
         ))}
-        {!loading && matches.length === 0 && <div className="text-center text-xs text-gray-500 italic py-2">No matches created for this tournament.</div>}
+        {!loading && matches.length === 0 && <div className="text-center text-xs text-theme-text-faint italic py-2">No matches created for this tournament.</div>}
       </div>
     </div>
   );
@@ -335,7 +335,7 @@ const Admin = ({ globalGame, globalTournament }) => {
     fetchData();
   }, []);
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full relative font-sans custom-scrollbar">
+    <div className="flex-1 bg-bg-100 text-theme-text-base overflow-y-auto flex flex-col h-full relative font-sans custom-scrollbar">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -349,11 +349,11 @@ const Admin = ({ globalGame, globalTournament }) => {
           {activeTournamentObj && (
             <div className="w-full flex items-center justify-between mb-4" style={{ borderRadius: "9999px", border: "1px solid #00c8c8", padding: "16px 48px", backgroundColor: "transparent" }}>
               <div className="flex items-center gap-4">
-                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Active Folder:</span>
+                <span className="text-sm font-bold text-theme-text-muted uppercase tracking-widest">Active Folder:</span>
                 <span className="text-cyan-400 font-black text-xl tracking-wider">{activeTournamentObj.name}</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Game Title:</span>
+                <span className="text-xs text-theme-text-faint font-bold uppercase tracking-widest">Game Title:</span>
                 <div className="relative">
                   <select 
                     value={activeTournamentObj.game.toUpperCase()} 
@@ -361,8 +361,8 @@ const Admin = ({ globalGame, globalTournament }) => {
                     className="appearance-none bg-transparent border border-[#00c8c8] text-cyan-400 text-sm font-bold focus:outline-none cursor-pointer"
                     style={{ borderRadius: "9999px", padding: "8px 48px 8px 24px" }}
                   >
-                    <option value="VALORANT" className="bg-[#0f1722]">VALORANT</option>
-                    <option value="CROSSFIRE" className="bg-[#0f1722]">CROSSFIRE</option>
+                    <option value="VALORANT" className="bg-bg-300">VALORANT</option>
+                    <option value="CROSSFIRE" className="bg-bg-300">CROSSFIRE</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-cyan-400">
                     <svg xmlns="http://www.w3.org/w0000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -376,76 +376,76 @@ const Admin = ({ globalGame, globalTournament }) => {
           {}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             {}
-            <div className="xl:col-span-5 bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
-              <div className="border-b border-[#1c2532] bg-[#121a25]" style={{ padding: "24px 32px" }}>
-                 <h2 className="text-sm font-bold text-gray-300 tracking-wide" style={{ paddingLeft: "12px" }}>League Quick Stats (PH Local Context)</h2>
+            <div className="xl:col-span-5 bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
+              <div className="border-b border-[#1c2532] bg-bg-300" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-sm font-bold text-theme-text-base tracking-wide" style={{ paddingLeft: "12px" }}>League Quick Stats (PH Local Context)</h2>
               </div>
                <div className="grid grid-cols-2 flex-1" style={{ padding: "32px", gap: "24px" }}>
                  {}
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Total Registered Players</span>
+                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Total Registered Players</span>
                     <div className="flex items-center gap-6 mb-3">
                        <UsersIcon />
                        <div className="flex flex-col">
                          <span className="text-3xl font-black text-cyan-400 leading-none">12,500</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Players</span>
+                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Players</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-6 text-center">Verified (PH: 98%)</span>
+                    <span className="text-[10px] text-theme-text-faint mt-6 text-center">Verified (PH: 98%)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Total Teams</span>
+                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Total Teams</span>
                     <div className="flex items-center gap-6 mb-3">
                        <TrophyIcon />
                        <div className="flex flex-col">
                          <span className="text-3xl font-black text-cyan-400 leading-none">620</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Teams</span>
+                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Teams</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Active Teams (Local Leagues)</span>
+                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Active Teams (Local Leagues)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Active Tournaments</span>
+                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Active Tournaments</span>
                     <div className="flex items-center gap-6 mb-3">
                        <CalendarIcon />
                        <div className="flex flex-col">
                          <span className="text-3xl font-black text-orange-400 leading-none">15</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Tournaments</span>
+                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Tournaments</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
+                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">Pending Verifications</span>
+                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Pending Verifications</span>
                     <div className="flex items-center gap-6 mb-3">
                        <ClipboardCheckIcon />
                        <div className="flex flex-col">
                          <span className="text-3xl font-black text-orange-400 leading-none">45</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Verifications</span>
+                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Verifications</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-6 text-center">New Player IDs to review</span>
+                    <span className="text-[10px] text-theme-text-faint mt-6 text-center">New Player IDs to review</span>
                  </div>
                  {}
-                 <div className="col-span-2 flex flex-col items-center justify-center bg-[#151e2b] border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-gray-400 mb-6 text-center">New Admin Logins</span>
+                 <div className="col-span-2 flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
+                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">New Admin Logins</span>
                     <div className="flex items-center gap-6 mb-3">
                        <LockIcon />
                        <div className="flex flex-col">
                          <span className="text-3xl font-black text-cyan-400 leading-none">12</span>
-                         <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">Admins</span>
+                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Admins</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-6 text-center text-balance">Admins (Central & Local PH)</span>
+                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Admins (Central & Local PH)</span>
                  </div>
                </div>
             </div>
             {}
-            <div className="xl:col-span-7 bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
-              <div className="border-b border-[#1c2532] bg-[#121a25] flex flex-wrap justify-between items-center" style={{ padding: "24px 32px", gap: "24px" }}>
+            <div className="xl:col-span-7 bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
+              <div className="border-b border-[#1c2532] bg-bg-300 flex flex-wrap justify-between items-center" style={{ padding: "24px 32px", gap: "24px" }}>
                  <div className="flex flex-col flex-shrink-0 whitespace-nowrap" style={{ gap: "4px" }}>
-                   <h2 className="text-sm font-bold text-gray-300 tracking-wide">Admin Accounts & User Directory</h2>
-                   <span className="text-[10px] text-gray-500 font-mono italic">(System Access Hub)</span>
+                   <h2 className="text-sm font-bold text-theme-text-base tracking-wide">Admin Accounts & User Directory</h2>
+                   <span className="text-[10px] text-theme-text-faint font-mono italic">(System Access Hub)</span>
                  </div>
                  <div className="flex items-center flex-wrap" style={{ gap: "16px" }}>
                     <div className="relative flex-shrink-0" style={{ width: "256px" }}>
@@ -455,7 +455,7 @@ const Admin = ({ globalGame, globalTournament }) => {
                       <input 
                         type="text" 
                         placeholder="Search (IGN, Team, Location)" 
-                        className="w-full bg-[#151e2b] border border-[#2a3648] text-gray-300 text-xs rounded-lg focus:outline-none focus:border-cyan-500 transition-colors"
+                        className="w-full bg-bg-300 border border-[#2a3648] text-theme-text-base text-xs rounded-lg focus:outline-none focus:border-cyan-500 transition-colors"
                         style={{ padding: "10px 16px 10px 40px" }}
                       />
                     </div>
@@ -466,7 +466,7 @@ const Admin = ({ globalGame, globalTournament }) => {
               </div>
               <div className="flex-1 overflow-auto custom-scrollbar">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#151e2b] text-gray-500 sticky top-0 shadow-sm z-10 border-b border-[#1c2532]">
+                  <thead className="bg-bg-300 text-theme-text-faint sticky top-0 shadow-sm z-10 border-b border-[#1c2532]">
                     <tr>
                       <th className="font-semibold w-1/5" style={{ padding: "24px 32px" }}>Username</th>
                       <th className="font-semibold" style={{ padding: "24px 32px" }}>Role</th>
@@ -477,10 +477,10 @@ const Admin = ({ globalGame, globalTournament }) => {
                   </thead>
                   <tbody className="divide-y divide-[#1c2532]">
                     {accounts.length === 0 ? (
-                      <tr><td colSpan="5" className="text-center py-6 text-gray-500 italic">No accounts found or loading...</td></tr>
+                      <tr><td colSpan="5" className="text-center py-6 text-theme-text-faint italic">No accounts found or loading...</td></tr>
                     ) : accounts.map((user, idx) => (
-                      <tr key={idx} onClick={() => handleOpenEdit(user)} className="hover:bg-[#151e2b]/50 transition-colors cursor-pointer group">
-                        <td className="text-gray-300 font-medium group-hover:text-cyan-400" style={{ padding: "20px 32px" }}>
+                      <tr key={idx} onClick={() => handleOpenEdit(user)} className="hover:bg-bg-300/50 transition-colors cursor-pointer group">
+                        <td className="text-theme-text-base font-medium group-hover:text-cyan-400" style={{ padding: "20px 32px" }}>
                            <div className="flex flex-col gap-1">
                              <span>{user.username}</span>
                              <span className={`text-[9px] text-cyan-600/70 italic transition-opacity duration-200 ${!user.is_super_admin ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'}`}>
@@ -488,15 +488,15 @@ const Admin = ({ globalGame, globalTournament }) => {
                              </span>
                            </div>
                         </td>
-                        <td className="text-gray-400" style={{ padding: "20px 32px" }}>{user.role || 'N/A'}</td>
-                        <td className="text-gray-400" style={{ padding: "20px 32px" }}>
+                        <td className="text-theme-text-muted" style={{ padding: "20px 32px" }}>{user.role || 'N/A'}</td>
+                        <td className="text-theme-text-muted" style={{ padding: "20px 32px" }}>
                            {user.is_super_admin ? (
                              <span className="bg-cyan-500/20 text-cyan-400 rounded text-[10px] font-black uppercase tracking-wider" style={{ padding: "8px 24px", borderRadius: "9999px" }}>Yes</span>
                            ) : (
-                             <span className="bg-[#1c2532]/50 text-gray-500 rounded text-[10px] font-black uppercase tracking-wider border border-[#2a3648]/50" style={{ padding: "8px 24px", borderRadius: "9999px" }}>No</span>
+                             <span className="bg-bg-400/50 text-theme-text-faint rounded text-[10px] font-black uppercase tracking-wider border border-[#2a3648]/50" style={{ padding: "8px 24px", borderRadius: "9999px" }}>No</span>
                            )}
                         </td>
-                        <td className="text-gray-400 font-mono text-[9px] tracking-wide max-w-[150px] truncate" style={{ padding: "20px 32px" }}>
+                        <td className="text-theme-text-muted font-mono text-[9px] tracking-wide max-w-[150px] truncate" style={{ padding: "20px 32px" }}>
                            {user.permissions ? JSON.stringify(user.permissions) : 'None'}
                         </td>
                         <td className="text-center" style={{ padding: "20px 32px" }}>
@@ -510,13 +510,13 @@ const Admin = ({ globalGame, globalTournament }) => {
                 </table>
               </div>
               {}
-              <div className="border-t border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
+              <div className="border-t border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
                  <div className="flex items-center gap-3 font-black text-xl italic tracking-wider text-orange-500 drop-shadow-md">
                     <svg viewBox="0 0 100 100" className="w-8 h-8 fill-orange-500"><path d="M50 0L90 20v50L50 100 10 70V20z"/></svg>
                     <span>TNC Hub</span>
                  </div>
                  <div className="flex items-center gap-4">
-                    <button onClick={() => setShowCreateModal(true)} className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow-lg shadow-cyan-900/20" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Admin</button>
+                    <button onClick={() => setShowCreateModal(true)} className="bg-cyan-600 hover:bg-cyan-500 text-theme-text-base text-xs font-bold transition-colors shadow-lg shadow-cyan-900/20" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Admin</button>
                     <button className="bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create New Player</button>
                     <button className="bg-transparent border border-cyan-700/50 text-cyan-500 text-xs font-bold hover:bg-cyan-900/30 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Import Teams via CSV</button>
                  </div>
@@ -524,24 +524,24 @@ const Admin = ({ globalGame, globalTournament }) => {
             </div>
           </div>
           {}
-          <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
-                 <h2 className="text-sm font-bold text-gray-300 tracking-wide">Rulebook Viewer</h2>
-                 <label className="bg-transparent border border-[#2a3648] text-cyan-400 text-[10px] font-bold hover:bg-[#1c2532] transition-colors cursor-pointer" style={{ padding: "12px 24px", borderRadius: "9999px" }}>
+          <div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
+             <div className="border-b border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-sm font-bold text-theme-text-base tracking-wide">Rulebook Viewer</h2>
+                 <label className="bg-transparent border border-[#2a3648] text-cyan-400 text-[10px] font-bold hover:bg-bg-400 transition-colors cursor-pointer" style={{ padding: "12px 24px", borderRadius: "9999px" }}>
                     Upload New Rulebook
                     <input type="file" className="hidden" accept="application/pdf,image/*" onChange={handleRulebookUpload} />
                  </label>
              </div>
              <div style={{ padding: "32px" }}>
                  {rulebookUrl ? (
-                   <div className="bg-[#151e2b] rounded-lg border border-[#1c2532] flex flex-wrap items-center justify-between" style={{ padding: "24px", gap: "16px" }}>
+                   <div className="bg-bg-300 rounded-lg border border-[#1c2532] flex flex-wrap items-center justify-between" style={{ padding: "24px", gap: "16px" }}>
                      <div className="flex items-center" style={{ gap: "16px" }}>
                        <div className="flex-shrink-0 w-12 h-12 rounded flex items-center justify-center bg-cyan-500/20 text-cyan-400">
                          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                        </div>
                        <div className="flex flex-col" style={{ gap: "4px" }}>
-                         <span className="text-sm font-bold text-gray-300">Official League Rulebook</span>
-                         <span className="text-[10px] text-gray-500 font-mono">{rulebookUrl.split('/').pop()}</span>
+                         <span className="text-sm font-bold text-theme-text-base">Official League Rulebook</span>
+                         <span className="text-[10px] text-theme-text-faint font-mono">{rulebookUrl.split('/').pop()}</span>
                        </div>
                      </div>
                      <div className="flex items-center" style={{ gap: "12px" }}>
@@ -549,30 +549,30 @@ const Admin = ({ globalGame, globalTournament }) => {
                      </div>
                    </div>
                  ) : (
-                   <div className="flex items-center justify-center text-gray-500 font-mono text-sm border-2 border-dashed border-[#1c2532] rounded-lg" style={{ padding: "48px" }}>
+                   <div className="flex items-center justify-center text-theme-text-faint font-mono text-sm border-2 border-dashed border-[#1c2532] rounded-lg" style={{ padding: "48px" }}>
                       No rulebook uploaded yet.
                    </div>
                  )}
              </div>
           </div>
           {}
-          <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="border-b border-[#1c2532] bg-[#121a25] flex justify-between items-center" style={{ padding: "24px 32px" }}>
-                 <h2 className="text-sm font-black text-gray-300 tracking-widest uppercase">Recently Record <span className="text-red-500">(Super Admin Logs)</span></h2>
-                 <button className="bg-[#1c2532] border border-[#2a3648] text-cyan-400 text-xs font-bold hover:bg-[#232f40] transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Detailed Report</button>
+          <div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
+             <div className="border-b border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-sm font-black text-theme-text-base tracking-widest uppercase">Recently Record <span className="text-red-500">(Super Admin Logs)</span></h2>
+                 <button className="bg-bg-400 border border-[#2a3648] text-cyan-400 text-xs font-bold hover:bg-bg-500 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Detailed Report</button>
              </div>
              <div className="flex flex-col" style={{ padding: "32px", gap: "16px" }}>
                 {auditLogsData.map((log, idx) => (
-                  <div key={idx} className="bg-[#151e2b] rounded-xl border border-[#1c2532] flex flex-col md:flex-row md:items-center justify-between transition-colors hover:border-cyan-500/30 hover:bg-[#1a2533]" style={{ padding: "20px 24px", gap: "24px" }}>
+                  <div key={idx} className="bg-bg-300 rounded-xl border border-[#1c2532] flex flex-col md:flex-row md:items-center justify-between transition-colors hover:border-cyan-500/30 hover:bg-bg-400" style={{ padding: "20px 24px", gap: "24px" }}>
                      <div className="flex flex-col" style={{ gap: "8px", minWidth: "200px" }}>
                         <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{log.type}</span>
                         <span className="text-sm font-bold text-gray-200">{log.ign}</span>
                      </div>
                      <div className="flex-1 md:px-4">
-                        <span className="text-xs text-gray-400 leading-relaxed">{log.details}</span>
+                        <span className="text-xs text-theme-text-muted leading-relaxed">{log.details}</span>
                      </div>
                      <div className="flex items-center justify-end" style={{ minWidth: "150px" }}>
-                        <span className="text-[10px] text-gray-500 font-mono bg-[#0b1018] rounded border border-[#1c2532]" style={{ padding: "8px 12px" }}>{log.time}</span>
+                        <span className="text-[10px] text-theme-text-faint font-mono bg-bg-200 rounded border border-[#1c2532]" style={{ padding: "8px 12px" }}>{log.time}</span>
                      </div>
                   </div>
                 ))}
@@ -583,41 +583,41 @@ const Admin = ({ globalGame, globalTournament }) => {
       {}
       {showCreateModal && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0f1722] p-8 rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
-            <button onClick={() => setShowCreateModal(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+          <div className="bg-bg-300 p-8 rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+            <button onClick={() => setShowCreateModal(false)} className="absolute top-4 right-4 text-theme-text-faint hover:text-theme-text-base transition-colors">
               <svg xmlns="http://www.w3.org/w0000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="flex items-center space-x-3 mb-6">
               <LockIcon />
-              <h3 className="text-xl font-black text-white uppercase tracking-widest">Create Admin Account</h3>
+              <h3 className="text-xl font-black text-theme-text-base uppercase tracking-widest">Create Admin Account</h3>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">Email Address</label>
+                <label className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest block mb-1.5">Email Address</label>
                 <input 
                   type="email" 
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="w-full bg-[#151e2b] border border-[#2a3648] text-white text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full bg-bg-300 border border-[#2a3648] text-theme-text-base text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
                   placeholder="admin@esport.ph"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">Password</label>
+                <label className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest block mb-1.5">Password</label>
                 <input 
                   type="password" 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#151e2b] border border-[#2a3648] text-white text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full bg-bg-300 border border-[#2a3648] text-theme-text-base text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
                   placeholder="••••••••"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">Role</label>
+                <label className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest block mb-1.5">Role</label>
                 <select 
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full bg-[#151e2b] border border-[#2a3648] text-white text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full bg-bg-300 border border-[#2a3648] text-theme-text-base text-sm rounded-lg py-2 px-3 focus:outline-none focus:border-cyan-500 transition-colors"
                 >
                   <option value="Tournament Mod">Tournament Mod</option>
                   <option value="Super Admin">Super Admin</option>
@@ -638,25 +638,25 @@ const Admin = ({ globalGame, globalTournament }) => {
       {}
       {editingUser && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0f1722] rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200" style={{ padding: "32px" }}>
-            <button onClick={() => setEditingUser(null)} className="absolute text-gray-500 hover:text-white transition-colors" style={{ top: "16px", right: "16px" }}>
+          <div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200" style={{ padding: "32px" }}>
+            <button onClick={() => setEditingUser(null)} className="absolute text-theme-text-faint hover:text-theme-text-base transition-colors" style={{ top: "16px", right: "16px" }}>
               <svg xmlns="http://www.w3.org/w0000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="flex items-center" style={{ gap: "12px", marginBottom: "24px" }}>
               <LockIcon />
-              <h3 className="text-xl font-black text-white uppercase tracking-widest">Edit Permissions</h3>
+              <h3 className="text-xl font-black text-theme-text-base uppercase tracking-widest">Edit Permissions</h3>
             </div>
             <div className="flex flex-col" style={{ gap: "24px" }}>
-              <div className="bg-[#151e2b] rounded-lg border border-[#1c2532]" style={{ padding: "16px" }}>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block" style={{ marginBottom: "4px" }}>User</label>
-                <div className="text-cyan-400 font-bold text-base">{editingUser.username} <span className="text-gray-500 text-sm font-normal ml-1">({editingUser.role})</span></div>
+              <div className="bg-bg-300 rounded-lg border border-[#1c2532]" style={{ padding: "16px" }}>
+                <label className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest block" style={{ marginBottom: "4px" }}>User</label>
+                <div className="text-cyan-400 font-bold text-base">{editingUser.username} <span className="text-theme-text-faint text-sm font-normal ml-1">({editingUser.role})</span></div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block" style={{ marginBottom: "12px" }}>Permissions</label>
+                <label className="text-[10px] font-bold text-theme-text-muted uppercase tracking-widest block" style={{ marginBottom: "12px" }}>Permissions</label>
                 <div className="grid grid-cols-2" style={{ gap: "12px" }}>
                    {['view', 'edit', 'full', 'manage_folders'].map((perm) => (
-                      <label key={perm} className="flex items-center cursor-pointer group bg-[#151e2b] rounded-lg border border-[#1c2532] hover:border-cyan-500/50 transition-all" style={{ padding: "12px", gap: "12px" }}>
-                        <div className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded border ${editPermissions[perm] ? 'bg-cyan-500 border-cyan-500' : 'bg-[#0f1722] border-gray-600 group-hover:border-gray-500'} transition-colors`}>
+                      <label key={perm} className="flex items-center cursor-pointer group bg-bg-300 rounded-lg border border-[#1c2532] hover:border-cyan-500/50 transition-all" style={{ padding: "12px", gap: "12px" }}>
+                        <div className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded border ${editPermissions[perm] ? 'bg-cyan-500 border-cyan-500' : 'bg-bg-300 border-gray-600 group-hover:border-gray-500'} transition-colors`}>
                            {editPermissions[perm] && <svg className="w-3.5 h-3.5 text-[#090e14]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                         </div>
                         <input
@@ -665,7 +665,7 @@ const Admin = ({ globalGame, globalTournament }) => {
                           onChange={(e) => setEditPermissions({...editPermissions, [perm]: e.target.checked})}
                           className="hidden"
                         />
-                        <span className="text-sm font-medium text-gray-300 capitalize group-hover:text-cyan-400 transition-colors whitespace-nowrap">{perm.replace('_', ' ')}</span>
+                        <span className="text-sm font-medium text-theme-text-base capitalize group-hover:text-cyan-400 transition-colors whitespace-nowrap">{perm.replace('_', ' ')}</span>
                       </label>
                    ))}
                 </div>

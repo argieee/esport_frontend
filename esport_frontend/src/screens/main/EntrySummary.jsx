@@ -83,34 +83,34 @@ const EntrySummary = ({ globalGame, globalTournament }) => {
         <td className="py-3 px-4 text-center font-mono text-emerald-400/90">{st.kr}</td>
         <td className="py-3 px-4 text-center font-mono text-cyan-400/90">{st.hk}</td>
         <td className="py-3 px-4 text-center font-mono text-purple-400/90">{st.sr}</td>
-        <td className={`py-3 px-4 text-center font-bold ${st.plusMinus > 0 ? 'text-green-400' : st.plusMinus < 0 ? 'text-red-400' : 'text-slate-400'}`}>
+        <td className={`py-3 px-4 text-center font-bold ${st.plusMinus > 0 ? 'text-green-400' : st.plusMinus < 0 ? 'text-red-400' : 'text-theme-text-muted'}`}>
           {st.plusMinus > 0 ? `+${st.plusMinus}` : st.plusMinus}
         </td>
-        <td className="py-3 px-4 text-center font-black text-[#00ffcc]">{st.prs.toFixed(2)}</td>
+        <td className="py-3 px-4 text-center font-black text-cyan-400">{st.prs.toFixed(2)}</td>
       </tr>
     ));
   };
   return (
-    <div className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800 overflow-y-auto custom-scrollbar">
+    <div className="h-full flex flex-col bg-bg-100 light:bg-slate-50 text-theme-text-base light:text-slate-800 overflow-y-auto custom-scrollbar">
       <div className="w-full max-w-[1500px] mx-auto px-8 py-10 flex flex-col gap-8">
         {}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black text-white uppercase tracking-widest mb-2 drop-shadow-md">Entry Summary</h1>
-            <p className="text-slate-400 text-sm tracking-wider uppercase">Live calculation based on Data Entry inputs</p>
+            <h1 className="text-3xl font-black text-theme-text-base uppercase tracking-widest mb-2 drop-shadow-md">Entry Summary</h1>
+            <p className="text-theme-text-muted text-sm tracking-wider uppercase">Live calculation based on Data Entry inputs</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex gap-8 items-center shadow-lg">
             <div className="text-center">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Total Round Score</p>
-              <p className="text-2xl font-black text-white">{totalRounds}</p>
+              <p className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest mb-1">Total Round Score</p>
+              <p className="text-2xl font-black text-theme-text-base">{totalRounds}</p>
             </div>
             <div className="w-px h-10 bg-slate-800"></div>
             <div className="text-center">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">{teamA.name}</p>
+              <p className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest mb-1">{teamA.name}</p>
               <p className="text-2xl font-black text-blue-400">{scoreA}</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">{teamB.name}</p>
+              <p className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest mb-1">{teamB.name}</p>
               <p className="text-2xl font-black text-red-400">{scoreB}</p>
             </div>
           </div>
@@ -120,23 +120,23 @@ const EntrySummary = ({ globalGame, globalTournament }) => {
           <div className="bg-gradient-to-br from-amber-500/20 to-amber-900/20 border border-amber-500/30 rounded-3xl p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-[0_0_30px_rgba(245,158,11,0.1)]">
              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
              <h3 className="text-amber-400 font-black tracking-[0.3em] uppercase text-sm mb-4">Match MVP</h3>
-             <p className="text-3xl font-black text-white mb-2">{matchMVP.ign || 'N/A'}</p>
+             <p className="text-3xl font-black text-theme-text-base mb-2">{matchMVP.ign || 'N/A'}</p>
              <div className="flex gap-6 mt-4">
-               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">K/D</p><p className="text-lg font-mono text-white">{matchMVP.kd || '-'}</p></div>
-               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">K/R</p><p className="text-lg font-mono text-white">{matchMVP.kr || '-'}</p></div>
-               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">PRS</p><p className="text-2xl font-black text-[#00ffcc]">{matchMVP.prs ? matchMVP.prs.toFixed(2) : '-'}</p></div>
+               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">K/D</p><p className="text-lg font-mono text-theme-text-base">{matchMVP.kd || '-'}</p></div>
+               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">K/R</p><p className="text-lg font-mono text-theme-text-base">{matchMVP.kr || '-'}</p></div>
+               <div className="text-center"><p className="text-xs text-amber-500/80 font-bold">PRS</p><p className="text-2xl font-black text-cyan-400">{matchMVP.prs ? matchMVP.prs.toFixed(2) : '-'}</p></div>
              </div>
           </div>
         </div>
         {}
-        <div className="bg-[#0b111a] border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="bg-bg-200 border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl">
           <div className="bg-slate-900/80 py-4 border-b border-slate-800 flex items-center justify-center">
-            <h2 className="text-slate-300 font-black tracking-[0.4em] text-sm uppercase">Set Summary</h2>
+            <h2 className="text-theme-text-base font-black tracking-[0.4em] text-sm uppercase">Set Summary</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#0f1724]">
-                <tr className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-800/60">
+              <thead className="bg-bg-300">
+                <tr className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest border-b border-slate-800/60">
                   <th className="py-4 px-4 text-left">Player</th>
                   <th className="py-4 px-4">Kills</th>
                   <th className="py-4 px-4">Deaths</th>
@@ -147,7 +147,7 @@ const EntrySummary = ({ globalGame, globalTournament }) => {
                   <th className="py-4 px-4 text-cyan-500/80">H/K</th>
                   <th className="py-4 px-4 text-purple-500/80">S/R</th>
                   <th className="py-4 px-4">+/-</th>
-                  <th className="py-4 px-4 text-[#00ffcc]">PRS</th>
+                  <th className="py-4 px-4 text-cyan-400">PRS</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,19 +160,19 @@ const EntrySummary = ({ globalGame, globalTournament }) => {
           </div>
         </div>
         {}
-        <div className="bg-[#0b111a] border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl mt-4">
+        <div className="bg-bg-200 border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl mt-4">
            <div className="bg-slate-900/80 py-4 border-b border-slate-800 flex items-center justify-center">
-            <h2 className="text-slate-300 font-black tracking-[0.4em] text-sm uppercase">PRS Breakdown Per Set</h2>
+            <h2 className="text-theme-text-base font-black tracking-[0.4em] text-sm uppercase">PRS Breakdown Per Set</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#0f1724]">
-                <tr className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-800/60">
+              <thead className="bg-bg-300">
+                <tr className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest border-b border-slate-800/60">
                   <th className="py-4 px-4 text-left">Player</th>
                   {cfGroups.filter(g => !g.isTotal).map(g => (
                     <th key={g.id} className="py-4 px-4 text-center">{g.label}</th>
                   ))}
-                  <th className="py-4 px-4 text-[#00ffcc] text-center">AVR PRS</th>
+                  <th className="py-4 px-4 text-cyan-400 text-center">AVR PRS</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,12 +183,12 @@ const EntrySummary = ({ globalGame, globalTournament }) => {
                        const origPlayer = [...playersA, ...playersB].find(p => (p.ign || 'Unknown') === st.ign) || {};
                        const setStat = getSetStats(origPlayer, g.id);
                        return (
-                         <td key={g.id} className="py-3 px-4 text-center text-slate-300 font-mono">
+                         <td key={g.id} className="py-3 px-4 text-center text-theme-text-base font-mono">
                            {setStat.prs.toFixed(2)}
                          </td>
                        );
                     })}
-                    <td className="py-3 px-4 text-center font-black text-[#00ffcc] bg-[#00ffcc]/5">{st.prs.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-center font-black text-cyan-400 bg-cyan-400/5">{st.prs.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

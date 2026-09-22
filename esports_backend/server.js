@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { generatePrediction } = require('./utils/predictor');
 const stats = require('./utils/statsCalculator');
+const { getLiveStreamId } = require('./utils/youtubeScraper');
 const app = express();
 
 
@@ -79,6 +80,10 @@ const cacheMiddleware = (req, res, next) => {
 const idempotencyCache = new NodeCache({ stdTTL: 2, checkperiod: 2 });
 const preventDuplicates = (req, res, next) => {
   if (req.method !== 'POST') return next();
+  // Bypass idempotency for file uploads (multipart) or specific endpoints like teams that might be created rapidly
+  if (req.originalUrl.includes('/api/teams') || req.headers['content-type']?.includes('multipart/form-data')) {
+    return next();
+  }
   const hash = crypto.createHash('sha256')
     .update(req.ip + req.originalUrl + JSON.stringify(req.body || {}))
     .digest('hex');
@@ -149,6 +154,18 @@ const isAdmin = async (req, res, next) => {
     return res.status(500).json({ error: 'Internal server error during authorization.' });
   }
 };
+
+app.get('/api/streams/live', cacheMiddleware, async (req, res) => {
+  const { game } = req.query;
+  const channelId = game === 'crossfire' ? '@CrossfirePhilippines' : '@ValorantEsports';
+  
+  try {
+    const streamData = await getLiveStreamId(channelId);
+    res.json(streamData);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch stream data', videoId: null, isLive: false });
+  }
+});
 app.get('/api/audit-logs', authenticateToken, isAdmin, cacheMiddleware, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   try {
@@ -517,6 +534,7 @@ app.post('/api/stats/valorant/match', authenticateToken, isAdmin, async (req, re
       map: matchHeader?.mapName || null,
       team_name: p.team_name || null,
       ign: p.ign,
+      group_label: p.agentRole || null,
       win: p.win !== undefined ? p.win : null,
       kills: Number(p.kills) || 0,
       deaths: Number(p.deaths) || 0,
@@ -700,7 +718,7 @@ app.get('/api/matches', async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   try {
     const { tournament, status } = req.query;
-    let query = supabase.from('matches').select('*, team_a:teams!matches_team_a_id_fkey(*), team_b:teams!matches_team_b_id_fkey(*)').order('created_at', { ascending: false });
+    let query = supabase.from('matches').select('*, team_a:teams!matches_team_a_id_fkey(*), team_b:teams!matches_team_b_id_fkey(*)');
     if (tournament) query = query.eq('tournament_name', tournament);
     if (status) query = query.in('status', status.split(','));
     const { data, error } = await query;
@@ -710,6 +728,120 @@ app.get('/api/matches', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+const syncLocks = {};
+async function acquireSyncLock(key) {
+  while (syncLocks[key]) {
+    await new Promise(r => setTimeout(r, 50));
+  }
+  syncLocks[key] = true;
+}
+
+app.post('/api/matches/sync-live', authenticateToken, isAdmin, async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
+  const { tournament_name, team_a_id, team_b_id, map_name, game_title, team_a_score, team_b_score, status } = req.body;
+  
+  const lockKey = `${tournament_name}_${team_a_id}_${team_b_id}`;
+  await acquireSyncLock(lockKey);
+
+  try {
+    // Check if match already exists - ONLY checking 'live' matches
+    const { data: existingMatch } = await supabase
+      .from('matches')
+      .select('*')
+      .eq('tournament_name', tournament_name)
+      .eq('team_a_id', team_a_id)
+      .eq('team_b_id', team_b_id)
+      .eq('status', 'live')
+      .limit(1);
+
+    if (existingMatch && existingMatch.length > 0) {
+      // Update existing live match (can update to 'finished')
+      const { data, error } = await supabase
+        .from('matches')
+        .update({ status, map_name, team_a_score, team_b_score })
+        .eq('match_id', existingMatch[0].match_id)
+        .select();
+      if (error) throw error;
+      return res.json(data[0]);
+    } else {
+      // If we are trying to mark a match as finished but there is no live match, just ignore
+      if (status === 'finished') {
+         return res.json({});
+      }
+      
+      // Create new live match
+      const { data, error } = await supabase
+        .from('matches')
+        .insert([{ tournament_name, team_a_id, team_b_id, map_name, game_title, status, team_a_score, team_b_score }])
+        .select();
+      if (error) throw error;
+      return res.json(data[0]);
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    delete syncLocks[lockKey];
+  }
+});
+
+app.post('/api/matches/finish-live', authenticateToken, isAdmin, async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
+  const { tournament_name, team_a_name, team_b_name, team_a_score, team_b_score } = req.body;
+  
+  try {
+    // We need to resolve team names to IDs if we only have names
+    let tAId = req.body.team_a_id;
+    let tBId = req.body.team_b_id;
+
+    if (!tAId && team_a_name) {
+       const { data: ta } = await supabase.from('teams').select('team_id').eq('team_name', team_a_name).limit(1);
+       if (ta && ta.length) tAId = ta[0].team_id;
+    }
+    if (!tBId && team_b_name) {
+       const { data: tb } = await supabase.from('teams').select('team_id').eq('team_name', team_b_name).limit(1);
+       if (tb && tb.length) tBId = tb[0].team_id;
+    }
+
+    if (!tAId || !tBId) {
+       return res.status(400).json({ error: 'Could not resolve team IDs.' });
+    }
+
+    const lockKey = `${tournament_name}_${tAId}_${tBId}`;
+    await acquireSyncLock(lockKey);
+
+    try {
+      const { data: existingMatch } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('tournament_name', tournament_name)
+        .eq('team_a_id', tAId)
+        .eq('team_b_id', tBId)
+        .eq('status', 'live')
+        .limit(1);
+
+      if (existingMatch && existingMatch.length > 0) {
+        const { data, error } = await supabase
+          .from('matches')
+          .update({ 
+             status: 'finished', 
+             team_a_score: team_a_score, 
+             team_b_score: team_b_score
+          })
+          .eq('match_id', existingMatch[0].match_id)
+          .select();
+        if (error) throw error;
+        return res.json(data[0]);
+      } else {
+        return res.json({ message: 'No active live match found to finish' });
+      }
+    } finally {
+      delete syncLocks[lockKey];
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/matches', authenticateToken, isAdmin, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   try {
@@ -907,6 +1039,75 @@ app.delete('/api/brackets/:id', authenticateToken, isAdmin, async (req, res) => 
 
 
 // GET bracket state
+app.get('/api/tournaments-dashboard', async (req, res) => {
+  try {
+    const { data: tourns, error: e1 } = await supabase.from('tournaments').select('*');
+    if (e1) throw e1;
+    
+    const { data: states, error: e2 } = await supabase.from('bracket_states').select('*');
+    if (e2) throw e2;
+    
+    const { data: results, error: e3 } = await supabase.from('bracket_results').select('tournament_name');
+    if (e3) throw e3;
+    
+    const completedSet = new Set(results.map(r => r.tournament_name));
+    const dashboardList = [];
+    const processedStates = new Set();
+    
+    if (states) {
+      states.forEach(s => {
+        let status = 'IN PROGRESS';
+        if (completedSet.has(s.tournament_name)) status = 'COMPLETE';
+        
+        let pCount = 0;
+        if (s.team_pool && Array.isArray(s.team_pool)) pCount = s.team_pool.length;
+        
+        dashboardList.push({
+          id: s.id,
+          name: s.tournament_name,
+          game_title: s.game_title,
+          format: s.format,
+          status: status,
+          participant_count: pCount,
+          date: s.updated_at || s.created_at
+        });
+        processedStates.add(s.tournament_name);
+      });
+    }
+    
+    if (tourns) {
+      tourns.forEach(t => {
+        if (!processedStates.has(t.name)) {
+          dashboardList.push({
+            id: 't-' + t.id,
+            name: t.name,
+            game_title: t.game_title,
+            format: 'Unspecified Format',
+            status: 'PENDING',
+            participant_count: 0,
+            date: t.created_at
+          });
+        }
+      });
+    }
+    
+    dashboardList.sort((a, b) => new Date(b.date) - new Date(a.date));
+    res.json(dashboardList);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/bracket-states-all', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('bracket_states').select('*').order('updated_at', { ascending: false });
+    if (error) throw error;
+    res.json(data || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/bracket-state', async (req, res) => {
   const { tournament, game_title, format } = req.query;
   try {
@@ -949,6 +1150,58 @@ app.post('/api/bracket-state', authenticateToken, isAdmin, async (req, res) => {
     if (error) throw error;
     res.status(200).json(data[0]);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----------------------------------------------------
+// BRACKET RESULTS
+// ----------------------------------------------------
+app.post('/api/bracket-results', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { tournament_name, game_title, format, results } = req.body;
+    
+    // First, delete existing results for this tournament & format to avoid duplicates
+    await supabase.from('bracket_results')
+      .delete()
+      .eq('tournament_name', tournament_name)
+      .eq('game_title', game_title)
+      .eq('format', format);
+      
+    // Insert new results
+    const insertData = results.map(r => ({
+      tournament_name,
+      game_title,
+      format,
+      team_name: r.team_name,
+      placement_rank: r.placement_rank,
+      logo_url: r.logo_url
+    }));
+    
+    const { data, error } = await supabase.from('bracket_results').insert(insertData);
+    if (error) throw error;
+    
+    res.json({ message: 'Results saved successfully!', data });
+  } catch (err) {
+    console.error('Save Bracket Results Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/bracket-results', authenticateToken, async (req, res) => {
+  try {
+    const { tournament_name, game_title, format } = req.query;
+    let query = supabase.from('bracket_results').select('*').order('placement_rank', { ascending: true });
+    
+    if (tournament_name) query = query.eq('tournament_name', tournament_name);
+    if (game_title) query = query.eq('game_title', game_title);
+    if (format) query = query.eq('format', format);
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Fetch Bracket Results Error:', err);
     res.status(500).json({ error: err.message });
   }
 });

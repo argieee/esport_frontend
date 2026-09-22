@@ -3,7 +3,7 @@ import { apiFetch } from "../../utils/api";
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
-    className="h-4 w-4 text-gray-500"
+    className="h-4 w-4 text-theme-text-faint"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -16,7 +16,7 @@ const SearchIcon = () => (
     />
   </svg>
 );
-const PlayerRankings = ({ globalGame }) => {
+const PlayerRankings = ({ globalGame, globalTournament }) => {
   const activeGame = (globalGame || "VALORANT").toUpperCase();
   const [dailySearch, setDailySearch] = useState("");
   const [weeklySearch, setWeeklySearch] = useState("");
@@ -24,27 +24,30 @@ const PlayerRankings = ({ globalGame }) => {
   const [dbCrossfireStats, setDbCrossfireStats] = useState([]);
   const [matchRecords, setMatchRecords] = useState([]);
   useEffect(() => {
-    apiFetch("/api/stats/valorant")
+    apiFetch(`/api/stats/valorant?tournament=${encodeURIComponent(globalTournament || 'Default')}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setDbValorantStats(data);
         else console.error("Expected array for Valorant stats, got:", data);
       })
       .catch(console.error);
-    apiFetch("/api/stats/crossfire")
+
+    apiFetch(`/api/stats/crossfire?tournament=${encodeURIComponent(globalTournament || 'Default')}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setDbCrossfireStats(data);
         else console.error("Expected array for Crossfire stats, got:", data);
       })
       .catch(console.error);
-    apiFetch("/api/match-records")
+
+    apiFetch(`/api/match-records?tournament=${encodeURIComponent(globalTournament || 'Default')}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setMatchRecords(data);
+        else console.error("Expected array for Match Records, got:", data);
       })
       .catch(console.error);
-  }, []);
+  }, [globalTournament]);
   const liveValorantPlayers = useMemo(() => {
     if (!Array.isArray(dbValorantStats)) return [];
     return [...dbValorantStats]
@@ -428,7 +431,7 @@ const PlayerRankings = ({ globalGame }) => {
     p.name.toLowerCase().includes(weeklySearch.toLowerCase()),
   );
   return (
-    <div className="flex-1 bg-[#090e14] text-white overflow-y-auto flex flex-col h-full custom-scrollbar">
+    <div className="flex-1 bg-bg-100 text-theme-text-base overflow-y-auto flex flex-col h-full custom-scrollbar">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -452,11 +455,11 @@ const PlayerRankings = ({ globalGame }) => {
             style={{ gap: "32px", paddingBottom: "32px" }}
           >
             {}
-            <div className="bg-[#0b1018] rounded-2xl border border-slate-800 shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[450px] overflow-hidden relative group">
-              {}
+            <div className="bg-bg-200 rounded-2xl border border-theme-input shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[450px] overflow-hidden relative group">
+              {/* Decorative elements */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.03] to-transparent pointer-events-none z-0"></div>
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
-              <div className="border-b border-slate-800/80 bg-[#101722] relative z-10" style={{ padding: "32px" }}>
+              <div className="border-b border-theme-input bg-bg-300 relative z-10" style={{ padding: "32px" }}>
                 <div className="flex justify-between items-center" style={{ marginBottom: "24px" }}>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
@@ -464,7 +467,7 @@ const PlayerRankings = ({ globalGame }) => {
                         D
                       </span>
                     </div>
-                    <h3 className="text-[13px] font-black text-white uppercase tracking-widest drop-shadow-md">
+                    <h3 className="text-[13px] font-black text-theme-text-base uppercase tracking-widest drop-shadow-md">
                       Daily Player Ranking
                     </h3>
                   </div>
@@ -476,16 +479,16 @@ const PlayerRankings = ({ globalGame }) => {
                   <input
                     type="text"
                     placeholder="Search Player Here"
-                    className="w-full bg-[#0a0f16]/80 border border-slate-700 text-sm text-white rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner placeholder-gray-600 font-medium"
+                    className="w-full bg-theme-input border border-theme-input text-sm text-theme-text-base rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner placeholder-gray-600 font-medium"
                     style={{ padding: "12px 16px 12px 44px" }}
                     value={dailySearch}
                     onChange={(e) => setDailySearch(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-b from-[#0a0f16] to-[#0d131c] relative z-10" style={{ padding: "0 32px 32px 32px" }}>
+              <div className="flex-1 overflow-y-auto custom-scrollbar bg-bg-200 relative z-10" style={{ padding: "0 32px 32px 32px" }}>
                 <table className="w-full text-center text-[11px]">
-                  <thead className="bg-[#121a25]/90 backdrop-blur-md sticky top-0 text-slate-500 font-black shadow-md z-10 text-[9px] tracking-[0.15em] uppercase border-b border-slate-800">
+                  <thead className="bg-bg-300/90 backdrop-blur-md sticky top-0 text-theme-text-muted font-black shadow-md z-10 text-[9px] tracking-[0.15em] uppercase border-b border-theme-input">
                     <tr>
                       <th className="py-4 px-2 text-left pl-6">
                         Player Identity
@@ -500,33 +503,33 @@ const PlayerRankings = ({ globalGame }) => {
                       <th className="py-4 px-1 text-emerald-500/70">A/P</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-theme-input">
                     {filteredDaily.length > 0 ? (
                       filteredDaily.map((p, i) => (
                         <tr
                           key={i}
-                          className="hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                          className="hover:bg-bg-300 transition-colors group cursor-pointer"
                         >
                           <td className="py-3 px-2 text-left pl-4 font-bold flex items-center" style={{ gap: "16px" }}>
                             <div
-                              className={`w-6 h-6 flex items-center justify-center rounded-md font-black text-[10px] shadow-lg ${i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/40" : i === 1 ? "bg-slate-300/20 text-slate-300 border border-slate-300/40" : i === 2 ? "bg-orange-700/20 text-orange-400 border border-orange-700/40" : "bg-slate-800 text-slate-500"}`}
+                              className={`w-6 h-6 flex items-center justify-center rounded-md font-black text-[10px] shadow-lg ${i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/40" : i === 1 ? "bg-slate-300/20 text-theme-text-base border border-slate-300/40" : i === 2 ? "bg-orange-700/20 text-orange-400 border border-orange-700/40" : "bg-theme-input text-theme-text-muted"}`}
                             >
                               {p.rank}
                             </div>
                             <span
-                              className="truncate max-w-[120px] text-white group-hover:text-cyan-400 transition-colors"
+                              className="truncate max-w-[120px] text-theme-text-base group-hover:text-cyan-400 transition-colors"
                               title={p.name}
                             >
                               {p.name}
                             </span>
                           </td>
-                          <td className="py-3 px-1 text-slate-300 font-semibold">
+                          <td className="py-3 px-1 text-theme-text-base font-semibold">
                             {p.kills}
                           </td>
-                          <td className="py-3 px-1 text-slate-400">
+                          <td className="py-3 px-1 text-theme-text-muted">
                             {p.death}
                           </td>
-                          <td className="py-3 px-1 text-slate-500">
+                          <td className="py-3 px-1 text-theme-text-muted">
                             {p.round}
                           </td>
                           <td className="py-3 px-1 text-cyan-400 font-black">
@@ -563,11 +566,11 @@ const PlayerRankings = ({ globalGame }) => {
               </div>
             </div>
             {}
-            <div className="bg-[#0b1018] rounded-2xl border border-slate-800 shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[450px] overflow-hidden relative group">
-              {}
+            <div className="bg-bg-200 rounded-2xl border border-theme-input shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[450px] overflow-hidden relative group">
+              {/* Decorative elements */}
               <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/[0.03] to-transparent pointer-events-none z-0"></div>
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-fuchsia-500/50 to-transparent"></div>
-              <div className="border-b border-slate-800/80 bg-[#101722] relative z-10" style={{ padding: "32px" }}>
+              <div className="border-b border-theme-input bg-bg-300 relative z-10" style={{ padding: "32px" }}>
                 <div className="flex justify-between items-center" style={{ marginBottom: "24px" }}>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center">
@@ -575,7 +578,7 @@ const PlayerRankings = ({ globalGame }) => {
                         W
                       </span>
                     </div>
-                    <h3 className="text-[13px] font-black text-white uppercase tracking-widest drop-shadow-md">
+                    <h3 className="text-[13px] font-black text-theme-text-base uppercase tracking-widest drop-shadow-md">
                       Weekly Player Ranking
                     </h3>
                   </div>
@@ -587,16 +590,16 @@ const PlayerRankings = ({ globalGame }) => {
                   <input
                     type="text"
                     placeholder="Search Player Here"
-                    className="w-full bg-[#0a0f16]/80 border border-slate-700 text-sm text-white rounded-xl focus:outline-none focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500/50 transition-all shadow-inner placeholder-gray-600 font-medium"
+                    className="w-full bg-theme-input border border-theme-input text-sm text-theme-text-base rounded-xl focus:outline-none focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500/50 transition-all shadow-inner placeholder-gray-600 font-medium"
                     style={{ padding: "12px 16px 12px 44px" }}
                     value={weeklySearch}
                     onChange={(e) => setWeeklySearch(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-b from-[#0a0f16] to-[#0d131c] relative z-10" style={{ padding: "0 32px 32px 32px" }}>
+              <div className="flex-1 overflow-y-auto custom-scrollbar bg-bg-200 relative z-10" style={{ padding: "0 32px 32px 32px" }}>
                 <table className="w-full text-center text-[11px]">
-                  <thead className="bg-[#121a25]/90 backdrop-blur-md sticky top-0 text-slate-500 font-black shadow-md z-10 text-[9px] tracking-[0.15em] uppercase border-b border-slate-800">
+                  <thead className="bg-bg-300/90 backdrop-blur-md sticky top-0 text-theme-text-muted font-black shadow-md z-10 text-[9px] tracking-[0.15em] uppercase border-b border-theme-input">
                     <tr>
                       <th className="py-4 px-2 text-left pl-6">
                         Player Identity
@@ -611,33 +614,33 @@ const PlayerRankings = ({ globalGame }) => {
                       <th className="py-4 px-1 text-emerald-500/70">A/P</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-theme-input">
                     {filteredWeekly.length > 0 ? (
                       filteredWeekly.map((p, i) => (
                         <tr
                           key={i}
-                          className="hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                          className="hover:bg-bg-300 transition-colors group cursor-pointer"
                         >
                           <td className="py-3 px-2 text-left pl-4 font-bold flex items-center" style={{ gap: "16px" }}>
                             <div
-                              className={`w-6 h-6 flex items-center justify-center rounded-md font-black text-[10px] shadow-lg ${i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/40" : i === 1 ? "bg-slate-300/20 text-slate-300 border border-slate-300/40" : i === 2 ? "bg-orange-700/20 text-orange-400 border border-orange-700/40" : "bg-slate-800 text-slate-500"}`}
+                              className={`w-6 h-6 flex items-center justify-center rounded-md font-black text-[10px] shadow-lg ${i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/40" : i === 1 ? "bg-slate-300/20 text-theme-text-base border border-slate-300/40" : i === 2 ? "bg-orange-700/20 text-orange-400 border border-orange-700/40" : "bg-theme-input text-theme-text-muted"}`}
                             >
                               {p.rank}
                             </div>
                             <span
-                              className="truncate max-w-[120px] text-white group-hover:text-fuchsia-400 transition-colors"
+                              className="truncate max-w-[120px] text-theme-text-base group-hover:text-fuchsia-400 transition-colors"
                               title={p.name}
                             >
                               {p.name}
                             </span>
                           </td>
-                          <td className="py-3 px-1 text-slate-300 font-semibold">
+                          <td className="py-3 px-1 text-theme-text-base font-semibold">
                             {p.kills}
                           </td>
-                          <td className="py-3 px-1 text-slate-400">
+                          <td className="py-3 px-1 text-theme-text-muted">
                             {p.death}
                           </td>
-                          <td className="py-3 px-1 text-slate-500">
+                          <td className="py-3 px-1 text-theme-text-muted">
                             {p.round}
                           </td>
                           <td className="py-3 px-1 text-fuchsia-400 font-black">

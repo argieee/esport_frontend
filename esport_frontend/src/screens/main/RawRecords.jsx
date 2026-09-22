@@ -33,7 +33,7 @@ const RawRecords = ({ globalTournament }) => {
   }
   columns.push('Rounds', 'Map');
   return (
-    <div className="flex-1 bg-[#05080f] light:bg-[#f8fafc] text-white light:text-slate-900 overflow-y-auto flex flex-col h-full relative font-sans custom-scrollbar">
+    <div className="flex-1 bg-bg-base light:bg-slate-50 text-theme-text-base light:text-slate-900 overflow-y-auto flex flex-col h-full relative font-sans custom-scrollbar">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0b1018; }
@@ -52,10 +52,10 @@ const RawRecords = ({ globalTournament }) => {
         }
       `}</style>
       {}
-      <div className="border-b border-slate-800/80 light:border-slate-200 bg-[#0a0f18]/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between flex-shrink-0 shadow-lg" style={{ padding: "48px 48px 32px 48px" }}>
+      <div className="border-b border-slate-800/80 light:border-slate-200 bg-bg-200/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between flex-shrink-0 shadow-lg" style={{ padding: "48px 48px 32px 48px" }}>
         <div>
           <h1 className="text-3xl font-black uppercase tracking-widest title-gradient" style={{ marginBottom: "16px" }}>Raw Match Records</h1>
-          <p className="text-slate-400 light:text-slate-500 text-sm tracking-wide font-medium">Spreadsheet view of every individual player's match performance.</p>
+          <p className="text-theme-text-muted light:text-theme-text-muted text-sm tracking-wide font-medium">Spreadsheet view of every individual player's match performance.</p>
         </div>
         <div className="flex items-center" style={{ gap: "24px" }}>
           <div className="flex" style={{ gap: "12px" }}>
@@ -65,8 +65,8 @@ const RawRecords = ({ globalTournament }) => {
                 onClick={() => setGameFilter(filter)}
                 className={`text-sm font-black uppercase tracking-widest transition-all duration-300 border ${
                   gameFilter === filter 
-                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)] scale-105' 
-                    : 'bg-slate-900/50 border-slate-800/60 text-slate-500 hover:text-slate-300 hover:bg-slate-800/80'
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/40 shadow-[0_0_20px_color-mix(in_srgb,var(--color--)_%,transparent)] scale-105' 
+                    : 'bg-slate-900/50 border-slate-800/60 text-theme-text-muted hover:text-theme-text-base hover:bg-slate-800/80'
                 }`}
                 style={{ padding: "12px 24px", borderRadius: "12px" }}
               >
@@ -76,7 +76,7 @@ const RawRecords = ({ globalTournament }) => {
           </div>
           <button 
             onClick={fetchRecords}
-            className="group flex items-center bg-slate-800/80 hover:bg-slate-700 light:bg-white light:hover:bg-slate-50 border border-slate-700/80 light:border-slate-300 text-white light:text-slate-700 text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-95"
+            className="group flex items-center bg-slate-800/80 hover:bg-slate-700 light:bg-white light:hover:bg-slate-50 border border-slate-700/80 light:border-slate-300 text-theme-text-base light:text-slate-700 text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-95"
             style={{ padding: "12px 24px", borderRadius: "12px", gap: "12px" }}
           >
             <svg className={`text-cyan-400 group-hover:rotate-180 transition-transform duration-500 ${loading ? 'animate-spin' : ''}`} style={{ width: "16px", height: "16px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,26 +93,26 @@ const RawRecords = ({ globalTournament }) => {
       )}
       {}
       <div className="flex-1 overflow-hidden flex flex-col" style={{ padding: "48px" }}>
-        <div className="flex-1 overflow-auto custom-scrollbar rounded-2xl border border-slate-700/50 light:border-slate-300 shadow-2xl light:shadow-md bg-[#0b1018] light:bg-white relative">
+        <div className="flex-1 overflow-auto custom-scrollbar rounded-2xl border border-slate-700/50 light:border-slate-300 shadow-2xl light:shadow-md bg-bg-200 light:bg-white relative">
           <table className="min-w-full text-left border-collapse spreadsheet-table">
-            <thead className="bg-[#0f1522] light:bg-slate-50 sticky top-0 z-10 shadow-md">
+            <thead className="bg-bg-300 light:bg-slate-50 sticky top-0 z-10 shadow-md">
               <tr>
                 {columns.map((col, i) => (
                   <th 
                     key={col}
-                    className={`px-4 py-4 text-[10px] font-black text-slate-400 light:text-slate-600 uppercase tracking-widest border-b border-slate-700/60 light:border-slate-200 border-r border-slate-800/40 last:border-r-0 
-                    ${['Team', 'Player', 'Win'].includes(col) ? 'bg-[#121926] light:bg-slate-100' : ''} 
-                    ${['Kills', 'Deaths', 'Assists', 'Headshots', 'ACS', 'Econ', 'Rounds'].includes(col) ? 'bg-[#151c29] light:bg-slate-200/50' : ''}`}
+                    className={`px-4 py-4 text-[10px] font-black text-theme-text-muted light:text-slate-600 uppercase tracking-widest border-b border-slate-700/60 light:border-slate-200 border-r border-slate-800/40 last:border-r-0 
+                    ${['Team', 'Player', 'Win'].includes(col) ? 'bg-bg-300 light:bg-slate-100' : ''} 
+                    ${['Kills', 'Deaths', 'Assists', 'Headshots', 'ACS', 'Econ', 'Rounds'].includes(col) ? 'bg-bg-300 light:bg-slate-200/50' : ''}`}
                   >
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/40 light:divide-slate-100 bg-[#0a0f16] light:bg-white">
+            <tbody className="divide-y divide-slate-800/40 light:divide-slate-100 bg-bg-100 light:bg-white">
               {loading && records.length === 0 ? (
                 <tr>
-                  <td colSpan="16" className="px-6 py-12 text-center text-slate-500 light:text-slate-400 italic text-sm">
+                  <td colSpan="16" className="px-6 py-12 text-center text-theme-text-muted light:text-theme-text-muted italic text-sm">
                     <div className="flex items-center justify-center gap-3">
                       <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
                       Loading match records...
@@ -121,21 +121,21 @@ const RawRecords = ({ globalTournament }) => {
                 </tr>
               ) : filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan="16" className="px-6 py-12 text-center text-slate-500 light:text-slate-400 italic text-sm">
+                  <td colSpan="16" className="px-6 py-12 text-center text-theme-text-muted light:text-theme-text-muted italic text-sm">
                     No match records found.
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((row, idx) => (
-                  <tr key={row.id || idx} className="hover:bg-[#121a25] light:hover:bg-slate-50 transition-colors group">
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-400 light:text-slate-600 font-medium group-hover:text-cyan-400 transition-colors">{row.game}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-500">{row.week || '-'}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-500">{row.day || '-'}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-500">{row.match || '-'}</td>
+                  <tr key={row.id || idx} className="hover:bg-bg-300 light:hover:bg-slate-50 transition-colors group">
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted light:text-slate-600 font-medium group-hover:text-cyan-400 transition-colors">{row.game}</td>
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted">{row.week || '-'}</td>
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted">{row.day || '-'}</td>
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted">{row.match || '-'}</td>
                     <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 font-mono text-cyan-500/80 light:text-blue-600/80">{row.set_num || '-'}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-300 light:text-slate-700 font-bold bg-[#111824]/40 light:bg-slate-50/50">{row.team_name || '-'}</td>
-                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 font-black text-white light:text-slate-900 bg-[#111824]/40 light:bg-slate-50/50 tracking-wide">{row.ign}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 bg-[#111824]/40 light:bg-slate-50/50">
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-base light:text-slate-700 font-bold bg-bg-300/40 light:bg-slate-50/50">{row.team_name || '-'}</td>
+                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 font-black text-theme-text-base light:text-slate-900 bg-bg-300/40 light:bg-slate-50/50 tracking-wide">{row.ign}</td>
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 bg-bg-300/40 light:bg-slate-50/50">
                       {row.win === true ? (
                         <div className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]">
                           Win
@@ -146,26 +146,26 @@ const RawRecords = ({ globalTournament }) => {
                         </div>
                       ) : '-'}
                     </td>
-                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-white light:text-slate-800 bg-[#151c29]/30 light:bg-slate-100/50 font-mono font-medium">{row.kills}</td>
-                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-white light:text-slate-800 bg-[#151c29]/30 light:bg-slate-100/50 font-mono font-medium">{row.deaths}</td>
-                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-white light:text-slate-800 bg-[#151c29]/30 light:bg-slate-100/50 font-mono font-medium">{row.assists}</td>
+                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-base light:text-slate-800 bg-bg-300/30 light:bg-slate-100/50 font-mono font-medium">{row.kills}</td>
+                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-base light:text-slate-800 bg-bg-300/30 light:bg-slate-100/50 font-mono font-medium">{row.deaths}</td>
+                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-base light:text-slate-800 bg-bg-300/30 light:bg-slate-100/50 font-mono font-medium">{row.assists}</td>
                     {columns.includes('Headshots') && (
-                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-slate-400 light:text-slate-600 bg-[#151c29]/30 light:bg-slate-100/50 font-mono">
+                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted light:text-slate-600 bg-bg-300/30 light:bg-slate-100/50 font-mono">
                         {row.game === 'Crossfire' ? <span className="text-cyan-400">{row.headshots}</span> : '-'}
                       </td>
                     )}
                     {columns.includes('ACS') && (
-                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-slate-400 light:text-slate-600 bg-[#151c29]/30 light:bg-slate-100/50 font-mono">
+                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted light:text-slate-600 bg-bg-300/30 light:bg-slate-100/50 font-mono">
                         {row.game === 'Valorant' ? <span className="text-emerald-400">{row.acs}</span> : '-'}
                       </td>
                     )}
                     {columns.includes('Econ') && (
-                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-slate-400 light:text-slate-600 bg-[#151c29]/30 light:bg-slate-100/50 font-mono">
+                      <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted light:text-slate-600 bg-bg-300/30 light:bg-slate-100/50 font-mono">
                         {row.game === 'Valorant' ? <span className="text-emerald-400">{row.econ}</span> : '-'}
                       </td>
                     )}
-                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-slate-300 light:text-slate-700 bg-[#151c29]/30 light:bg-slate-100/50 font-mono">{row.rounds}</td>
-                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-slate-500 light:text-slate-600 truncate max-w-[120px]">{row.map || '-'}</td>
+                    <td className="px-4 py-3 text-sm border-r border-slate-800/40 light:border-slate-200 text-theme-text-base light:text-slate-700 bg-bg-300/30 light:bg-slate-100/50 font-mono">{row.rounds}</td>
+                    <td className="px-4 py-3 text-xs border-r border-slate-800/40 light:border-slate-200 text-theme-text-muted light:text-slate-600 truncate max-w-[120px]">{row.map || '-'}</td>
                   </tr>
                 ))
               )}
