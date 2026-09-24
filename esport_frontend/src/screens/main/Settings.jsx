@@ -269,8 +269,12 @@ const Settings = ({ globalGame, themeBg, setThemeBg, themeAccent, setThemeAccent
   const [formulas, setFormulas] = useState([]);
   const [selectedRole, setSelectedRole] = useState('Global');
   
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [calcTarget, setCalcTarget] = useState('excel_formula');
+  const [calcString, setCalcString] = useState('');
+
   const activeFormula = formulas.find(f => f.role === selectedRole) || {
-    id: null, kill_weight: 1.0, death_weight: 1.0, assist_weight: 0.5, base_multiplier: 78.0, base_rating: 60.0
+    id: null, kill_weight: 1.0, death_weight: 1.0, assist_weight: 0.5, acs_weight: 1.0, econ_weight: 1.0, first_kill_weight: 1.0, plants_weight: 1.0, defuse_weight: 1.0, ace_weight: 1.0, excel_formula: "", acs_formula: "", kda_formula: "", base_multiplier: 78.0, base_rating: 60.0
   };
 
   const fetchFormulas = async () => {
@@ -282,7 +286,11 @@ const Settings = ({ globalGame, themeBg, setThemeBg, themeAccent, setThemeAccent
   };
 
   const handleFormulaUpdate = async (field, value) => {
-    const updated = { ...activeFormula, [field]: parseFloat(value) || 0 };
+    let finalValue = value;
+    if (field !== 'excel_formula' && field !== 'acs_formula' && field !== 'kda_formula') {
+      finalValue = parseFloat(value) || 0;
+    }
+    const updated = { ...activeFormula, [field]: finalValue };
     setFormulas(prev => prev.map(f => f.role === selectedRole ? updated : f));
   };
 
@@ -474,9 +482,31 @@ const Settings = ({ globalGame, themeBg, setThemeBg, themeAccent, setThemeAccent
                     <Input label="Assist Weight" type="number" step="0.01" value={activeFormula.assist_weight} onChange={(e) => handleFormulaUpdate('assist_weight', e.target.value)} />
                  </div>
                  
+                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
+                    <Input label="ACS Weight" type="number" step="0.01" value={activeFormula.acs_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('acs_weight', e.target.value)} />
+                    <Input label="ECON Weight" type="number" step="0.01" value={activeFormula.econ_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('econ_weight', e.target.value)} />
+                    <Input label="First Kill Weight" type="number" step="0.01" value={activeFormula.first_kill_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('first_kill_weight', e.target.value)} />
+                 </div>
+                 
+                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
+                    <Input label="Plants Weight" type="number" step="0.01" value={activeFormula.plants_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('plants_weight', e.target.value)} />
+                    <Input label="Defuse Weight" type="number" step="0.01" value={activeFormula.defuse_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('defuse_weight', e.target.value)} />
+                    <Input label="ACE Weight" type="number" step="0.01" value={activeFormula.ace_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('ace_weight', e.target.value)} />
+                 </div>
+                 
                  <div className="grid grid-cols-2" style={{ gap: "24px" }}>
                     <Input label="Base Multiplier (e.g. 78.0)" type="number" step="0.1" value={activeFormula.base_multiplier} onChange={(e) => handleFormulaUpdate('base_multiplier', e.target.value)} />
                     <Input label="Base Rating (e.g. 60.0)" type="number" step="0.1" value={activeFormula.base_rating} onChange={(e) => handleFormulaUpdate('base_rating', e.target.value)} />
+                 </div>
+
+                 <div className="flex justify-between items-center border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
+                    <div className="flex flex-col">
+                      <h4 className="text-theme-text-base font-bold text-sm">Advanced Formula Editor</h4>
+                      <p className="text-theme-text-faint text-[10px]">Open scientific calculator to modify formulas for Performance Score, ACS, K/DA.</p>
+                    </div>
+                    <button onClick={() => { setCalcTarget('excel_formula'); setCalcString(activeFormula.excel_formula || ''); setCalculatorOpen(true); }} className="border border-purple-500/50 light:border-purple-300 bg-purple-900/20 light:bg-purple-50 text-purple-400 light:text-purple-600 font-bold tracking-wider text-xs hover:bg-purple-600 hover:text-white transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "12px 24px", borderRadius: "8px" }}>
+                      Open Editor
+                    </button>
                  </div>
 
                  <div className="flex justify-end border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
@@ -862,6 +892,65 @@ const Settings = ({ globalGame, themeBg, setThemeBg, themeAccent, setThemeAccent
               <span className="text-3xl font-black text-theme-text-base">{health?.active_matches || 0}</span>
               <span className="text-sm font-bold text-green-500">{health?.active_matches_trend || '+0%'}</span>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={calculatorOpen} onClose={() => setCalculatorOpen(false)} title="Advanced Formula Editor" maxWidth="max-w-4xl">
+        <div className="flex flex-col gap-6 p-4">
+          <Select 
+            label="Target Calculation" 
+            options={['Performance Score Calculation', 'ACS Calculation', 'K/DA Calculation']}
+            value={calcTarget === 'excel_formula' ? 'Performance Score Calculation' : calcTarget === 'acs_formula' ? 'ACS Calculation' : 'K/DA Calculation'}
+            onChange={(val) => {
+              const tgt = val === 'Performance Score Calculation' ? 'excel_formula' : val === 'ACS Calculation' ? 'acs_formula' : 'kda_formula';
+              setCalcTarget(tgt);
+              setCalcString(activeFormula[tgt] || '');
+            }}
+          />
+          
+          <textarea 
+            className="w-full bg-theme-input light:bg-white rounded-lg border border-theme-input focus:border-blue-500 focus:outline-none p-4 text-theme-text-base font-mono text-lg min-h-[100px] shadow-inner resize-y transition-colors"
+            placeholder="Select variables and operations or type to build formula..."
+            value={calcString}
+            onChange={(e) => setCalcString(e.target.value)}
+          />
+
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-3 grid grid-cols-3 gap-3">
+               {['kills', 'deaths', 'assists', 'acs', 'econ', 'first_kills', 'plants', 'defuse', 'ace', 'rounds', '(', ')'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + btn)} className="bg-bg-400 hover:bg-bg-500 text-theme-text-base py-3 rounded text-sm font-bold shadow-md transition-colors border border-[#1c2532]">
+                   {btn}
+                 </button>
+               ))}
+               {[7, 8, 9, 4, 5, 6, 1, 2, 3, 0, '.'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + btn)} className="bg-theme-input hover:bg-blue-900/30 text-theme-text-base py-3 rounded text-xl font-bold shadow-md transition-colors border border-[#1c2532]">
+                   {btn}
+                 </button>
+               ))}
+            </div>
+            <div className="flex flex-col gap-3">
+               {['+', '-', '*', '/'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + ' ' + btn + ' ')} className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 py-4 rounded text-xl font-bold shadow-md border border-blue-500/30 transition-colors">
+                   {btn}
+                 </button>
+               ))}
+               <button onClick={() => setCalcString(prev => prev.slice(0, -1))} className="bg-red-600/20 hover:bg-red-600/40 text-red-400 py-4 rounded font-bold shadow-md border border-red-500/30 transition-colors">
+                 Backspace
+               </button>
+               <button onClick={() => setCalcString('')} className="bg-red-600 hover:bg-red-700 text-white py-4 rounded font-bold shadow-md border border-red-500 transition-colors">
+                 Clear
+               </button>
+            </div>
+          </div>
+          
+          <div className="flex justify-end pt-4 border-t border-[#1c2532]">
+             <button onClick={() => {
+                handleFormulaUpdate(calcTarget, calcString);
+                setCalculatorOpen(false);
+             }} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-all">
+                Apply Formula
+             </button>
           </div>
         </div>
       </Modal>

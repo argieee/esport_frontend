@@ -457,9 +457,10 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
 
         // 1. Fetch Teams
         const resTeams = await fetch(`http://localhost:5000/api/teams?tournament=${tName}`);
+        let dbTeams = [];
         if (resTeams.ok) {
           const teamsData = await resTeams.json();
-          setTeamPool(teamsData.map(t => t.team_name));
+          dbTeams = teamsData.map(t => t.team_name);
         }
         
         // 2. Fetch Bracket State
@@ -472,6 +473,13 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
             .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
           
           const stateData = tournamentStates.length > 0 ? tournamentStates[0] : null;
+          
+          if (stateData && stateData.team_pool) {
+            setTeamPool(stateData.team_pool);
+          } else {
+            setTeamPool(dbTeams);
+          }
+
           if (stateData && stateData.format) {
             if (activeFormat !== "Results") {
               setActiveFormat(stateData.format);
@@ -482,9 +490,9 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
             if (stateData.format === "Round Robin") setRoundRobinData(stateData.bracket_data);
           } else {
              setIsFormatLocked(false);
-             if (activeFormat === "Single Elimination") setSingleElimData(generateSingleElimBracket(teamPool.length, teamPool));
-             if (activeFormat === "Double Elimination") setDoubleElimData(generateDoubleElimBracket(teamPool.length, teamPool));
-             if (activeFormat === "Round Robin") setRoundRobinData(generateRoundRobin(teamPool, roundRobinEncounters));
+             if (activeFormat === "Single Elimination") setSingleElimData(generateSingleElimBracket(dbTeams.length, dbTeams));
+             if (activeFormat === "Double Elimination") setDoubleElimData(generateDoubleElimBracket(dbTeams.length, dbTeams));
+             if (activeFormat === "Round Robin") setRoundRobinData(generateRoundRobin(dbTeams, roundRobinEncounters));
           }
         }
       } catch (err) {
@@ -494,7 +502,7 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
       }
     };
     fetchState();
-  }, [globalTournament?.name, globalGame, activeFormat]);
+  }, [globalTournament?.name, globalGame]);
 
   
   const [processedLiveMatches, setProcessedLiveMatches] = useStickyState([], "bracket_processed_live_matches");

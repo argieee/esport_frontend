@@ -253,6 +253,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       a: defaultA[i],
       acs: defaultACS[i],
       econ: defaultEcon[i],
+      first_kills: 0,
+      plants: 0,
+      defuse: 0,
+      ace: 0,
     }));
   }, `${setScope}_playersA`);
   const [playersB, setPlayersB] = useStickyState(() => {
@@ -273,6 +277,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
         a: i < 3 ? defaultA[i] : 0,
         acs: i < 3 ? defaultACS[i] : 0,
         econ: i < 3 ? defaultEcon[i] : 0,
+        first_kills: 0,
+        plants: 0,
+        defuse: 0,
+        ace: 0,
       }));
   }, `${setScope}_playersB`);
   const [notes, setNotes] = useStickyState(
@@ -281,6 +289,44 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedRecords, setSubmittedRecords] = useState([]);
+
+  useEffect(() => {
+    const fetchRecords = async () => {
+      try {
+        const queryParams = new URLSearchParams({
+           game: game
+        }).toString();
+        const res = await fetch(`http://localhost:5000/api/match_records?${queryParams}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Sort chronologically (newest first) so recently submitted sets appear at the top
+          data.sort((a, b) => {
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            // 1. Most recently sent first
+            if (dateA !== dateB) return dateB - dateA; 
+            // 1.5. If same time (e.g. null), sort by match number (highest/newest match first)
+            const matchA = Number(a.match) || 0;
+            const matchB = Number(b.match) || 0;
+            if (matchA !== matchB) return matchB - matchA;
+            // 2. If same time and match, sort by set number (highest/newest set first)
+            const setA = Number(a.set_num) || 0;
+            const setB = Number(b.set_num) || 0;
+            if (setA !== setB) return setB - setA; 
+            // 3. Within the same set, keep Team 1 above Team 15
+            if (a.team_name !== b.team_name) return (a.team_name || "").localeCompare(b.team_name || "");
+            // 4. Finally, sort by player name
+            return (a.ign || '').localeCompare(b.ign || '');
+          });
+          setSubmittedRecords(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchRecords();
+  }, [submitSuccess, globalTournament, game, week, day, match]);
   const [activeTab, setActiveTab] = useStickyState("stats", "de_activeTab");
   const [heatmapData, setHeatmapData] = useStickyState(
     [],
@@ -585,7 +631,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               const rD = Number(p[`r${i+1}_d`]) || 0;
               const rA = Number(p[`r${i+1}_a`]) || 0;
               const rH = Number(p[`r${i+1}_h`]) || 0;
-              if (p.ign && (rK > 0 || rD > 0 || rA > 0 || rH > 0)) {
+              if (p.ign) {
                 rawEntries.push({
                   ign: p.ign, kills: rK, deaths: rD, assists: rA, headshots: rH, team_name: teamName, win: isWin
                 });
@@ -599,7 +645,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 const d = Number(p[`${g.id}_d`]) || 0;
                 const a = Number(p[`${g.id}_a`]) || 0;
                 const h = Number(p[`${g.id}_h`]) || 0;
-                if (p.ign && (k > 0 || d > 0 || a > 0 || h > 0)) {
+                if (p.ign) {
                   rawEntries.push({
                     ign: p.ign,
                     kills: k,
@@ -617,10 +663,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               }
             });
           }
-          if (
-            p.ign &&
-            (kills > 0 || deaths > 0 || assists > 0 || headshots > 0)
-          ) {
+          if (p.ign) {
             if (payloadMap[p.ign]) {
               payloadMap[p.ign].kills += kills;
               payloadMap[p.ign].deaths += deaths;
@@ -721,20 +764,17 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       try {
         const payloadMap = {};
         const extractNewStats = (p, teamName, isWin) => {
-          if (
-            p.ign &&
-            (Number(p.k) > 0 ||
-              Number(p.d) > 0 ||
-              Number(p.a) > 0 ||
-              Number(p.acs) > 0 ||
-              Number(p.econ) > 0)
-          ) {
+          if (p.ign) {
             if (payloadMap[p.ign]) {
               payloadMap[p.ign].kills += Number(p.k) || 0;
               payloadMap[p.ign].deaths += Number(p.d) || 0;
               payloadMap[p.ign].assists += Number(p.a) || 0;
               payloadMap[p.ign].acs += Number(p.acs) || 0;
               payloadMap[p.ign].econ += Number(p.econ) || 0;
+              payloadMap[p.ign].first_kills = (payloadMap[p.ign].first_kills || 0) + (Number(p.first_kills) || 0);
+              payloadMap[p.ign].plants = (payloadMap[p.ign].plants || 0) + (Number(p.plants) || 0);
+              payloadMap[p.ign].defuse = (payloadMap[p.ign].defuse || 0) + (Number(p.defuse) || 0);
+              payloadMap[p.ign].aces = (payloadMap[p.ign].aces || 0) + (Number(p.ace) || 0);
             } else {
               payloadMap[p.ign] = {
                 ign: p.ign,
@@ -743,6 +783,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 assists: Number(p.a) || 0,
                 acs: Number(p.acs) || 0,
                 econ: Number(p.econ) || 0,
+                first_kills: Number(p.first_kills) || 0,
+                plants: Number(p.plants) || 0,
+                defuse: Number(p.defuse) || 0,
+                aces: Number(p.ace) || 0,
+                agent: p.agent || "",
                 rounds: scoreA + scoreB,
                 agentRole: "Rifler",
                 team_name: teamName,
@@ -1704,8 +1749,20 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         ACS
                       </th>
-                      <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         Econ Rating
+                      </th>
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        First Kills
+                      </th>
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        Plants
+                      </th>
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        Defuse
+                      </th>
+                      <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        Ace
                       </th>
                     </tr>
                   )}
@@ -1833,7 +1890,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-emerald-400`}
@@ -1843,6 +1900,66 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                   "A",
                                   idx,
                                   "econ",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.first_kills}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "A",
+                                  idx,
+                                  "first_kills",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.plants}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "A",
+                                  idx,
+                                  "plants",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.defuse}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "A",
+                                  idx,
+                                  "defuse",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.ace}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "A",
+                                  idx,
+                                  "ace",
                                   Number(e.target.value) || 0,
                                 )
                               }
@@ -2085,7 +2202,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={`${tableInput} text-[#f87171]`}
@@ -2095,6 +2212,66 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                   "B",
                                   idx,
                                   "econ",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.first_kills}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "B",
+                                  idx,
+                                  "first_kills",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.plants}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "B",
+                                  idx,
+                                  "plants",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.defuse}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "B",
+                                  idx,
+                                  "defuse",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={tableInput}
+                              value={p.ace}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "B",
+                                  idx,
+                                  "ace",
                                   Number(e.target.value) || 0,
                                 )
                               }
@@ -2440,9 +2617,74 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             </div>
           </div>
           {}
+
+          {submittedRecords.length > 0 && (
+            <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/60 light:border-slate-200 overflow-hidden shadow-2xl">
+              <div className="px-6 py-4 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/50 light:bg-slate-50 flex flex-col gap-1">
+                <h3 className="text-xl font-black text-white light:text-slate-900 tracking-wider">SUBMITTED RECORDS</h3>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{game.toUpperCase()} | REGULAR SEASON | W{week} D{day} M{match} (ALL SETS)</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm text-slate-300 light:text-slate-700 whitespace-nowrap">
+                  <thead>
+                    <tr className="text-[10px] uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100">
+                      <th className="px-3 py-3 font-bold text-center">Week</th>
+                      <th className="px-3 py-3 font-bold text-center">Day</th>
+                      <th className="px-3 py-3 font-bold text-center">Match</th>
+                      <th className="px-3 py-3 font-bold text-center">Set</th>
+                      <th className="px-4 py-3 font-bold">Team</th>
+                      <th className="px-4 py-3 font-bold">Player</th>
+                      <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
+                      <th className="px-3 py-3 font-bold text-center">Kills</th>
+                      <th className="px-3 py-3 font-bold text-center">Deaths</th>
+                      <th className="px-3 py-3 font-bold text-center">Assists</th>
+                      <th className="px-4 py-3 font-bold text-center text-emerald-400">ACS</th>
+                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Econ</th>
+                      <th className="px-4 py-3 font-bold text-center">First Kills</th>
+                      <th className="px-4 py-3 font-bold text-center">Plants</th>
+                      <th className="px-4 py-3 font-bold text-center">Defuse</th>
+                      <th className="px-4 py-3 font-bold text-center">Ace</th>
+                      <th className="px-4 py-3 font-bold text-center">Agent</th>
+                      <th className="px-4 py-3 font-bold text-center">Rounds</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
+                    {submittedRecords.map((rec, idx) => {
+                      const isTeamA = rec.team_name === (teamA.name || "Team A");
+                      const teamColorClass = isTeamA ? "text-blue-400" : "text-red-400";
+                      
+                      return (
+                        <tr key={idx} className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
+                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.week}</td>
+                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.day}</td>
+                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.match}</td>
+                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.set_num}</td>
+                          <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.team_name}</td>
+                          <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.ign}</td>
+                          <td className={`px-3 py-2 text-center font-bold ${rec.win ? 'text-emerald-400' : 'text-red-500'}`}>{rec.win ? 'Yes' : 'No'}</td>
+                          <td className="px-3 py-2 text-center font-bold">{rec.kills}</td>
+                          <td className="px-3 py-2 text-center font-bold">{rec.deaths}</td>
+                          <td className="px-3 py-2 text-center font-bold">{rec.assists}</td>
+                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
+                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.econ}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.first_kills || 0}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.plants || 0}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.defuse || 0}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.aces || 0}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
+                          <td className="px-4 py-2 text-center font-bold">{rec.rounds}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
           <div className="h-4" />
         </div>
       </div>
+
       {}
       {submitSuccess && (
         <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">

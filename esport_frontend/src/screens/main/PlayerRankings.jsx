@@ -16,6 +16,49 @@ const SearchIcon = () => (
     />
   </svg>
 );
+
+const ValorantRankingTable = ({ title, data, valueKey, valueLabel, colors }) => (
+  <div className="bg-bg-200 rounded-2xl border border-theme-input shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[400px] overflow-hidden relative group">
+    <div className={`absolute inset-0 bg-gradient-to-br ${colors.bgGradient} to-transparent pointer-events-none z-0`}></div>
+    <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent ${colors.borderGradient} to-transparent`}></div>
+    <div className="border-b border-theme-input bg-bg-300 relative z-10" style={{ padding: "16px" }}>
+      <h3 className="text-[12px] font-black text-theme-text-base uppercase tracking-widest drop-shadow-md text-center">
+        {title}
+      </h3>
+    </div>
+    <div className="flex-1 overflow-y-auto custom-scrollbar bg-bg-200 relative z-10" style={{ padding: "0" }}>
+      <table className="w-full text-center text-[10px]">
+        <thead className="bg-bg-300/90 backdrop-blur-md sticky top-0 text-theme-text-muted font-black shadow-md z-10 text-[9px] tracking-[0.15em] uppercase border-b border-theme-input">
+          <tr>
+            <th className="py-3 px-2 text-center">Rank</th>
+            <th className="py-3 px-2 text-left">Player</th>
+            <th className="py-3 px-2 text-left">Team</th>
+            <th className={`py-3 px-2 text-center ${colors.headerText}`}>{valueLabel}</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-theme-input">
+          {data && data.map((p, i) => (
+            <tr key={i} className="hover:bg-bg-300 transition-colors group cursor-pointer">
+              <td className="py-2 px-2 text-center font-bold w-[40px]">
+                <div className={`mx-auto w-5 h-5 flex items-center justify-center rounded-md font-black text-[10px] ${i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/40" : i === 1 ? "bg-slate-300/20 text-theme-text-base border border-slate-300/40" : i === 2 ? "bg-orange-700/20 text-orange-400 border border-orange-700/40" : "text-theme-text-muted"}`}>
+                  {p.rank}
+                </div>
+              </td>
+              <td className="py-2 px-2 text-left text-theme-text-base font-bold truncate max-w-[90px]" title={p.ign}>{p.ign}</td>
+              <td className="py-2 px-2 text-left text-theme-text-muted text-[9px] truncate max-w-[90px]" title={p.team}>{p.team}</td>
+              <td className={`py-2 px-2 text-center font-black ${colors.valueText}`}>{p[valueKey]}</td>
+            </tr>
+          ))}
+          {!data || data.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="py-8 text-center text-theme-text-muted text-xs">No records found</td>
+            </tr>
+          ) : null}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
 const PlayerRankings = ({ globalGame, globalTournament }) => {
   const activeGame = (globalGame || "VALORANT").toUpperCase();
   const [dailySearch, setDailySearch] = useState("");
@@ -424,6 +467,44 @@ const PlayerRankings = ({ globalGame, globalTournament }) => {
       displayWeeklyPlayers: aggregateMatchRecords(weeklyRecords),
     };
   }, [matchRecords, activeGame]);
+
+  const valorantRankings = useMemo(() => {
+    if (!matchRecords || matchRecords.length === 0 || activeGame !== "VALORANT") return null;
+    const vRecords = matchRecords.filter(r => r.game.toUpperCase() === "VALORANT");
+    if (vRecords.length === 0) return null;
+
+    const stats = {};
+    vRecords.forEach(r => {
+      const ign = r.ign;
+      if (!ign) return;
+      if (!stats[ign]) {
+        stats[ign] = { ign, team: r.team_name, kills: 0, deaths: 0, assists: 0, acs: 0, matchCount: 0 };
+      }
+      stats[ign].kills += Number(r.kills) || 0;
+      stats[ign].deaths += Number(r.deaths) || 0;
+      stats[ign].assists += Number(r.assists) || 0;
+      stats[ign].acs += Number(r.acs) || 0;
+      stats[ign].matchCount += 1;
+    });
+
+    const players = Object.values(stats).map(p => {
+      const kda = p.deaths === 0 ? p.kills + p.assists : (p.kills + p.assists) / p.deaths;
+      const avgAcs = p.matchCount === 0 ? 0 : p.acs / p.matchCount;
+      return {
+        ...p,
+        kda: kda.toFixed(2),
+        avgAcs: Math.round(avgAcs)
+      };
+    });
+
+    return {
+      topKills: [...players].sort((a, b) => b.kills - a.kills).map((p, i) => ({ ...p, rank: i + 1 })),
+      leastDeaths: [...players].sort((a, b) => a.deaths - b.deaths).map((p, i) => ({ ...p, rank: i + 1 })),
+      topAssists: [...players].sort((a, b) => b.assists - a.assists).map((p, i) => ({ ...p, rank: i + 1 })),
+      topKda: [...players].sort((a, b) => b.kda - a.kda).map((p, i) => ({ ...p, rank: i + 1 })),
+      topAcs: [...players].sort((a, b) => b.avgAcs - a.avgAcs).map((p, i) => ({ ...p, rank: i + 1 }))
+    };
+  }, [matchRecords, activeGame]);
   const filteredDaily = displayDailyPlayers.filter((p) =>
     p.name.toLowerCase().includes(dailySearch.toLowerCase()),
   );
@@ -677,6 +758,46 @@ const PlayerRankings = ({ globalGame, globalTournament }) => {
               </div>
             </div>
           </div>
+          
+          {activeGame === "VALORANT" && valorantRankings && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 pb-8">
+              <ValorantRankingTable 
+                title="TOTAL KILLS" 
+                data={valorantRankings.topKills} 
+                valueKey="kills" 
+                valueLabel="TOTAL KILLS"
+                colors={{ bgGradient: "from-red-500/[0.03]", borderGradient: "via-red-500/50", headerText: "text-red-500/70", valueText: "text-red-400" }} 
+              />
+              <ValorantRankingTable 
+                title="TOTAL LEAST DEATHS" 
+                data={valorantRankings.leastDeaths} 
+                valueKey="deaths" 
+                valueLabel="LEAST DEATHS"
+                colors={{ bgGradient: "from-emerald-500/[0.03]", borderGradient: "via-emerald-500/50", headerText: "text-emerald-500/70", valueText: "text-emerald-400" }} 
+              />
+              <ValorantRankingTable 
+                title="TOTAL ASSISTS" 
+                data={valorantRankings.topAssists} 
+                valueKey="assists" 
+                valueLabel="ASSISTS"
+                colors={{ bgGradient: "from-blue-500/[0.03]", borderGradient: "via-blue-500/50", headerText: "text-blue-500/70", valueText: "text-blue-400" }} 
+              />
+              <ValorantRankingTable 
+                title="HIGHEST KDA RATIO" 
+                data={valorantRankings.topKda} 
+                valueKey="kda" 
+                valueLabel="KDA RATIO"
+                colors={{ bgGradient: "from-fuchsia-500/[0.03]", borderGradient: "via-fuchsia-500/50", headerText: "text-fuchsia-500/70", valueText: "text-fuchsia-400" }} 
+              />
+              <ValorantRankingTable 
+                title="HIGHEST AVG ACS" 
+                data={valorantRankings.topAcs} 
+                valueKey="avgAcs" 
+                valueLabel="AVG ACS"
+                colors={{ bgGradient: "from-orange-500/[0.03]", borderGradient: "via-orange-500/50", headerText: "text-orange-500/70", valueText: "text-orange-400" }} 
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

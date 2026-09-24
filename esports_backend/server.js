@@ -451,6 +451,32 @@ app.post('/api/stats/crossfire/match', authenticateToken, isAdmin, async (req, r
     res.status(500).json({ error: err.message });
   }
 });
+
+app.get('/api/match_records', async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
+  try {
+    const { tournament, game, week, day, match, set_num } = req.query;
+    let query = supabase.from('match_records').select('*');
+    if (tournament) query = query.eq('tournament_name', tournament);
+    if (game) query = query.eq('game', game);
+    if (week) query = query.eq('week', week);
+    if (day) query = query.eq('day', day);
+    if (match) query = query.eq('match', match);
+    if (set_num) query = query.eq('set_num', set_num);
+    
+    query = query
+      .order('created_at', { ascending: false })
+      .order('set_num', { ascending: false })
+      .order('team_name', { ascending: true })
+      .order('ign', { ascending: true });
+
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json(data || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/api/stats/valorant', async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   try {
@@ -494,17 +520,28 @@ app.post('/api/stats/valorant/match', authenticateToken, isAdmin, async (req, re
         total_acs: 0,
         total_econ: 0,
         total_rounds_played: 0,
-        matches_played: 0
+        matches_played: 0,
+        total_first_kills: 0,
+        total_plants: 0,
+        total_defuse: 0,
+        total_aces: 0
       };
       const newTotalKills = existing.total_kills + (Number(p.kills) || 0);
       const newTotalDeaths = existing.total_deaths + (Number(p.deaths) || 0);
       const newTotalAssists = existing.total_assists + (Number(p.assists) || 0);
-      const newTotalAcs = existing.total_acs + (Number(p.acs) || 0);
+      const matchRounds = Number(p.rounds) || 0;
+      const matchTCS = (Number(p.acs) || 0) * matchRounds;
+      const newTotalAcs = existing.total_acs + matchTCS;
       const newTotalEcon = existing.total_econ + (Number(p.econ) || 0);
-      const newTotalRounds = existing.total_rounds_played + (Number(p.rounds) || 0);
+      const newTotalFirstKills = (existing.total_first_kills || 0) + (Number(p.fk) || 0);
+      const newTotalPlants = (existing.total_plants || 0) + (Number(p.plants) || 0);
+      const newTotalDefuse = (existing.total_defuse || 0) + (Number(p.defuse) || 0);
+      const newTotalAces = (existing.total_aces || 0) + (Number(p.ace) || 0);
+      const newTotalRounds = existing.total_rounds_played + matchRounds;
       const newMatchesPlayed = existing.matches_played + 1;
-      const ps = stats.calculatePerformanceScore(newTotalKills, newTotalDeaths, newTotalAssists, newTotalRounds, p.agentRole || 'Rifler', formulas);
-      const finalRating = stats.calculateFinalRating(ps, formulas, p.agentRole || 'Rifler');
+      const overallACS = newTotalRounds > 0 ? (newTotalAcs / newTotalRounds) : 0;
+      const ps = overallACS;
+      const finalRating = overallACS;
       return {
         ign: p.ign,
         tournament_name: tournamentName,
@@ -513,6 +550,10 @@ app.post('/api/stats/valorant/match', authenticateToken, isAdmin, async (req, re
         total_assists: newTotalAssists,
         total_acs: newTotalAcs,
         total_econ: newTotalEcon,
+        total_first_kills: newTotalFirstKills,
+        total_plants: newTotalPlants,
+        total_defuse: newTotalDefuse,
+        total_aces: newTotalAces,
         total_rounds_played: newTotalRounds,
         matches_played: newMatchesPlayed,
         performance_score: isNaN(ps) ? 0 : ps,
@@ -535,18 +576,74 @@ app.post('/api/stats/valorant/match', authenticateToken, isAdmin, async (req, re
       team_name: p.team_name || null,
       ign: p.ign,
       group_label: p.agentRole || null,
+      agent: p.agent || null,
       win: p.win !== undefined ? p.win : null,
       kills: Number(p.kills) || 0,
       deaths: Number(p.deaths) || 0,
       assists: Number(p.assists) || 0,
       acs: Number(p.acs) || 0,
       econ: Number(p.econ) || 0,
+      first_kills: Number(p.fk) || 0,
+      plants: Number(p.plants) || 0,
+      defuse: Number(p.defuse) || 0,
+      aces: Number(p.ace) || 0,
       rounds: Number(p.rounds) || 0
     }));
+    
+    console.log("[VALORANT MATCH RECORDS] Attempting to insert matchRecords with agent:", matchRecords.map(r => ({ ign: r.ign, agent: r.agent })));
+
     const { error: matchRecordsError } = await supabase
       .from('match_records')
       .insert(matchRecords);
-    if (matchRecordsError) console.error('Failed to insert match records:', matchRecordsError);
+      
+    if (matchRecordsError) {
+      console.error('[CRITICAL] Failed to insert match records:', JSON.stringify(matchRecordsError, null, 2));
+    } else {
+      console.log("[VALORANT MATCH RECORDS] Successfully inserted match records.");
+    }
+
+    // Agent Stats Tracking
+    const agentsUsed = [...new Set(players.filter(p => p.agent).map(p => p.agent))];
+    if (agentsUsed.length > 0) {
+      const { data: existingAgentData } = await supabase
+        .from('valorant_agent_stats')
+        .select('*')
+        .eq('tournament_name', tournamentName)
+        .in('agent', agentsUsed);
+      const existingAgentMap = {};
+      if (existingAgentData) {
+        existingAgentData.forEach(row => {
+          existingAgentMap[row.agent] = row;
+        });
+      }
+      const agentUpdatesMap = {};
+      players.forEach(p => {
+        if (!p.agent) return;
+        if (!agentUpdatesMap[p.agent]) {
+          const existing = existingAgentMap[p.agent] || { matches_played: 0, wins: 0, total_kills: 0, total_deaths: 0, total_assists: 0 };
+          agentUpdatesMap[p.agent] = {
+            agent: p.agent,
+            tournament_name: tournamentName,
+            matches_played: existing.matches_played + 1,
+            wins: existing.wins + (p.win ? 1 : 0),
+            total_kills: existing.total_kills + (Number(p.kills) || 0),
+            total_deaths: existing.total_deaths + (Number(p.deaths) || 0),
+            total_assists: existing.total_assists + (Number(p.assists) || 0)
+          };
+        } else {
+          agentUpdatesMap[p.agent].matches_played += 1;
+          agentUpdatesMap[p.agent].wins += (p.win ? 1 : 0);
+          agentUpdatesMap[p.agent].total_kills += (Number(p.kills) || 0);
+          agentUpdatesMap[p.agent].total_deaths += (Number(p.deaths) || 0);
+          agentUpdatesMap[p.agent].total_assists += (Number(p.assists) || 0);
+        }
+      });
+      const agentUpdates = Object.values(agentUpdatesMap);
+      const { error: agentUpsertError } = await supabase
+        .from('valorant_agent_stats')
+        .upsert(agentUpdates, { onConflict: 'agent,tournament_name' });
+      if (agentUpsertError) console.error('Failed to upsert agent stats:', agentUpsertError);
+    }
     await logAudit('MATCH', `Submitted Valorant match stats for ${players.length} players`, { players, matchHeader, ign: 'Admin(Argie)' }, 'Valorant');
     res.json({ message: 'Stats successfully updated!', data: upsertData });
   } catch (err) {
@@ -1154,6 +1251,22 @@ app.post('/api/bracket-state', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
+// DELETE bracket state (full reset)
+app.delete('/api/bracket-state', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { tournament_name, game_title } = req.query;
+    const { error } = await supabase.from('bracket_states')
+      .delete()
+      .eq('tournament_name', tournament_name)
+      .eq('game_title', game_title);
+      
+    if (error) throw error;
+    res.json({ message: 'Bracket state cleared successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ----------------------------------------------------
 // BRACKET RESULTS
 // ----------------------------------------------------
@@ -1263,9 +1376,9 @@ app.get('/api/settings/formula', async (req, res) => {
 app.put('/api/settings/formula/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { kill_weight, death_weight, assist_weight, base_multiplier, base_rating } = req.body;
+    const { kill_weight, death_weight, assist_weight, acs_weight, econ_weight, first_kill_weight, plants_weight, defuse_weight, ace_weight, excel_formula, acs_formula, kda_formula, base_multiplier, base_rating } = req.body;
     const { data, error } = await supabase.from('evaluation_formulas').update({
-      kill_weight, death_weight, assist_weight, base_multiplier, base_rating, updated_at: new Date()
+      kill_weight, death_weight, assist_weight, acs_weight, econ_weight, first_kill_weight, plants_weight, defuse_weight, ace_weight, excel_formula, acs_formula, kda_formula, base_multiplier, base_rating, updated_at: new Date()
     }).eq('id', id).select();
     if (error) throw error;
     res.json(data[0]);

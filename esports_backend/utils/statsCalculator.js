@@ -1,3 +1,5 @@
+const math = require('mathjs');
+
 const ROLE_WEIGHTS = {
   Rifler: {
     killWeight: 1.056920,
@@ -32,14 +34,38 @@ const calculateKillDifferential = (kills, deaths) => {
 };
 const calculatePerformanceScore = (kills, deaths, assists, totalRounds, role, formulas) => {
   let weights = { killWeight: 1.0, deathWeight: 1.0, assistWeight: 0.5 };
+  let customFormula = "";
   if (formulas && formulas.length > 0) {
     const f = formulas.find(x => x.role === role) || formulas.find(x => x.role === 'Global');
-    if (f) weights = { killWeight: f.kill_weight, deathWeight: f.death_weight, assistWeight: f.assist_weight };
+    if (f) {
+       weights = { killWeight: f.kill_weight, deathWeight: f.death_weight, assistWeight: f.assist_weight };
+       customFormula = f.excel_formula;
+    }
   } else {
     weights = ROLE_WEIGHTS[role] || ROLE_WEIGHTS['Rifler']; 
     weights.assistWeight = 0.5;
   }
   
+  if (customFormula && customFormula.trim() !== "") {
+    try {
+      const scope = {
+        kills: kills || 0,
+        deaths: deaths || 0,
+        assists: assists || 0,
+        rounds: totalRounds || 1,
+        acs: 0,
+        econ: 0,
+        first_kills: 0,
+        plants: 0,
+        defuse: 0,
+        ace: 0
+      };
+      return math.evaluate(customFormula, scope);
+    } catch (e) {
+      console.error("Formula evaluation error:", e);
+    }
+  }
+
   const weightedKills = kills * weights.killWeight;
   const weightedDeaths = deaths * weights.deathWeight;
   const weightedAssists = (assists || 0) * weights.assistWeight;
