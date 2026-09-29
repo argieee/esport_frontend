@@ -55,12 +55,15 @@ const MapBpResults = ({ globalGame, globalTournament }) => {
   return (
     <div className="flex-1 bg-bg-base text-theme-text-base overflow-y-auto flex flex-col h-full custom-scrollbar relative" style={{ padding: "32px" }}>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-10 bg-cyan-500 pointer-events-none z-0"></div>
-      <div className="w-full max-w-[1600px] mx-auto pb-16 h-full flex flex-col relative z-10">
+      <div className="w-full pb-16 h-full flex flex-col relative z-10">
         <Card title="Map BP Results" className="w-full flex-1">
           <div className="overflow-x-auto flex-1 custom-scrollbar">
             <table className="w-full table-fixed text-center text-sm whitespace-nowrap">
               <thead>
                 <tr className="border-b border-white/5 text-[10px] font-bold tracking-[0.2em] text-theme-text-muted uppercase bg-bg-100/80">
+                  <th style={{ padding: "24px 16px" }}>Week</th>
+                  <th style={{ padding: "24px 16px" }}>Day</th>
+                  <th style={{ padding: "24px 16px" }}>Match</th>
                   <th style={{ padding: "24px 16px" }}>Team 1</th>
                   <th style={{ padding: "24px 16px" }}>Team 2</th>
                   <th className="bg-rose-500/5" style={{ padding: "24px 16px" }}>Ban 1</th>
@@ -77,6 +80,9 @@ const MapBpResults = ({ globalGame, globalTournament }) => {
               <tbody className="divide-y divide-white/5">
                 {dbVetoes.map((v, i) => (
                   <tr key={v.id} className="hover:bg-white/[0.02] transition-colors bg-transparent">
+                    <td className="text-theme-text-base font-bold" style={{ padding: "24px 16px" }}>{v.week || '-'}</td>
+                    <td className="text-theme-text-base font-bold" style={{ padding: "24px 16px" }}>{v.day || '-'}</td>
+                    <td className="text-theme-text-base font-bold" style={{ padding: "24px 16px" }}>{v.match || '-'}</td>
                     <td className="font-black text-blue-400 truncate" style={{ padding: "24px 16px" }}>{v.team_a}</td>
                     <td className="font-black text-red-400 truncate" style={{ padding: "24px 16px" }}>{v.team_b}</td>
                     <td className="text-rose-400/80 font-semibold bg-rose-500/[0.02]" style={{ padding: "24px 16px" }}>{v.ban_1 || '-'}</td>

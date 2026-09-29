@@ -15,8 +15,8 @@ import AuditLogs from "./AuditLogs.jsx";
 import PlayerRankings from "./PlayerRankings.jsx";
 import PlayerStatsTab from "./PlayerStatsTab.jsx";
 import RawRecords from "./RawRecords.jsx";
-import MapBpResults from "./MapBpResults.jsx";
-import Bracket from "./Bracket.jsx";
+
+
 import Predictions from "./Predictions.jsx";
 import Settings from "./Settings.jsx";
 
@@ -38,7 +38,6 @@ const iconMap = {
   'Data Entry': FileEdit,
   'PRS Entry': UserPlus,
   'Player Management': Users,
-  'Map BP Results': BarChart2,
   'Leaderboards': ListOrdered,
   'Analytics': PieChart,
   'Player Rankings': TrendingUp,
@@ -147,7 +146,7 @@ const MainUIScreen = ({ onLogout }) => {
       links: [
         { name: 'Dashboard' },
         { name: 'Tournament' },
-        { name: 'Bracket' },
+
         { name: 'Tournament History' },
         { name: 'Predictions' }
       ]
@@ -158,8 +157,7 @@ const MainUIScreen = ({ onLogout }) => {
         { name: 'Map Vetoes' },
         { name: 'Data Entry' },
         ...(globalGame === 'CROSSFIRE' ? [{ name: 'PRS Entry' }] : []),
-        { name: 'Player Management' },
-        { name: 'Map BP Results' }
+        { name: 'Player Management' }
       ]
     },
     {
@@ -182,7 +180,7 @@ const MainUIScreen = ({ onLogout }) => {
     }
   ];
   const renderContent = () => {
-    const requiresFolder = ['Dashboard', 'Tournament', 'Bracket', 'Predictions', 'Map Vetoes', 'Data Entry', 'PRS Entry', 'Player Management', 'Map BP Results', 'Leaderboards', 'Analytics', 'Player Rankings', 'Player Stats', 'Raw Records'];
+    const requiresFolder = ['Dashboard', 'Tournament', 'Predictions', 'Map Vetoes', 'Data Entry', 'PRS Entry', 'Player Management', 'Leaderboards', 'Analytics', 'Player Rankings', 'Player Stats', 'Raw Records'];
     if (requiresFolder.includes(activeTab) && !globalTournament) {
       return (
         <div className="p-8 w-full h-full flex flex-col items-center animate-fade-in text-theme-text-base overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e293b transparent' }}>
@@ -233,14 +231,13 @@ const MainUIScreen = ({ onLogout }) => {
     switch (activeTab) {
       case 'Dashboard': return <ErrorBoundary><Dashboard globalGame={globalGame} globalTournament={globalTournament} /></ErrorBoundary>;
       case 'Tournament': return <Tournament globalGame={globalGame} globalTournament={tournaments.find(t => t.name === globalTournament)} />;
-      case 'Bracket': return <Bracket globalGame={globalGame} globalTournament={globalTournament} />;
+
       case 'Tournament History': return <TournamentHistory setGlobalTournament={setGlobalTournament} setActiveTab={setActiveTab} />;
       case 'Predictions': return <Predictions globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Map Vetoes': return <Mapping globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Data Entry': return <DataEntry key={`de-${globalTournament}`} globalGame={globalGame} globalTournament={globalTournament} />;
       case 'PRS Entry': return <PRSEntry key={`prs-${globalTournament}`} globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Player Management': return <PlayerManagement globalGame={globalGame} globalTournament={globalTournament} />;
-      case 'Map BP Results': return <MapBpResults globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Leaderboards': return <Leaderboards globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Analytics': return <Analytics globalGame={globalGame} globalTournament={globalTournament} />;
       case 'Player Rankings': return <PlayerRankings globalGame={globalGame} globalTournament={globalTournament} />;
@@ -252,42 +249,42 @@ const MainUIScreen = ({ onLogout }) => {
       default: return (<div className="h-full flex flex-col items-center justify-center p-10 bg-bg-100">            <div className="border border-slate-800 bg-slate-900/40 rounded-[2rem] p-12 text-center animate-fade-in shadow-2xl backdrop-blur-sm max-w-lg w-full">              <h2 className="text-2xl font-black text-theme-text-base mb-3 uppercase tracking-[0.2em]">{activeTab}</h2>              <p className="text-sm font-medium text-theme-text-muted tracking-wider">This module is currently under active development.</p>            </div>          </div>);
     }
   }; return (<div className="flex h-screen bg-bg-100 text-theme-text-base font-sans overflow-hidden selection:bg-cyan-500/30">      <style dangerouslySetInnerHTML={{ __html: `        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }        .custom-scrollbar::-webkit-scrollbar { width: 5px; }        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }        /* Toggle Switch */        .toggle-switch { position: relative; width: 48px; height: 26px; border-radius: 13px; cursor: pointer; transition: background-color 0.35s ease; }        .toggle-switch.off { background-color: #1e293b; }        .toggle-switch.on { background-color: #00ffcc; box-shadow: 0 0 16px color-mix(in_srgb,var(--color--)_%,transparent); }        .toggle-knob { position: absolute; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left 0.35s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }        .toggle-switch.off .toggle-knob { left: 3px; }        .toggle-switch.on .toggle-knob { left: 25px; }        /* Nav item underline indicator */        .nav-underline {          position: absolute;          bottom: 4px;          left: 50%;          transform: translateX(-50%) scaleX(0);          width: 40%;          height: 2px;          border-radius: 2px;          background: linear-gradient(90deg, transparent, #00ffcc, transparent);          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;          opacity: 0;        }        .nav-underline.active {          transform: translateX(-50%) scaleX(1);          opacity: 1;        }        /* Active nav glow pulse */        @keyframes glowPulse {          0%, 100% { box-shadow: 0 0 12px color-mix(in_srgb,var(--color--)_%,transparent), inset 0 0 12px color-mix(in_srgb,var(--color--)_%,transparent); }          50% { box-shadow: 0 0 24px color-mix(in_srgb,var(--color--)_%,transparent), inset 0 0 20px color-mix(in_srgb,var(--color--)_%,transparent); }        }        .nav-active-glow { animation: glowPulse 3s ease-in-out infinite; }        /* Title gradient animation */        @keyframes gradientShift {          0% { background-position: 0% 50%; }          50% { background-position: 100% 50%; }          100% { background-position: 0% 50%; }        }        .title-gradient {          background: linear-gradient(135deg, #00ffcc, #3b82f6, #00ffcc, #60a5fa);          background-size: 300% 300%;          -webkit-background-clip: text;          background-clip: text;          -webkit-text-fill-color: transparent;          animation: gradientShift 6s ease-in-out infinite;        }        /* Title underline */        @keyframes underlineGlow {          0% { transform: scaleX(0.3); opacity: 0.4; }          50% { transform: scaleX(1); opacity: 1; }          100% { transform: scaleX(0.3); opacity: 0.4; }        }        .title-underline {          height: 2px;          border-radius: 2px;          background: linear-gradient(90deg, transparent, #00ffcc, #3b82f6, transparent);          animation: underlineGlow 4s ease-in-out infinite;        }        /* Logout button ripple */        .logout-ripple {          position: absolute;          border-radius: 50%;          background: rgba(255,255,255,0.3);          width: 10px; height: 10px;          transform: translate(-50%, -50%) scale(0);          animation: rippleOut 0.6s ease-out forwards;          pointer-events: none;        }        @keyframes rippleOut {          to { transform: translate(-50%, -50%) scale(20); opacity: 0; }        }        /* Logout shimmer sweep */        @keyframes logoutShimmer {          0% { transform: translateX(-100%); }          100% { transform: translateX(250%); }        }        .logout-btn-styled::after {          content: '';          position: absolute;          top: 0; left: 0;          width: 40%; height: 100%;          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);          transform: translateX(-100%);        }        .logout-btn-styled:hover::after {          animation: logoutShimmer 0.8s ease-in-out;        }        /* Subtle glow pulse on logout */        @keyframes logoutGlow {          0%, 100% { box-shadow: 0 0 0px rgba(220,38,38,0), 0 4px 12px rgba(0,0,0,0.3); }          50% { box-shadow: 0 0 18px rgba(220,38,38,0.25), 0 4px 12px rgba(0,0,0,0.3); }        }        .logout-btn-styled { animation: logoutGlow 3s ease-in-out infinite; }        /* Modal overlay */        @keyframes modalOverlayIn { from { opacity: 0; } to { opacity: 1; } }        @keyframes modalOverlayOut { from { opacity: 1; } to { opacity: 0; } }        @keyframes modalScaleIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }        @keyframes modalScaleOut { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.85) translateY(20px); } }        .modal-overlay-enter { animation: modalOverlayIn 0.3s ease forwards; }        .modal-content-enter { animation: modalScaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }        /* Hover icon bounce */        @keyframes iconBounce {          0%, 100% { transform: scale(1); }          50% { transform: scale(1.15); }        }        .nav-btn:hover .nav-icon { animation: iconBounce 0.35s ease; }      ` }} />      { }      {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay-enter" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} onClick={() => setShowLogoutModal(false)}>
-          <div 
-            className="modal-content-enter bg-bg-300 border border-slate-700/60 rounded-3xl w-full max-w-md mx-4 shadow-[0_25px_60px_rgba(0,0,0,0.5)] flex flex-col items-center" 
-            style={{ padding: '40px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0" style={{ width: '80px', height: '80px', marginBottom: '24px' }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </div>
-            
-            <h3 className="font-black text-theme-text-base text-center tracking-widest uppercase" style={{ fontSize: '24px', marginBottom: '16px' }}>
-              End Session?
-            </h3>
-            
-            <p className="text-theme-text-muted text-center leading-relaxed" style={{ fontSize: '15px', marginBottom: '40px' }}>
-              You're about to log out of the dashboard. Any unsaved changes will be lost.
-            </p>
-            
-            <div className="flex w-full" style={{ gap: '16px' }}>
-              <button onClick={() => setShowLogoutModal(false)} className="flex-1 rounded-xl font-bold text-theme-text-base bg-slate-800/60 border border-slate-700/50 hover:bg-slate-700/60 hover:text-theme-text-base transition-all duration-300 tracking-wider uppercase" style={{ padding: '16px 0' }}>
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowLogoutModal(false);
-                  onLogout();
-                }}
-                className="flex-1 rounded-xl font-bold text-theme-text-base bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:shadow-[0_6px_30px_rgba(239,68,68,0.5)] transition-all duration-300 tracking-wider uppercase active:scale-95"
-                style={{ padding: '16px 0' }}
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay-enter" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} onClick={() => setShowLogoutModal(false)}>
+      <div
+        className="modal-content-enter bg-bg-300 border border-slate-700/60 rounded-3xl w-full max-w-md mx-4 shadow-[0_25px_60px_rgba(0,0,0,0.5)] flex flex-col items-center"
+        style={{ padding: '40px' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0" style={{ width: '80px', height: '80px', marginBottom: '24px' }}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
         </div>
-      )}
+
+        <h3 className="font-black text-theme-text-base text-center tracking-widest uppercase" style={{ fontSize: '24px', marginBottom: '16px' }}>
+          End Session?
+        </h3>
+
+        <p className="text-theme-text-muted text-center leading-relaxed" style={{ fontSize: '15px', marginBottom: '40px' }}>
+          You're about to log out of the dashboard. Any unsaved changes will be lost.
+        </p>
+
+        <div className="flex w-full" style={{ gap: '16px' }}>
+          <button onClick={() => setShowLogoutModal(false)} className="flex-1 rounded-xl font-bold text-theme-text-base bg-slate-800/60 border border-slate-700/50 hover:bg-slate-700/60 hover:text-theme-text-base transition-all duration-300 tracking-wider uppercase" style={{ padding: '16px 0' }}>
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              setShowLogoutModal(false);
+              onLogout();
+            }}
+            className="flex-1 rounded-xl font-bold text-theme-text-base bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:shadow-[0_6px_30px_rgba(239,68,68,0.5)] transition-all duration-300 tracking-wider uppercase active:scale-95"
+            style={{ padding: '16px 0' }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
     <aside
       className={`bg-bg-200 light:bg-white border-slate-800/50 light:border-slate-200 z-20 shrink-0 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] select-none
           ${isSidebarOpen ? 'w-[320px] border-r opacity-100' : 'w-0 border-r-0 opacity-0 overflow-hidden'}
@@ -337,8 +334,8 @@ const MainUIScreen = ({ onLogout }) => {
                         <button
                           onClick={() => setActiveTab(link.name)}
                           className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 ease-out transform ${isActive
-                              ? 'bg-gradient-to-r from-cyan-900/50 to-cyan-900/10 light:from-cyan-100 light:to-white text-cyan-400 light:text-cyan-600 font-bold border border-cyan-500/30 light:border-cyan-300 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--color--)_%,transparent)] light:shadow-sm translate-x-1'
-                              : 'text-theme-text-muted light:text-slate-600 hover:bg-slate-800/40 light:hover:bg-slate-100 hover:text-theme-text-base light:hover:text-slate-900 font-medium hover:translate-x-1'
+                            ? 'bg-gradient-to-r from-cyan-900/50 to-cyan-900/10 light:from-cyan-100 light:to-white text-cyan-400 light:text-cyan-600 font-bold border border-cyan-500/30 light:border-cyan-300 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--color--)_%,transparent)] light:shadow-sm translate-x-1'
+                            : 'text-theme-text-muted light:text-slate-600 hover:bg-slate-800/40 light:hover:bg-slate-100 hover:text-theme-text-base light:hover:text-slate-900 font-medium hover:translate-x-1'
                             }`}
                         >
                           {IconComponent && (

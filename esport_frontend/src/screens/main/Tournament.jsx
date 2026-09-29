@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
+import Bracket from "./Bracket.jsx";
 
 function useStickyState(defaultValue, key) {
   const [value, setValue] = React.useState(() => {
@@ -645,18 +646,18 @@ const getMatchCountdown = (match) => {
   if (!match.day || !match.time) return 'TBD';
 
   const now = new Date();
-  
+
   // Parse time like "8:51 PM" or "20:51"
   const timeRegex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
   const matchTimeStr = String(match.time).trim();
   const timeMatch = matchTimeStr.match(timeRegex);
-  
+
   if (!timeMatch) return `Starts at ${match.time}`;
-  
+
   let hours = parseInt(timeMatch[1], 10);
   const minutes = parseInt(timeMatch[2], 10);
   const ampm = timeMatch[3]?.toUpperCase();
-  
+
   if (ampm === 'PM' && hours < 12) hours += 12;
   if (ampm === 'AM' && hours === 12) hours = 0;
 
@@ -672,14 +673,14 @@ const getMatchCountdown = (match) => {
     if (h > 0) return `Starts in ${h}h ${m}m`;
     return `Starts in ${m}m`;
   }
-  
+
   return `Starts at ${match.time}`;
 };
 
 const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
   const isLive = match.isLive;
   return (
-    <div 
+    <div
       className="match-card snap-center animate-slide-in-right shrink-0 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all duration-300 cursor-pointer"
       style={{ animationDelay: `${index * 0.08}s` }}
     >
@@ -725,7 +726,7 @@ const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
           {match.team2Logo ? (
             <img src={match.team2Logo} alt={match.team2} className="team-logo" />
           ) : (
-             <div className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-full font-bold text-white text-xs shadow-md">{match.team2?.[0]}</div>
+            <div className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-full font-bold text-white text-xs shadow-md">{match.team2?.[0]}</div>
           )}
           <span className="text-white font-semibold truncate max-w-[120px]">{match.team2}</span>
         </div>
@@ -734,208 +735,145 @@ const MatchCard = ({ match, showCountdown, game, index = 0 }) => {
     </div>
   );
 };
-const LiveUpcomingTab = ({ game, globalTournament }) => {
-  const [matches, setMatches] = React.useState([]);
+const LiveUpcomingTab = ({ game, globalTournament, onOpenCreateModal }) => {
+  const [tournaments, setTournaments] = React.useState([]);
+  const [expandedTournament, setExpandedTournament] = React.useState(null);
+  const [matchesByTournament, setMatchesByTournament] = React.useState({});
+  const [showBracket, setShowBracket] = React.useState(false);
+  
   React.useEffect(() => {
-    const fetchMatches = async () => {
+    fetch('http://localhost:5000/api/tournaments')
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          setTournaments(data.filter(t => (t.game || 'VALORANT').toUpperCase() === game.toUpperCase()));
+        }
+      })
+      .catch(e => console.error(e));
+  }, [game]);
+
+  const toggleTournament = async (tName) => {
+    if (expandedTournament === tName) {
+      setExpandedTournament(null);
+      return;
+    }
+    setExpandedTournament(tName);
+    setShowBracket(false);
+    if (!matchesByTournament[tName]) {
       try {
-        const res = await fetch(`http://localhost:5000/api/matches?tournament=${globalTournament?.name || "Default"}`);
+        const res = await fetch(`http://localhost:5000/api/matches?tournament=${tName}`);
         if (res.ok) {
           const data = await res.json();
           const mapped = data.map(m => ({
-            id: m.match_id,
+            id: m.id,
             team1: m.team_a?.team_name || "TBD",
-            team1Logo: m.team_a?.logo_url,
+            team1Logo: m.team_a?.logo_url || null,
             team2: m.team_b?.team_name || "TBD",
-            team2Logo: m.team_b?.logo_url,
-            score: `${m.score_a || 0}-${m.score_b || 0}`,
-            isLive: m.is_live,
-            day: m.match_day ? (m.match_day.includes("-") ? parseInt(m.match_day.split("-")[2], 10) : parseInt(m.match_day, 10)) : undefined,
+            team2Logo: m.team_b?.logo_url || null,
+            score1: m.score_a || 0,
+            score2: m.score_b || 0,
+            isLive: m.status === "in_progress",
+            day: m.match_day,
             time: m.match_time
           }));
           mapped.sort((a, b) => {
-            if (a.isLive !== b.isLive) return a.isLive ? -1 : 1;
-            
-            const dayA = a.day || 999;
-            const dayB = b.day || 999;
-            if (dayA !== dayB) return dayA - dayB;
-
-            const parseTime = (t) => {
-              const m = String(t || "").trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
-              if (!m) return 9999;
-              let h = parseInt(m[1], 10);
-              const min = parseInt(m[2], 10);
-              const ampm = m[3]?.toUpperCase();
-              if (ampm === 'PM' && h < 12) h += 12;
-              if (ampm === 'AM' && h === 12) h = 0;
-              return h * 60 + min;
-            };
-            return parseTime(a.time) - parseTime(b.time);
+             if (a.isLive !== b.isLive) return a.isLive ? -1 : 1;
+             const dayA = a.day || 999;
+             const dayB = b.day || 999;
+             if (dayA !== dayB) return dayA - dayB;
+             return 0;
           });
-          setMatches(mapped);
+          setMatchesByTournament(prev => ({ ...prev, [tName]: mapped }));
         }
-      } catch (e) { console.error(e); }
-    };
-    fetchMatches();
-  }, [globalTournament?.name]);
-
-  const d = DATA[game];
-  const [showCountdown, setShowCountdown] = React.useState(true);
-  const [showAllRankings, setShowAllRankings] = React.useState(false);
-  const scrollRef = React.useRef(null);
-  
-  const scroll = (dir) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir * 280, behavior: 'smooth' });
+      } catch(e) { console.error(e); }
     }
   };
-  
-  // Parse qualifier slots for progress bar
-  const slotsMatch = d.qualifier.slots.match(/(\d+)\s*\/\s*(\d+)/);
-  const slotsFilled = slotsMatch ? parseInt(slotsMatch[1]) : 0;
-  const slotsTotal = slotsMatch ? parseInt(slotsMatch[2]) : 64;
-  const slotsPercent = Math.round((slotsFilled / slotsTotal) * 100);
-  
-  return (
-    <div className="flex flex-col gap-8">
-      {/* Upcoming Matches Section */}
-      <section className="relative bg-[#0d131c] rounded-3xl border border-slate-700/40 shadow-[0_8px_30px_rgb(0,0,0,0.4)] overflow-hidden animate-fade-in-up w-full" style={{ padding: '24px 32px', boxSizing: 'border-box', marginBottom: '32px' }}>
-        {/* Abstract Background Glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] blur-[80px] rounded-full pointer-events-none -translate-x-1/3 translate-y-1/3" style={{ backgroundColor: `${d.color}15` }} />
-        
-        <div className="relative z-10">
-          <div className="flex items-center justify-between border-b border-slate-800/60 pb-5 mb-5">
-            <div />
-            <div className="flex items-center gap-4">
-              {/* Scroll arrows */}
-              <div className="hidden md:flex items-center gap-2">
-                <button 
-                  onClick={() => scroll(-1)} 
-                  className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-90"
-                >
-                  <IconChevronLeft />
-                </button>
-                <button 
-                  onClick={() => scroll(1)} 
-                  className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-90"
-                >
-                  <IconChevronRight />
-                </button>
-              </div>
-              <div className="flex items-center gap-3 bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800">
-                <button 
-                  onClick={() => setShowCountdown(!showCountdown)}
-                  className={`w-10 h-5 rounded-full relative transition-colors duration-300 shadow-inner ${showCountdown ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-slate-700'}`}
-                >
-                  <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] transition-transform duration-300 ${showCountdown ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-                </button>
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Countdown</span>
-              </div>
-            </div>
-          </div>
-        <div className="relative z-10 w-full pt-4">
-          <div 
-            ref={scrollRef}
-            className="match-scroll-container snap-x snap-mandatory items-start w-full pb-4" 
-          >
-            {matches.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center py-10 text-slate-500 font-bold tracking-widest uppercase text-sm w-full">
-                No upcoming matches
-              </div>
-            ) : matches.map((match, idx) => (
-              <MatchCard 
-                key={match.id || idx} 
-                match={{...match, day: match.day || "TBD"}} 
-                showCountdown={showCountdown} 
-                game={game}
-                index={idx}
-              />
-            ))}
-            <div className="min-w-[20px] shrink-0" />
-          </div>
-        </div>
-        </div>
-      </section>
-      
-      {/* Team Rankings Section */}
-      <section className="w-full flex flex-col gap-6">
-        <div className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm flex flex-col animate-fade-in-up stagger-1 w-full" style={{ padding: '24px 32px', boxSizing: 'border-box', marginBottom: '32px' }}>
-          <div className="pb-5 border-b border-slate-800/50 light:border-slate-200 flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-black uppercase tracking-widest text-white light:text-slate-900 flex items-center gap-3">
-                <IconTrophy /> Team Rankings
-              </h2>
-            </div>
-            <div className="text-slate-600 bg-slate-800/40 p-2 rounded-xl">
-              <IconTrend />
-            </div>
-          </div>
-          <div className="flex-1 overflow-auto max-h-[500px]" style={{ scrollbarWidth: "thin", scrollbarColor: "#334155 transparent" }}>
-            <table className="w-full text-left border-collapse min-w-[700px]">
-              <thead className="bg-[#1a2332] text-white sticky top-0 z-10 shadow-md">
-                <tr>
-                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase text-center w-20">Pos</th>
-                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase">Team</th>
-                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">W</th>
-                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">L</th>
-                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">D</th>
-                  <th className="py-4 px-4 text-xs font-black tracking-widest uppercase text-center w-16">Pts</th>
-                  <th className="py-4 px-6 text-xs font-black tracking-widest uppercase text-center w-24">Form</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.rankings.map((team, idx) => {
-                  const isGold = team.rank === 1;
-                  const isSilver = team.rank === 2;
-                  const isBronze = team.rank === 3;
-                  
-                  // Dark theme compatible striping and medal colors
-                  const bgClass = isGold ? 'bg-yellow-500/10' : 
-                                  isSilver ? 'bg-slate-300/10' : 
-                                  isBronze ? 'bg-orange-500/10' : 
-                                  idx % 2 === 0 ? 'bg-slate-800/20' : 'bg-transparent';
-                                  
-                  const textColor = isGold ? 'text-yellow-500' : 
-                                    isSilver ? 'text-slate-300' : 
-                                    isBronze ? 'text-orange-400' : 
-                                    'text-slate-300';
-                                    
-                  const borderColor = isGold ? 'border-yellow-500/20' : 
-                                      isSilver ? 'border-slate-300/20' : 
-                                      isBronze ? 'border-orange-500/20' : 
-                                      'border-slate-800/50';
 
+  return (
+    <div className="flex flex-col gap-8 w-full animate-fade-in-up">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-[#0d131c] rounded-3xl p-6 border border-slate-700/40 shadow-lg relative overflow-hidden gap-4">
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-cyan-500/10 blur-[80px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <h2 className="text-xl md:text-2xl font-black uppercase tracking-widest text-white relative z-10 flex items-center gap-3">
+          <IconCalendar /> Live & Upcoming Tournaments
+        </h2>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {tournaments.length === 0 ? (
+           <div className="text-center py-20 text-slate-500 font-bold uppercase tracking-widest bg-[#0d131c] rounded-2xl border border-slate-800">No tournaments found. Create one to get started.</div>
+        ) : (
+           <div className="flex flex-col gap-8 w-full">
+             {/* Row of vertical cards */}
+             <div className="flex gap-4 overflow-x-auto pb-4 px-2 custom-scrollbar snap-x snap-mandatory">
+               {tournaments.map(t => {
+                  const isExpanded = expandedTournament === t.name;
+                  
                   return (
-                    <tr 
-                      key={team.rank}
-                      className={`${bgClass} ${textColor} hover:bg-slate-800/40 transition-all duration-200 border-b ${borderColor} last:border-0`}
-                    >
-                      <td className={`py-3 px-6 text-center font-black text-sm border-r ${borderColor} bg-black/20`}>
-                        {team.rank}
-                      </td>
-                      <td className="py-3 px-6 font-black text-sm tracking-wide uppercase">
-                        {team.name}
-                      </td>
-                      <td className="py-3 px-4 text-center font-bold text-sm">{20 - Math.floor(idx/3)}</td>
-                      <td className="py-3 px-4 text-center font-bold text-sm">{5 + Math.floor(idx/4)}</td>
-                      <td className="py-3 px-4 text-center font-bold text-sm">2</td>
-                      <td className="py-3 px-4 text-center font-black text-sm">{63 - idx}</td>
-                      <td className={`py-3 px-6 text-center text-sm font-black bg-black/20 border-l ${borderColor}`}>
-                        {idx % 4 !== 3 ? (
-                          <span className="text-emerald-500">▲</span>
-                        ) : (
-                          <span className="text-red-500">▼</span>
-                        )}
-                      </td>
-                    </tr>
+                  <div 
+                    key={t.id} 
+                    className={`flex-1 min-w-[130px] max-w-[320px] h-[220px] md:min-w-[150px] md:h-[250px] shrink-0 snap-center rounded-2xl flex flex-col overflow-hidden cursor-pointer shadow-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all duration-300 group border-[3px]
+                      ${isExpanded ? 'border-cyan-500 bg-slate-800 shadow-[0_0_25px_rgba(6,182,212,0.3)]' : 'border-slate-700 bg-[#0d131c] hover:border-cyan-400 hover:bg-slate-800/80'}`}
+                    onClick={() => toggleTournament(t.name)}
+                  >
+                     <div className="flex-1 relative flex flex-col items-center justify-center p-4 md:p-5 text-center overflow-hidden">
+                         <span className="text-xs md:text-sm font-semibold text-slate-400 drop-shadow-sm capitalize">{(t.game || game).toLowerCase()}</span>
+                         <h3 className="text-base md:text-xl font-black text-white uppercase leading-tight drop-shadow-md line-clamp-4 mt-1">{t.name}</h3>
+                     </div>
+                     
+                     <div className={`h-[45px] md:h-[55px] border-t-[3px] flex items-center justify-center transition-colors shrink-0
+                        ${isExpanded ? 'border-cyan-500 bg-cyan-900/30' : 'border-slate-700 bg-[#0a0f16] group-hover:bg-slate-800'}`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`w-6 h-6 md:w-8 md:h-8 transition-transform duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-400 group-hover:text-cyan-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                        </svg>
+                     </div>
+                  </div>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+               })}
+             </div>
+
+             {/* Expanded Matches Container (Appears below the row) */}
+             {expandedTournament && (
+               <div className="p-6 md:p-8 border-[3px] border-slate-700 bg-[#0a0f16] rounded-3xl shadow-2xl animate-fade-in-up relative mt-2">
+                  <div className="absolute -top-[14px] left-[50px] w-6 h-6 bg-[#0a0f16] border-t-[3px] border-l-[3px] border-slate-700 rotate-45 hidden md:block"></div>
+                  
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-widest">{expandedTournament} <span className="text-cyan-500">MATCHES</span></h3>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setShowBracket(!showBracket)}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border font-bold uppercase tracking-widest transition-colors shadow-inner text-xs md:text-sm cursor-pointer
+                           ${showBracket ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'bg-slate-900/80 text-slate-300 border-slate-700 hover:border-cyan-500 hover:text-cyan-400'}`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                           {showBracket ? <><path d="M18 15l-6-6-6 6"/></> : <><path d="M6 9l6 6 6-6"/></>}
+                        </svg>
+                        {showBracket ? 'Hide Bracket' : 'View Bracket'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {(!matchesByTournament[expandedTournament] || matchesByTournament[expandedTournament].length === 0) ? (
+                     <div className="text-center py-16 text-slate-500 font-bold tracking-widest uppercase">
+                       No upcoming matches for this tournament
+                     </div>
+                  ) : (
+                     <div className="match-scroll-container snap-x snap-mandatory flex gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-6 custom-scrollbar">
+                       {matchesByTournament[expandedTournament].map((match, idx) => (
+                         <MatchCard key={match.id || idx} match={{...match, day: match.day || "TBD"}} showCountdown={false} game={game} index={idx} />
+                       ))}
+                     </div>
+                  )}
+
+                  {showBracket && (
+                    <div className="w-full border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl mt-4 animate-fade-in-up">
+                       <Bracket globalGame={game} globalTournament={{ name: expandedTournament }} isReadOnly={true} />
+                    </div>
+                  )}
+               </div>
+             )}
+           </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -978,13 +916,13 @@ const ResultTab = ({ game, globalTournament }) => {
 
   return (
     <div className="dashboard-wrapper">
-      
+
       {/* Top Left: Leaderboard Panel */}
       <div className="glass-panel">
         <h2 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
           <span className="text-yellow-500"><IconTrophy /></span> FINAL RESULTS & KEY STATS
         </h2>
-        
+
         <table className="stats-table">
           <thead>
             <tr>
@@ -999,7 +937,7 @@ const ResultTab = ({ game, globalTournament }) => {
             {d.results.table.map((row) => {
               const rank = row.rank;
               const rankClass = rank <= 3 ? `rank-${rank}` : 'text-gray-400';
-              
+
               return (
                 <tr key={row.rank} className="rounded-lg">
                   <td>
@@ -1035,39 +973,39 @@ const ResultTab = ({ game, globalTournament }) => {
         </h2>
         {liveBrackets.length > 0 ? (
           <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-4">
-             {liveBrackets.map((b, i) => (
-                <div
-                  key={i}
-                  className="bg-slate-900/40 rounded-xl border border-slate-800/50 p-4 transition-colors shadow-sm hover:border-slate-700/80"
-                >
-                  <div className="flex justify-between items-center mb-2.5 text-[9px] uppercase tracking-widest font-bold text-slate-400">
-                    <span>{b.round}</span>
-                    <span className="text-cyan-500">{b.bestOf}</span>
+            {liveBrackets.map((b, i) => (
+              <div
+                key={i}
+                className="bg-slate-900/40 rounded-xl border border-slate-800/50 p-4 transition-colors shadow-sm hover:border-slate-700/80"
+              >
+                <div className="flex justify-between items-center mb-2.5 text-[9px] uppercase tracking-widest font-bold text-slate-400">
+                  <span>{b.round}</span>
+                  <span className="text-cyan-500">{b.bestOf}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
+                      {b.team1Logo ? <img src={b.team1Logo} className="w-full h-full object-contain" /> : b.team1[0]}
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team1}</span>
                   </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex flex-col items-center gap-1 flex-1">
-                      <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
-                        {b.team1Logo ? <img src={b.team1Logo} className="w-full h-full object-contain"/> : b.team1[0]}
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team1}</span>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg font-black text-white">{b.score1}</span>
+                      <span className="text-slate-600 font-bold">–</span>
+                      <span className="text-lg font-black text-slate-400">{b.score2}</span>
                     </div>
-                    <div className="flex flex-col items-center gap-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-lg font-black text-white">{b.score1}</span>
-                        <span className="text-slate-600 font-bold">–</span>
-                        <span className="text-lg font-black text-slate-400">{b.score2}</span>
-                      </div>
-                      <span className="text-[8px] text-slate-500 font-mono">{b.map}</span>
+                    <span className="text-[8px] text-slate-500 font-mono">{b.map}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
+                      {b.team2Logo ? <img src={b.team2Logo} className="w-full h-full object-contain" /> : b.team2[0]}
                     </div>
-                    <div className="flex flex-col items-center gap-1 flex-1">
-                      <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
-                        {b.team2Logo ? <img src={b.team2Logo} className="w-full h-full object-contain"/> : b.team2[0]}
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team2}</span>
-                    </div>
+                    <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team2}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         ) : (
           <div className="empty-bracket-placeholder">
@@ -1131,14 +1069,14 @@ const ResultTab = ({ game, globalTournament }) => {
 const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const daysOfWeek = ["M", "T", "W", "T", "F", "S", "S"];
-  
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const totalDays = new Date(year, month + 1, 0).getDate();
-  
+
   let startDay = new Date(year, month, 1).getDay();
   startDay = startDay === 0 ? 6 : startDay - 1; // Make Monday first day
-  
+
   const monthName = currentDate.toLocaleString("default", { month: "long" });
 
   const cells = [];
@@ -1149,7 +1087,7 @@ const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
   const todayObj = new Date();
-    const today = month === todayObj.getMonth() && year === todayObj.getFullYear() ? todayObj.getDate() : null; 
+  const today = month === todayObj.getMonth() && year === todayObj.getFullYear() ? todayObj.getDate() : null;
 
   return (
     <div className="calendar-card">
@@ -1182,14 +1120,14 @@ const MiniCalendar = ({ highlightDays = [], selectedDay, onSelectDay }) => {
       <div className="calendar-grid">
         {cells.map((date, idx) => {
           if (!date) return <div key={idx} className="date-cell empty"></div>;
-          
+
           const isSelected = date === selectedDay;
           const isToday = date === today;
           const isMatchDay = highlightDays.includes(date);
 
           return (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               onClick={() => onSelectDay(date === selectedDay ? null : date)}
               className={`date-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
             >
@@ -1373,260 +1311,260 @@ const ManageBracketTab = ({ globalGame, globalTournament }) => {
   return (
     <div className="flex justify-center w-full mb-10">
       <div className="flex flex-col w-full px-4 lg:px-8">
-      <div 
-        className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full"
-        style={{ padding: '32px', boxSizing: 'border-box', marginBottom: '24px', marginTop: '24px' }}
-      >
-        <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 text-center tracking-widest m-0" style={{ marginBottom: '32px' }}>
-          Manage Brackets
-        </h2>
+        <div
+          className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full"
+          style={{ padding: '32px', boxSizing: 'border-box', marginBottom: '24px', marginTop: '24px' }}
+        >
+          <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 text-center tracking-widest m-0" style={{ marginBottom: '32px' }}>
+            Manage Brackets
+          </h2>
 
-        <div className="flex flex-col gap-8 mb-10 w-full">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-1">
-              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                ROUND
-              </label>
-              <input
-                type="text"
-                value={round}
-                onChange={(e) => setRound(e.target.value)}
-                className={inputClass(round)}
-                placeholder="e.g. Semi-Finals"
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                BEST OF
-              </label>
-              <input
-                type="text"
-                value={bestOf}
-                onChange={(e) => setBestOf(e.target.value)}
-                className={inputClass(bestOf)}
-                placeholder="e.g. Best of 3"
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                MAP INFO
-              </label>
-              <input
-                type="text"
-                value={mapInfo}
-                onChange={(e) => setMapInfo(e.target.value)}
-                className={inputClass(mapInfo)}
-                placeholder="e.g. Map 2: 7-9"
-                disabled={isSubmitting}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
-            <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team A</div>
+          <div className="flex flex-col gap-8 mb-10 w-full">
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-[2]">
+              <div className="flex-1">
                 <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  NAME
+                  ROUND
                 </label>
                 <input
                   type="text"
-                  value={teamA}
-                  onChange={(e) => setTeamA(e.target.value)}
-                  className={inputClass(teamA)}
-                  placeholder="e.g. All Gamers"
+                  value={round}
+                  onChange={(e) => setRound(e.target.value)}
+                  className={inputClass(round)}
+                  placeholder="e.g. Semi-Finals"
                   disabled={isSubmitting}
                 />
-              </div>
-              <div className="flex-[3]">
-                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  LOGO
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    disabled={isSubmitting}
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setTeamAFile(file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => setTeamALogo(reader.result);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
-                  />
-                  {teamALogo && (
-                    <img
-                      src={teamALogo}
-                      alt="Preview"
-                      className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
-                    />
-                  )}
-                </div>
               </div>
               <div className="flex-1">
                 <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  SCORE
-                </label>
-                <input
-                  type="number"
-                  value={scoreA}
-                  onChange={(e) => setScoreA(e.target.value)}
-                  className={inputClass(scoreA)}
-                  placeholder="0"
-                  disabled={isSubmitting}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
-            <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team B</div>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-[2]">
-                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  NAME
+                  BEST OF
                 </label>
                 <input
                   type="text"
-                  value={teamB}
-                  onChange={(e) => setTeamB(e.target.value)}
-                  className={inputClass(teamB)}
-                  placeholder="e.g. Baisha Gaming"
+                  value={bestOf}
+                  onChange={(e) => setBestOf(e.target.value)}
+                  className={inputClass(bestOf)}
+                  placeholder="e.g. Best of 3"
                   disabled={isSubmitting}
                 />
               </div>
-              <div className="flex-[3]">
-                <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  LOGO
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    disabled={isSubmitting}
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setTeamBFile(file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => setTeamBLogo(reader.result);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
-                  />
-                  {teamBLogo && (
-                    <img
-                      src={teamBLogo}
-                      alt="Preview"
-                      className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
-                    />
-                  )}
-                </div>
-              </div>
               <div className="flex-1">
                 <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-                  SCORE
+                  MAP INFO
                 </label>
                 <input
-                  type="number"
-                  value={scoreB}
-                  onChange={(e) => setScoreB(e.target.value)}
-                  className={inputClass(scoreB)}
-                  placeholder="0"
+                  type="text"
+                  value={mapInfo}
+                  onChange={(e) => setMapInfo(e.target.value)}
+                  className={inputClass(mapInfo)}
+                  placeholder="e.g. Map 2: 7-9"
                   disabled={isSubmitting}
                 />
               </div>
             </div>
-          </div>
-        </div>
-        {showErrors && (
-          <div className="text-red-500 text-xs font-bold mb-6 text-center uppercase animate-pulse">
-            Please fill in all required fields.
-          </div>
-        )}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
-          <button
-            onClick={addBracket}
-            disabled={isSubmitting}
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
-            style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
-          >
-            {isSubmitting ? "Saving..." : "Add Bracket"}
-          </button>
-        </div>
-      </div>
 
-      <div 
-        className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl mt-6"
-        style={{ padding: '32px', boxSizing: 'border-box' }}
-      >
-        <h3 className="text-sm font-black uppercase text-slate-400 mb-4 mt-0">
-          Current Brackets
-        </h3>
-        <div className="flex flex-col gap-2">
-          {brackets.length === 0 && (
-            <div className="text-slate-500 text-sm">No bracket data found.</div>
+            <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
+              <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team A</div>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-[2]">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={teamA}
+                    onChange={(e) => setTeamA(e.target.value)}
+                    className={inputClass(teamA)}
+                    placeholder="e.g. All Gamers"
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className="flex-[3]">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    LOGO
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isSubmitting}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setTeamAFile(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => setTeamALogo(reader.result);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                    />
+                    {teamALogo && (
+                      <img
+                        src={teamALogo}
+                        alt="Preview"
+                        className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    SCORE
+                  </label>
+                  <input
+                    type="number"
+                    value={scoreA}
+                    onChange={(e) => setScoreA(e.target.value)}
+                    className={inputClass(scoreA)}
+                    placeholder="0"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6 border border-slate-800/80 rounded-2xl relative mt-4" style={{ padding: '24px' }}>
+              <div className="absolute -top-3 left-6 bg-[#0d131c] px-3 font-bold text-cyan-500 text-sm uppercase tracking-widest">Team B</div>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-[2]">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={teamB}
+                    onChange={(e) => setTeamB(e.target.value)}
+                    className={inputClass(teamB)}
+                    placeholder="e.g. Baisha Gaming"
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className="flex-[3]">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    LOGO
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isSubmitting}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setTeamBFile(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => setTeamBLogo(reader.result);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                    />
+                    {teamBLogo && (
+                      <img
+                        src={teamBLogo}
+                        alt="Preview"
+                        className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-bold text-slate-500  text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    SCORE
+                  </label>
+                  <input
+                    type="number"
+                    value={scoreB}
+                    onChange={(e) => setScoreB(e.target.value)}
+                    className={inputClass(scoreB)}
+                    placeholder="0"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          {showErrors && (
+            <div className="text-red-500 text-xs font-bold mb-6 text-center uppercase animate-pulse">
+              Please fill in all required fields.
+            </div>
           )}
-          {brackets.map((b) => (
-            <div
-              key={b.id}
-              className="flex items-center justify-between bg-slate-900/30 p-3 rounded border border-slate-800/50"
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
+            <button
+              onClick={addBracket}
+              disabled={isSubmitting}
+              className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
+              style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
             >
-              <div className="flex items-center gap-3">
-                {b.teamALogo ? (
-                  <img
-                    src={b.teamALogo}
-                    alt="Team A"
-                    className="w-6 h-6 object-contain"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
-                    ?
-                  </div>
-                )}
-                <div className="text-white font-bold text-sm">
-                  {b.teamA} {b.scoreA} - {b.scoreB} {b.teamB}
-                </div>
-                {b.teamBLogo ? (
-                  <img
-                    src={b.teamBLogo}
-                    alt="Team B"
-                    className="w-6 h-6 object-contain"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
-                    ?
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <div className="text-slate-400 text-xs">
-                  {b.round} | {b.mapInfo}
-                </div>
-                <button
-                  onClick={() => removeBracket(b.id)}
-                  className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
+              {isSubmitting ? "Saving..." : "Add Bracket"}
+            </button>
+          </div>
         </div>
-      </div>
+
+        <div
+          className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl mt-6"
+          style={{ padding: '32px', boxSizing: 'border-box' }}
+        >
+          <h3 className="text-sm font-black uppercase text-slate-400 mb-4 mt-0">
+            Current Brackets
+          </h3>
+          <div className="flex flex-col gap-2">
+            {brackets.length === 0 && (
+              <div className="text-slate-500 text-sm">No bracket data found.</div>
+            )}
+            {brackets.map((b) => (
+              <div
+                key={b.id}
+                className="flex items-center justify-between bg-slate-900/30 p-3 rounded border border-slate-800/50"
+              >
+                <div className="flex items-center gap-3">
+                  {b.teamALogo ? (
+                    <img
+                      src={b.teamALogo}
+                      alt="Team A"
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                      ?
+                    </div>
+                  )}
+                  <div className="text-white font-bold text-sm">
+                    {b.teamA} {b.scoreA} - {b.scoreB} {b.teamB}
+                  </div>
+                  {b.teamBLogo ? (
+                    <img
+                      src={b.teamBLogo}
+                      alt="Team B"
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                      ?
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="text-slate-400 text-xs">
+                    {b.round} | {b.mapInfo}
+                  </div>
+                  <button
+                    onClick={() => removeBracket(b.id)}
+                    className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-const ManageScheduleTab = ({ globalGame, globalTournament }) => {
+const ManageScheduleTab = ({ readOnly, globalGame, globalTournament, embedded, onOpenCreateModal }) => {
   const activeGame = (globalGame || "VALORANT").toUpperCase();
   const safeFolder = globalTournament?.name
     ? globalTournament.name.replace(/[^a-zA-Z0-9]/g, "_")
@@ -1644,11 +1582,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
   const [teamBFile, setTeamBFile] = useState(null);
 
   const [day, setDay] = useStickyState(new Date().toISOString().split("T")[0], `${key}_day`);
-  const [time, setTime] = useStickyState("14:00", `${key}_time`);
-  const [timezone, setTimezone] = useStickyState(
-    "20:00 PST",
-    `${key}_timezone`,
-  );
+  const [time, setTime] = useStickyState("14:00", `${key}_time_v2`);
 
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1713,12 +1647,16 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
     if (createRes.ok) {
       const newTeam = await createRes.json();
       return newTeam.team_id;
+    } else {
+      const errText = await createRes.text();
+      console.error("Failed to create team:", teamName, errText);
+      alert(`Failed to create team ${teamName}: ${errText}`);
     }
     return null;
   };
 
   const addMatch = async () => {
-    if (!teamA || !teamB || !day || !time || !timezone) {
+    if (!teamA || !teamB || !day || !time) {
       setShowErrors(true);
       return;
     }
@@ -1733,7 +1671,7 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
       const parsedDay = day.includes("-")
         ? parseInt(day.split("-")[2], 10)
         : parseInt(day, 10);
-      await fetch("http://localhost:5000/api/matches", {
+      const matchRes = await fetch("http://localhost:5000/api/matches", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1747,9 +1685,15 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
           status: "scheduled",
           match_day: parsedDay.toString(),
           match_time: time,
-          match_timezone: timezone,
+          match_timezone: "Local",
         }),
       });
+
+      if (!matchRes.ok) {
+        const errText = await matchRes.text();
+        console.error("Failed to create match:", errText);
+        alert(`Failed to create match: ${errText}`);
+      }
       await fetchMatches();
 
       setTeamA("");
@@ -1773,221 +1717,233 @@ const ManageScheduleTab = ({ globalGame, globalTournament }) => {
   };
 
   const inputClass = (val) =>
-    `w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-3 text-white text-sm transition-all ${showErrors && !val ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] outline-none"}`;
+    `w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-3 text-white text-sm normal-nums transition-all ${showErrors && !val ? "border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] outline-none"}`;
 
   return (
     <div className="flex justify-center w-full mb-10">
-      <div className="flex flex-col w-full px-4 lg:px-8">
-      <div 
-        className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full"
-        style={{ padding: '32px', boxSizing: 'border-box', marginBottom: '24px', marginTop: '24px' }}
-      >
-        <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 text-center tracking-widest m-0" style={{ marginBottom: '32px' }}>
-          Manage Schedule
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" style={{ padding: '0 8px' }}>
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TEAM A NAME
-            </label>
-            <input
-              type="text"
-              value={teamA}
-              onChange={(e) => setTeamA(e.target.value)}
-              className={inputClass(teamA)}
-              placeholder="e.g. All Gamers"
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TEAM A LOGO
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                disabled={isSubmitting}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setTeamAFile(file);
-                    const reader = new FileReader();
-                    reader.onloadend = () => setTeamALogo(reader.result);
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
-              />
-              {teamALogo && (
-                <img
-                  src={teamALogo}
-                  alt="Preview"
-                  className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
-                />
-              )}
+      <div className="flex flex-col lg:flex-row gap-6 w-full max-w-[1400px] px-4 lg:px-8 mt-6">
+        
+        {/* LEFT COLUMN */}
+        <div className="flex-1 flex flex-col gap-6">
+          {/* Create Tournament Box (Only shown if not embedded and has callback) */}
+          {!readOnly && !embedded && onOpenCreateModal && (
+            <div className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full p-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h2 className="text-xl font-black uppercase text-white light:text-slate-900 tracking-widest m-0">
+                Tournament Setup
+              </h2>
+              <button 
+                onClick={onOpenCreateModal}
+                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] shrink-0"
+                style={{ padding: '14px 32px', fontWeight: 'bold', letterSpacing: '1px', fontSize: '13px' }}
+              >
+                + Create Tournament
+              </button>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TEAM B NAME
-            </label>
-            <input
-              type="text"
-              value={teamB}
-              onChange={(e) => setTeamB(e.target.value)}
-              className={inputClass(teamB)}
-              placeholder="e.g. Baisha Gaming"
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TEAM B LOGO
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                disabled={isSubmitting}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setTeamBFile(file);
-                    const reader = new FileReader();
-                    reader.onloadend = () => setTeamBLogo(reader.result);
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
-              />
-              {teamBLogo && (
-                <img
-                  src={teamBLogo}
-                  alt="Preview"
-                  className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
-                />
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              DATE
-            </label>
-            <input
-              type="date"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-              className={inputClass(day) + " [color-scheme:dark]"}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TIME
-            </label>
-            <input
-              type="text"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className={inputClass(time)}
-              placeholder="e.g. 17:00"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
-              TIMEZONE LABEL
-            </label>
-            <input
-              type="text"
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className={inputClass(timezone)}
-              placeholder="e.g. 23:00 PST"
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
-        {showErrors && (
-          <div className="text-red-500 text-xs font-bold mt-6 text-center uppercase animate-pulse">
-            Please fill in all required fields.
-          </div>
-        )}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
-          <button
-            onClick={addMatch}
-            disabled={isSubmitting}
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
-            style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
-          >
-            {isSubmitting ? "Saving..." : "Add Match"}
-          </button>
-        </div>
-      </div>
-
-      <div 
-        className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl mt-6"
-        style={{ padding: '32px', boxSizing: 'border-box' }}
-      >
-        <h3 className="text-sm font-black uppercase text-slate-400 mb-4 mt-0">
-          Current Schedule
-        </h3>
-        <div className="flex flex-col gap-2">
-          {schedule.length === 0 && (
-            <div className="text-slate-500 text-sm">No matches scheduled.</div>
           )}
-          {schedule.map((m) => (
+
+          {/* Manage Schedule Form Box */}
+          {!readOnly && (
             <div
-              key={m.id}
-              className="flex items-center justify-between bg-slate-900/30 p-3 rounded border border-slate-800/50"
+              className="bg-[#0b1017] light:bg-white rounded-3xl border border-slate-800/60 light:border-slate-200 shadow-2xl w-full flex flex-col"
+              style={{ padding: '32px', boxSizing: 'border-box' }}
             >
-              <div className="flex items-center gap-3">
-                {m.teamALogo ? (
-                  <img
-                    src={m.teamALogo}
-                    alt="Team A"
-                    className="w-6 h-6 object-contain"
+              <h2 className="text-2xl font-black uppercase text-white light:text-slate-900 tracking-widest mb-8 text-center md:text-left">
+                Manage Schedule
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" style={{ padding: '0 8px' }}>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    TEAM A NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={teamA}
+                    onChange={(e) => setTeamA(e.target.value)}
+                    className={inputClass(teamA)}
+                    placeholder="e.g. All Gamers"
+                    disabled={isSubmitting}
                   />
-                ) : (
-                  <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
-                    ?
-                  </div>
-                )}
-                <div className="text-white font-bold text-sm">
-                  {m.teamA} vs {m.teamB}
                 </div>
-                {m.teamBLogo ? (
-                  <img
-                    src={m.teamBLogo}
-                    alt="Team B"
-                    className="w-6 h-6 object-contain"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-bold text-slate-500">
-                    ?
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    TEAM A LOGO
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isSubmitting}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setTeamAFile(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => setTeamALogo(reader.result);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                    />
+                    {teamALogo && (
+                      <img
+                        src={teamALogo}
+                        alt="Preview"
+                        className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                      />
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    TEAM B NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={teamB}
+                    onChange={(e) => setTeamB(e.target.value)}
+                    className={inputClass(teamB)}
+                    placeholder="e.g. Baisha Gaming"
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    TEAM B LOGO
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isSubmitting}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setTeamBFile(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => setTeamBLogo(reader.result);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full bg-[#070b10] border border-slate-800/80 rounded-xl px-4 py-2.5 text-white text-sm file:mr-4 file:py-1.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-900 hover:file:bg-cyan-400 cursor-pointer"
+                    />
+                    {teamBLogo && (
+                      <img
+                        src={teamBLogo}
+                        alt="Preview"
+                        className="w-10 h-10 object-contain rounded bg-slate-800 shrink-0"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    DATE
+                  </label>
+                  <input
+                    type="date"
+                    value={day}
+                    onChange={(e) => setDay(e.target.value)}
+                    className={inputClass(day) + " [color-scheme:dark]"}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 text-left" style={{ marginBottom: "12px", paddingLeft: "16px" }}>
+                    TIME
+                  </label>
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className={inputClass(time) + " cursor-pointer [color-scheme:dark]"}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-slate-400 text-xs">
-                  Day {m.day} - {m.time}
+
+              {showErrors && (
+                <div className="text-red-500 text-xs font-bold mt-6 text-center uppercase animate-pulse">
+                  Please fill in all required fields.
                 </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
                 <button
-                  onClick={() => removeMatch(m.id)}
-                  className="text-red-500 hover:text-red-400 text-xs font-bold uppercase"
+                  onClick={addMatch}
+                  disabled={isSubmitting}
+                  className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 uppercase rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50"
+                  style={{ padding: '12px 32px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '12px' }}
                 >
-                  Remove
+                  {isSubmitting ? "Saving..." : "Add Match"}
                 </button>
               </div>
             </div>
-          ))}
+          )}
         </div>
-      </div>
+
+        {/* RIGHT COLUMN - Current Schedule */}
+        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0">
+          <div
+            className="bg-[#0d131c] light:bg-white rounded-3xl border border-slate-800/50 light:border-slate-200 shadow-2xl h-full flex flex-col"
+            style={{ padding: '32px', boxSizing: 'border-box', minHeight: '500px' }}
+          >
+            <h3 className="text-sm font-black uppercase text-slate-400 mb-6 mt-0">
+              Current Schedule
+            </h3>
+            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1 pr-2">
+              {schedule.length === 0 && (
+                <div className="text-slate-500 text-sm italic">No matches scheduled yet.</div>
+              )}
+              {schedule.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex flex-col bg-[#0b1017] p-4 rounded-2xl border border-slate-800/80 gap-4 hover:border-slate-600 transition-colors shadow-lg"
+                >
+                  {/* Match Teams Header */}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      {m.teamALogo ? (
+                        <img src={m.teamALogo} alt="Team A" className="w-8 h-8 object-contain rounded bg-slate-900" />
+                      ) : (
+                        <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500">?</div>
+                      )}
+                      <div className="text-white font-bold text-sm truncate max-w-[90px]" title={m.teamA}>{m.teamA}</div>
+                    </div>
+                    <span className="text-cyan-500/70 font-black text-xs mx-2">VS</span>
+                    <div className="flex items-center gap-3 flex-row-reverse">
+                      {m.teamBLogo ? (
+                        <img src={m.teamBLogo} alt="Team B" className="w-8 h-8 object-contain rounded bg-slate-900" />
+                      ) : (
+                        <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500">?</div>
+                      )}
+                      <div className="text-white font-bold text-sm truncate max-w-[90px] text-right" title={m.teamB}>{m.teamB}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="w-full h-px bg-slate-800/60"></div>
+                  
+                  {/* Match Details Footer */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-slate-400 text-xs font-semibold flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {m.day} <span className="text-slate-600">•</span> {m.time}
+                    </div>
+                    <button
+                      onClick={() => removeMatch(m.id)}
+                      className="text-red-500 hover:text-red-400 text-[10px] font-black uppercase tracking-wider transition-colors px-2 py-1.5 hover:bg-red-500/10 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -2117,7 +2073,7 @@ const ScheduleTab = ({ game, globalTournament }) => {
             </span>
           </div>
         </div>
-        {}
+        { }
         <div className="flex flex-col gap-3">
           {filteredSchedule.map((s) => {
             const reminded =
@@ -2127,9 +2083,9 @@ const ScheduleTab = ({ game, globalTournament }) => {
                 key={s.id}
                 className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 hover:border-slate-700/70 light:hover:border-slate-300 transition-all duration-300 p-4 flex items-center gap-4 group shadow-sm"
               >
-                {}
+                { }
 
-                {}
+                { }
                 <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center gap-1 md:gap-3 py-1">
                   <div className="flex items-center gap-2">
                     {s.teamALogo ? (
@@ -2159,7 +2115,7 @@ const ScheduleTab = ({ game, globalTournament }) => {
                     ) : null}
                   </div>
                 </div>
-                {}
+                { }
                 <div className="text-right shrink-0 hidden sm:block">
                   <div className="text-sm font-black text-white light:text-slate-900">
                     {s.time}
@@ -2168,14 +2124,13 @@ const ScheduleTab = ({ game, globalTournament }) => {
                     {s.timezone}
                   </div>
                 </div>
-                {}
+                { }
                 <button
                   onClick={() => toggleReminder(s.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all active:scale-95 shrink-0 ${
-                    reminded
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all active:scale-95 shrink-0 ${reminded
                       ? "bg-cyan-500/15 border border-cyan-500/40 text-cyan-400"
                       : "bg-red-600 text-white hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]"
-                  }`}
+                    }`}
                 >
                   <IconBell />
                   {reminded ? "Reminded" : "Set Reminder"}
@@ -2184,7 +2139,7 @@ const ScheduleTab = ({ game, globalTournament }) => {
             );
           })}
         </div>
-        {}
+        { }
         {scheduleData.length === 0 && (
           <div className="flex-1 flex items-center justify-center py-20 text-slate-600 text-sm font-bold tracking-widest uppercase">
             No scheduled matches
@@ -2197,6 +2152,19 @@ const ScheduleTab = ({ game, globalTournament }) => {
 const Tournament = ({ globalGame, globalTournament }) => {
   const activeGame = (globalGame || "VALORANT").toUpperCase();
   const [activeTab, setActiveTab] = useState("LIVE & UPCOMING");
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [step, setStep] = useState(1);
+  const [tournData, setTournData] = useState({
+    name: "",
+    game: activeGame,
+    prizePool: "$5,000",
+    startDate: "",
+    region: "NA",
+    isPublic: true
+  });
+  const [isCreated, setIsCreated] = useState(false);
+
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const tabsRef = useRef({});
 
@@ -2209,44 +2177,45 @@ const Tournament = ({ globalGame, globalTournament }) => {
       });
     }
   }, [activeTab]);
-  
+
   const tabs = [
-    { 
-      key: "LIVE & UPCOMING", 
+    {
+      key: "LIVE & UPCOMING",
       icon: (
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)]"></span>
         </span>
-      ), 
-      label: "LIVE & UPCOMING" 
+      ),
+      label: "LIVE & UPCOMING"
+    },
+    {
+      key: "RESULT",
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
+      label: "RESULT"
+    },
+    {
+      key: "SCHEDULE",
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+      label: "SCHEDULE"
+    },
+    {
+      key: "CREATE TOURNAMENT",
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+      label: "CREATE TOURNAMENT"
     },
     { 
-      key: "RESULT", 
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>, 
-      label: "RESULT" 
+      key: "BRACKET MANAGEMENT", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+      label: "BRACKET MANAGEMENT" 
     },
-    { 
-      key: "SCHEDULE", 
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>, 
-      label: "SCHEDULE" 
-    },
-    { 
-      key: "MANAGE SCHEDULE", 
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>, 
-      label: "MANAGE SCHEDULE" 
-    },
-    { 
-      key: "MANAGE BRACKET", 
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>, 
-      label: "MANAGE BRACKET" 
-    },
+
   ];
-  
+
   const renderTab = () => {
     switch (activeTab) {
       case "LIVE & UPCOMING":
-        return <LiveUpcomingTab game={activeGame} globalTournament={globalTournament} />;
+        return <LiveUpcomingTab game={activeGame} globalTournament={globalTournament} onOpenCreateModal={() => { setStep(1); setShowCreateModal(true); }} />;
       case "RESULT":
         return (
           <ResultTab game={activeGame} globalTournament={globalTournament} />
@@ -2255,25 +2224,33 @@ const Tournament = ({ globalGame, globalTournament }) => {
         return (
           <ScheduleTab game={activeGame} globalTournament={globalTournament} />
         );
-      case "MANAGE SCHEDULE":
+      case "CREATE TOURNAMENT":
         return (
           <ManageScheduleTab
             globalGame={globalGame}
             globalTournament={globalTournament}
+            onOpenCreateModal={() => { setStep(1); setShowCreateModal(true); }}
           />
         );
-      case "MANAGE BRACKET":
+      case "BRACKET MANAGEMENT":
+        if (!globalTournament) {
+           return (
+             <div className="flex flex-col items-center justify-center p-16 text-slate-500 font-bold uppercase tracking-widest text-lg">
+               Select a tournament first to manage its bracket
+             </div>
+           );
+        }
         return (
-          <ManageBracketTab
-            globalGame={globalGame}
-            globalTournament={globalTournament}
-          />
+          <div className="w-full border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl mt-4 animate-fade-in-up">
+             <Bracket globalGame={activeGame} globalTournament={globalTournament} isReadOnly={false} />
+          </div>
         );
+
       default:
         return null;
     }
   };
-  
+
   return (
     <div className="flex-1 bg-[#090e14] light:bg-[#f8fafc] text-white light:text-slate-900 flex flex-col h-full overflow-hidden">
       <style>{`
@@ -2284,14 +2261,14 @@ const Tournament = ({ globalGame, globalTournament }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
       `}</style>
-      {}
+      { }
       <div className="shrink-0 px-8 md:px-12 pt-6 pb-0 bg-gradient-to-b from-[#0a1018] to-[#090e14] light:from-white light:to-[#f8fafc] flex flex-col items-center relative overflow-hidden">
         {/* Subtle ambient glow behind header */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[200px] bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none" />
         <div className="absolute top-0 right-1/4 w-[400px] h-[150px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
-        
+
         <div className="w-full max-w-[1400px] relative z-10">
-          {}
+          { }
           <div className="flex justify-center items-center w-full mb-6" style={{ padding: '16px 0' }}>
             <div className="relative flex items-center justify-between max-w-[1200px] w-full gap-4 md:gap-12 overflow-x-auto scrollbar-hide pb-2 border-b border-slate-800/60 light:border-slate-200">
               {tabs.map((tab) => (
@@ -2299,11 +2276,10 @@ const Tournament = ({ globalGame, globalTournament }) => {
                   key={tab.key}
                   ref={(el) => (tabsRef.current[tab.key] = el)}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-3 px-8 py-3 text-[0.85rem] md:text-[0.95rem] font-bold tracking-[0.1em] uppercase border-none bg-transparent cursor-pointer transition-all duration-300 shrink-0 z-10 ${
-                    activeTab === tab.key
+                  className={`flex items-center gap-3 px-8 py-3 text-[0.85rem] md:text-[0.95rem] font-bold tracking-[0.1em] uppercase border-none bg-transparent cursor-pointer transition-all duration-300 shrink-0 z-10 ${activeTab === tab.key
                       ? "text-white"
                       : "text-[#94a3b8] hover:text-white"
-                  }`}
+                    }`}
                 >
                   <span className="opacity-80">{tab.icon}</span>
                   {tab.label}
@@ -2311,22 +2287,304 @@ const Tournament = ({ globalGame, globalTournament }) => {
               ))}
 
               {/* The Sliding Bar */}
-              <div 
-                className="absolute bottom-[-1px] h-[3px] bg-cyan-400 rounded-full shadow-[0_0_12px_rgba(0,240,255,1)] pointer-events-none" 
-                style={{ 
-                  left: `${indicatorStyle.left}px`, 
+              <div
+                className="absolute bottom-[-1px] h-[3px] bg-cyan-400 rounded-full shadow-[0_0_12px_rgba(0,240,255,1)] pointer-events-none"
+                style={{
+                  left: `${indicatorStyle.left}px`,
                   width: `${indicatorStyle.width}px`,
                   transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
-                }} 
+                }}
               />
             </div>
           </div>
         </div>
       </div>
-      {}
+      { }
       <div className="flex-1 overflow-y-auto custom-scrollbar px-8 md:px-12 py-6 flex flex-col items-center">
         <div className="w-full max-w-[1400px]">{renderTab()}</div>
       </div>
+
+      {/* 4-Step Create Tournament Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-[#f8fafc] dark:bg-[#0b1017] border border-slate-200 dark:border-slate-800/60 rounded-3xl w-full max-w-4xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative transition-all duration-300 max-h-[90vh] overflow-hidden">
+            
+            <div className="p-8 md:p-10 flex flex-col items-center flex-1 overflow-y-auto custom-scrollbar">
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-10 tracking-wide text-center">
+                Create Tournament
+              </h2>
+
+              {/* Progress Bar Container */}
+              <div className="flex items-start w-full max-w-2xl mb-12 relative">
+                {/* Progress Lines */}
+                <div className="absolute top-5 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -z-10 -translate-y-1/2"></div>
+                <div 
+                  className="absolute top-5 left-0 h-1 bg-cyan-500 -z-10 -translate-y-1/2 transition-all duration-500"
+                  style={{ width: step === 1 ? '0%' : step === 2 ? '33.33%' : step === 3 ? '66.66%' : '100%' }}
+                ></div>
+
+                {/* Step 1 */}
+                <div className="flex-1 flex flex-col items-center z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    step > 1 ? 'bg-[#f0f9ff] dark:bg-slate-800 border-2 border-cyan-500 text-cyan-500' : 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]'
+                  }`}>
+                    {step > 1 ? (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    ) : (
+                      '1'
+                    )}
+                  </div>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-3 text-center w-24">Basic Info</span>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex-1 flex flex-col items-center z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    step > 2 ? 'bg-[#f0f9ff] dark:bg-slate-800 border-2 border-cyan-500 text-cyan-500' : step === 2 ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-400'
+                  }`}>
+                    {step > 2 ? (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    ) : (
+                      '2'
+                    )}
+                  </div>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-3 text-center w-24">Schedule</span>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex-1 flex flex-col items-center z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    step > 3 ? 'bg-[#f0f9ff] dark:bg-slate-800 border-2 border-cyan-500 text-cyan-500' : step === 3 ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-400'
+                  }`}>
+                    {step > 3 ? (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    ) : (
+                      '3'
+                    )}
+                  </div>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-3 text-center w-24">Brackets</span>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex-1 flex flex-col items-center z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    step === 4 ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-400'
+                  }`}>
+                    4
+                  </div>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-3 text-center w-24">Confirmation</span>
+                </div>
+              </div>
+
+              <div className="w-full mt-8 flex flex-col items-center">
+                {step === 1 && (
+                  <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm w-full max-w-2xl">
+                    <h3 className="text-lg font-black text-slate-800 dark:text-white mb-6 text-center">Tournament Information</h3>
+                    <div className="mb-4">
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Tournament Name</label>
+                      <input 
+                        type="text" 
+                        value={tournData.name}
+                        onChange={(e) => setTournData({...tournData, name: e.target.value})}
+                        disabled={isCreated}
+                        className="w-full bg-slate-50 dark:bg-[#070b10] border border-slate-200 dark:border-slate-800/80 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all disabled:opacity-50"
+                        placeholder="Enter tournament name"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Game Title</label>
+                      <select 
+                        value={tournData.game}
+                        onChange={(e) => setTournData({...tournData, game: e.target.value})}
+                        disabled={isCreated}
+                        className="w-full bg-slate-50 dark:bg-[#070b10] border border-slate-200 dark:border-slate-800/80 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        <option value="VALORANT">VALORANT</option>
+                        <option value="CROSSFIRE">CROSSFIRE</option>
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Prize Pool</label>
+                        <input 
+                          type="text" 
+                          value={tournData.prizePool}
+                          onChange={(e) => setTournData({...tournData, prizePool: e.target.value})}
+                          className="w-full bg-slate-50 dark:bg-[#070b10] border border-slate-200 dark:border-slate-800/80 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Start Date</label>
+                        <input 
+                          type="date" 
+                          value={tournData.startDate}
+                          onChange={(e) => setTournData({...tournData, startDate: e.target.value})}
+                          className="w-full bg-slate-50 dark:bg-[#070b10] border border-slate-200 dark:border-slate-800/80 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all [color-scheme:dark]"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Region</label>
+                      <select 
+                        value={tournData.region}
+                        onChange={(e) => setTournData({...tournData, region: e.target.value})}
+                        className="w-full bg-slate-50 dark:bg-[#070b10] border border-slate-200 dark:border-slate-800/80 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all cursor-pointer"
+                      >
+                        <option value="NA">North America (NA)</option>
+                        <option value="EU">Europe (EU)</option>
+                        <option value="APAC">Asia Pacific (APAC)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="w-full">
+                    <ManageScheduleTab globalGame={tournData.game} globalTournament={{ name: tournData.name }} embedded={true} />
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="w-full" style={{ minHeight: '600px' }}>
+                    <Bracket globalGame={tournData.game} globalTournament={{ name: tournData.name }} />
+                  </div>
+                )}
+
+                {step === 4 && (
+                  <div className="flex flex-col gap-6 w-full max-w-3xl">
+                    <div className="text-center mb-4">
+                      <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-wide">Review Your Tournament</h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Please confirm the details below before creating.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-white dark:bg-[#0b1017] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+                        <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-widest mb-6 border-b border-slate-100 dark:border-slate-800 pb-3">Basic Info</h4>
+                        <div className="flex flex-col gap-4">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Name</span>
+                            <span className="text-lg font-black text-slate-800 dark:text-white">{tournData.name || "N/A"}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Game</span>
+                            <span className="text-sm font-bold text-slate-800 dark:text-slate-200 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded text-cyan-500 inline-block">{tournData.game}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white dark:bg-[#0b1017] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                        <h4 className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-6 border-b border-slate-100 dark:border-slate-800 pb-3">Details</h4>
+                        <div className="flex flex-col gap-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Prize</span>
+                              <span className="text-sm font-black text-emerald-500">{tournData.prizePool || "None"}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Region</span>
+                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{tournData.region}</span>
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Start Date</span>
+                            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{tournData.startDate || "TBD"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <label className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-2xl p-6 shadow-lg flex items-center justify-between cursor-pointer group transition-all hover:bg-cyan-500/20">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-white group-hover:text-cyan-400 transition-colors">Make Tournament Public</span>
+                        <span className="text-xs text-slate-400 font-medium mt-1">This will list the tournament on the public viewer page.</span>
+                      </div>
+                      <div className="relative">
+                        <input 
+                          type="checkbox" 
+                          checked={tournData.isPublic}
+                          onChange={(e) => setTournData({...tournData, isPublic: e.target.checked})}
+                          className="sr-only"
+                        />
+                        <div className={`block w-14 h-8 rounded-full transition-colors ${tournData.isPublic ? 'bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'bg-slate-700'}`}></div>
+                        <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${tournData.isPublic ? 'transform translate-x-6' : ''}`}></div>
+                      </div>
+                    </label>
+
+                    {/* Show Schedule in Confirmation Step */}
+                    <div className="mt-4 w-full">
+                      <ManageScheduleTab globalGame={tournData.game} globalTournament={{ name: tournData.name }} embedded={true} readOnly={true} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer with Buttons */}
+            <div className="bg-slate-50 dark:bg-[#070b10] border-t border-slate-200 dark:border-slate-800/80 p-6 flex items-center justify-between shrink-0">
+              {step > 1 ? (
+                <button 
+                  onClick={() => setStep(step - 1)}
+                  className="px-6 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Previous
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-6 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              )}
+
+              {step < 4 ? (
+                <button 
+                  onClick={async () => {
+                    if (step === 1 && !isCreated) {
+                      if (!tournData.name.trim()) {
+                        alert("Tournament Name is required");
+                        return;
+                      }
+                      const token = localStorage.getItem("token");
+                      try {
+                        await fetch("http://localhost:5000/api/tournaments", {
+                           method: "POST",
+                           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                           body: JSON.stringify({ name: tournData.name, game: tournData.game }),
+                        });
+                        setIsCreated(true);
+                        setStep(2);
+                      } catch (e) {
+                        console.error(e);
+                        alert("Failed to create tournament");
+                      }
+                    } else {
+                      setStep(step + 1);
+                    }
+                  }}
+                  className="px-8 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold transition-colors shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                >
+                  Next
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setStep(1);
+                    alert("Tournament creation finalized! Refresh the page to see it in the sidebar.");
+                  }}
+                  className="px-8 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold transition-colors shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                >
+                  Submit
+                </button>
+              )}
+            </div>
+            
+          </div>
+        </div>
+      )}
     </div>
   );
 };

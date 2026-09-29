@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { apiFetch } from "../../utils/api";
+import MapBpResults from "./MapBpResults";
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/w0000/svg"
@@ -74,7 +75,18 @@ const ToggleSwitch = ({ enabled, onChange }) => (
     />
   </button>
 );
+const getStickyValue = (key, defaultVal) => {
+  try {
+    const val = window.sessionStorage.getItem(key);
+    if (val !== null) return JSON.parse(val);
+  } catch (e) {}
+  return defaultVal;
+};
+
 const Mapping = ({ globalGame, globalTournament }) => {
+  const matchWeek = getStickyValue("de_week", "1");
+  const matchDay = getStickyValue("de_day", "1");
+  const matchNumber = getStickyValue("de_match", "1");
   const [activeTab, setActiveTab] = useState("CURRENT MATCH");
   const game = globalGame === "CROSSFIRE" ? "Crossfire" : "Valorant";
   const [teamA, setTeamA] = useState("Team A");
@@ -110,7 +122,6 @@ const Mapping = ({ globalGame, globalTournament }) => {
     "CURRENT MATCH",
     "MAP POOL SETTINGS",
     "BAN HISTORY",
-    "TEAM SETTINGS",
     "ADMIN TOOLS",
   ];
   const initialValMaps = [
@@ -439,9 +450,9 @@ const Mapping = ({ globalGame, globalTournament }) => {
         game,
         tournament_name: globalTournament?.name || globalTournament || "Default",
         stage: "",
-        week: "",
-        day: "",
-        match: "",
+        week: matchWeek,
+        day: matchDay,
+        match: matchNumber,
         series: "",
         team_a: teamA,
         team_b: teamB,
@@ -507,6 +518,23 @@ const Mapping = ({ globalGame, globalTournament }) => {
         {" "}
         {}{" "}
         <div className="flex flex-col xl:flex-row justify-center items-center border-b border-slate-800/60" style={{ gap: "32px", marginBottom: "24px", paddingBottom: "24px" }}>
+          <div className="flex flex-col bg-slate-900/50 rounded-3xl border border-slate-800/50 shadow-lg" style={{ padding: "24px 32px", gap: "24px", alignSelf: "stretch", justifyContent: "center" }}>
+            <h3 className="text-[10px] font-black tracking-[0.2em] uppercase text-cyan-400">Match Details</h3>
+            <div className="flex gap-6">
+               <div className="flex flex-col">
+                  <span className="text-[9px] text-theme-text-muted font-bold tracking-widest uppercase mb-2">Week</span>
+                  <div className="bg-slate-900 border border-slate-800/60 rounded-lg px-6 py-2 text-sm font-bold text-gray-300 shadow-inner">{matchWeek}</div>
+               </div>
+               <div className="flex flex-col">
+                  <span className="text-[9px] text-theme-text-muted font-bold tracking-widest uppercase mb-2">Day</span>
+                  <div className="bg-slate-900 border border-slate-800/60 rounded-lg px-6 py-2 text-sm font-bold text-gray-300 shadow-inner">{matchDay}</div>
+               </div>
+               <div className="flex flex-col">
+                  <span className="text-[9px] text-theme-text-muted font-bold tracking-widest uppercase mb-2">Match</span>
+                  <div className="bg-slate-900 border border-slate-800/60 rounded-lg px-6 py-2 text-sm font-bold text-gray-300 shadow-inner">{matchNumber}</div>
+               </div>
+            </div>
+          </div>
           {" "}
           {}{" "}
           <div className="flex flex-col items-center" style={{ gap: "16px" }}>
@@ -1075,305 +1103,9 @@ const Mapping = ({ globalGame, globalTournament }) => {
     );
   };
   const renderBanHistory = () => {
-    const history = [
-      {
-        id: "1",
-        date: "Oct 24, 2026",
-        game: "Valorant",
-        teamA: "TNC",
-        teamB: "LOUD",
-        decider: "ASCENT",
-        result: "Completed",
-      },
-      {
-        id: "2",
-        date: "Oct 22, 2026",
-        game: "Crossfire",
-        teamA: "AG",
-        teamB: "Q9",
-        decider: "BLACK WIDOW",
-        result: "Completed",
-      },
-      {
-        id: "3",
-        date: "Oct 20, 2026",
-        game: "Valorant",
-        teamA: "Fnatic",
-        teamB: "Paper Rex",
-        decider: "LOTUS",
-        result: "Completed",
-      },
-      {
-        id: "4",
-        date: "Oct 15, 2026",
-        game: "Valorant",
-        teamA: "Sentinels",
-        teamB: "100T",
-        decider: "SPLIT",
-        result: "Admin Aborted",
-      },
-    ];
-    return (
-      <div className="animate-[fadeInScale_0.3s_ease-out] flex flex-col h-full" style={{ padding: "32px" }}>
-        {" "}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-800/60 shrink-0" style={{ gap: "24px", marginBottom: "32px", paddingBottom: "24px" }}>
-          {" "}
-          <div>
-            {" "}
-            <h2 className="text-2xl font-black text-theme-text-base uppercase tracking-wider mb-1">
-              Veto History Log
-            </h2>{" "}
-            <p className="text-sm text-theme-text-muted">
-              Review past map vetoes, bans, and picks.
-            </p>{" "}
-          </div>{" "}
-          <div className="flex items-center gap-4">
-            {" "}
-            {/* SEARCH BAR */}{" "}
-            <div className="relative flex items-center">
-              {" "}
-              {/* Absolute position keeps the icon on the left */}{" "}
-              <svg 
-                className="absolute left-3 w-4 h-4 text-theme-text-muted pointer-events-none" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {" "}
-              {/* !pl-10 forcefully overrides the global index.css padding of 12px */}{" "}
-              <input 
-                type="text" 
-                placeholder="Search team or map..." 
-                className="w-64 text-sm text-gray-200 bg-bg-200 border border-gray-700 focus:outline-none focus:border-blue-500"
-                style={{ padding: "12px 16px 12px 40px", borderRadius: "12px" }}
-              />
-            </div>
-            {" "}
-            {/* EXPORT BUTTON */}{" "}
-            <button className="flex items-center text-sm font-normal text-gray-200 bg-transparent border border-gray-600 hover:bg-gray-800 transition-colors" style={{ padding: "12px 24px", gap: "8px", borderRadius: "12px" }}>
-              {" "}
-              <svg 
-                className="w-4 h-4" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              {" "}
-              Export CSV
-            </button>{" "}
-          </div>{" "}
-        </div>{" "}
-        <div className="overflow-auto flex-1 custom-scrollbar">
-          {" "}
-          <table className="w-full text-left border-collapse whitespace-nowrap">
-            {" "}
-            <thead>
-              {" "}
-              <tr className="border-b border-gray-800 text-xs text-theme-text-faint uppercase tracking-wider">
-                {" "}
-                <th className="font-semibold" style={{ padding: "20px 16px" }}>Date</th>{" "}
-                <th className="font-semibold" style={{ padding: "20px 16px" }}>Game</th>{" "}
-                <th className="font-semibold" style={{ padding: "20px 16px" }}>Matchup</th>{" "}
-                <th className="font-semibold" style={{ padding: "20px 16px" }}>Decider Map</th>{" "}
-                <th className="font-semibold text-center" style={{ padding: "20px 16px" }}>Status</th>{" "}
-                <th className="font-semibold text-right" style={{ padding: "20px 16px" }}>Actions</th>{" "}
-              </tr>{" "}
-            </thead>{" "}
-            <tbody className="text-sm text-theme-text-base divide-y divide-gray-800/50">
-              {" "}
-              {history.map((row) => (
-                <tr
-                  key={row.id}
-                  className="hover:bg-gray-800/40 transition-colors"
-                >
-                  {" "}
-                  <td style={{ padding: "24px 16px" }}>{row.date}</td>{" "}
-                  <td style={{ padding: "24px 16px" }}>
-                    <span
-                      className={`px-2 py-1 rounded border text-[10px] font-bold uppercase tracking-wider ${row.game === "Valorant" ? "border-red-500/40 bg-red-500/10 text-red-400" : "border-blue-500/40 bg-blue-500/10 text-blue-400"}`}
-                    >
-                      {row.game}
-                    </span>
-                  </td>{" "}
-                  <td style={{ padding: "24px 16px" }}>
-                    <span className="font-bold text-gray-100">{row.teamA}</span>{" "}
-                    <span className="text-theme-text-faint text-xs mx-1">vs</span>{" "}
-                    <span className="font-bold text-gray-100">{row.teamB}</span>
-                  </td>{" "}
-                  <td className="font-bold text-teal-400 tracking-wide" style={{ padding: "24px 16px" }}>
-                    {row.decider}
-                  </td>{" "}
-                  <td className="font-medium text-center" style={{ padding: "24px 16px" }}>
-                    {" "}
-                    <span
-                      className={`${row.result === "Completed" ? "text-green-400" : "text-red-400"}`}
-                    >
-                      {row.result}
-                    </span>{" "}
-                  </td>{" "}
-                  <td className="text-right" style={{ padding: "24px 16px" }}>
-                    {" "}
-                    <button className="text-theme-text-faint hover:text-theme-text-base transition-colors font-black text-lg pb-2">
-                      ...
-                    </button>{" "}
-                  </td>{" "}
-                </tr>
-              ))}{" "}
-            </tbody>{" "}
-          </table>{" "}
-        </div>{" "}
-      </div>
-    );
+    return <MapBpResults globalGame={globalGame} globalTournament={globalTournament} />;
   };
-  const renderTeamSettings = () => {
-    return (
-      <div className="animate-[fadeInScale_0.3s_ease-out]">
-        {" "}
-        <div className="border-b border-slate-800/60" style={{ marginBottom: "32px", paddingBottom: "24px" }}>
-          {" "}
-          <h2 className="text-2xl font-black tracking-widest uppercase">
-            Team Settings
-          </h2>{" "}
-          <p className="text-theme-text-muted text-sm mt-1">
-            Configure team identities, logos, and accent colors for the veto
-            interface.
-          </p>{" "}
-        </div>{" "}
-        <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "32px" }}>
-          {" "}
-          {}{" "}
-          <div className="bg-slate-900/50 rounded-2xl border border-blue-900/50 shadow-[0_0_30px_rgba(29,78,216,0.1)] relative overflow-hidden group" style={{ padding: "32px" }}>
-            {" "}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent pointer-events-none"></div>{" "}
-            <h3 className="text-lg font-black tracking-widest text-blue-400 uppercase mb-6">
-              Team A Settings
-            </h3>{" "}
-            <div className="flex flex-col relative z-10" style={{ gap: "24px" }}>
-              {" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Display Name
-                </label>{" "}
-                <select
-                  value={teamA}
-                  onChange={(e) => setTeamA(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-theme-text-base focus:outline-none focus:border-blue-500 transition-colors"
-                >
-                  {" "}
-                  {dbTeams.map((t) => (
-                    <option
-                      key={`set-a-${t.team_name}`}
-                      value={t.team_name}
-                      className="bg-slate-900 text-theme-text-base"
-                    >
-                      {t.team_name}
-                    </option>
-                  ))}{" "}
-                </select>{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Accent Color
-                </label>{" "}
-                <div className="flex space-x-3">
-                  {" "}
-                  <button className="w-10 h-10 rounded-full bg-blue-600 ring-2 ring-white shadow-lg"></button>{" "}
-                  <button className="w-10 h-10 rounded-full bg-indigo-500 opacity-50 hover:opacity-100 transition-opacity"></button>{" "}
-                  <button className="w-10 h-10 rounded-full bg-cyan-500 opacity-50 hover:opacity-100 transition-opacity"></button>{" "}
-                </div>{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Team Logo
-                </label>{" "}
-                <div className="border-2 border-dashed border-slate-700 bg-slate-800/50 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-blue-500 hover:bg-slate-800 transition-colors cursor-pointer">
-                  {" "}
-                  <UploadIcon />{" "}
-                  <span className="text-sm text-blue-400 font-bold">
-                    Click to upload logo
-                  </span>{" "}
-                  <span className="text-[10px] text-theme-text-muted mt-1">
-                    PNG, JPG up to 2MB (Square aspect ratio recommended)
-                  </span>{" "}
-                </div>{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>{" "}
-          {}{" "}
-          <div className="bg-slate-900/50 rounded-2xl border border-red-900/50 shadow-[0_0_30px_rgba(185,28,28,0.1)] relative overflow-hidden group" style={{ padding: "32px" }}>
-            {" "}
-            <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent pointer-events-none"></div>{" "}
-            <h3 className="text-lg font-black tracking-widest text-red-400 uppercase mb-6">
-              Team B Settings
-            </h3>{" "}
-            <div className="flex flex-col relative z-10" style={{ gap: "24px" }}>
-              {" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Display Name
-                </label>{" "}
-                <select
-                  value={teamB}
-                  onChange={(e) => setTeamB(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-theme-text-base focus:outline-none focus:border-red-500 transition-colors"
-                >
-                  {" "}
-                  {dbTeams.map((t) => (
-                    <option
-                      key={`set-b-${t.team_name}`}
-                      value={t.team_name}
-                      className="bg-slate-900 text-theme-text-base"
-                    >
-                      {t.team_name}
-                    </option>
-                  ))}{" "}
-                </select>{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Accent Color
-                </label>{" "}
-                <div className="flex space-x-3">
-                  {" "}
-                  <button className="w-10 h-10 rounded-full bg-red-600 ring-2 ring-white shadow-lg"></button>{" "}
-                  <button className="w-10 h-10 rounded-full bg-orange-500 opacity-50 hover:opacity-100 transition-opacity"></button>{" "}
-                  <button className="w-10 h-10 rounded-full bg-pink-500 opacity-50 hover:opacity-100 transition-opacity"></button>{" "}
-                </div>{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="text-xs font-bold text-theme-text-muted uppercase tracking-widest mb-2 block">
-                  Team Logo
-                </label>{" "}
-                <div className="border-2 border-dashed border-slate-700 bg-slate-800/50 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-red-500 hover:bg-slate-800 transition-colors cursor-pointer">
-                  {" "}
-                  <UploadIcon />{" "}
-                  <span className="text-sm text-red-400 font-bold">
-                    Click to upload logo
-                  </span>{" "}
-                  <span className="text-[10px] text-theme-text-muted mt-1">
-                    PNG, JPG up to 2MB (Square aspect ratio recommended)
-                  </span>{" "}
-                </div>{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>{" "}
-        </div>{" "}
-        <div className="flex justify-center" style={{ marginTop: "48px" }}>
-          {" "}
-          <button className="bg-cyan-400/20 text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400 hover:text-black font-black uppercase tracking-widest transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "14px 48px", borderRadius: "12px" }}>
-            SAVE
-          </button>{" "}
-        </div>{" "}
-      </div>
-    );
-  };
-  const renderAdminTools = () => {
+    const renderAdminTools = () => {
     return (
       <div className="animate-[fadeInScale_0.3s_ease-out]">
         {" "}
@@ -1428,35 +1160,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </div>{" "}
             </div>{" "}
           </div>{" "}
-          <div className="bg-slate-900 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-600 transition-colors" style={{ padding: "24px", gap: "24px" }}>
-            {" "}
-            <div>
-              {" "}
-              <h3 className="text-sm font-bold text-theme-text-base uppercase tracking-wider mb-2">
-                Manual Map Status Override
-              </h3>{" "}
-              <p className="text-xs text-theme-text-muted mb-6">
-                Force a specific map to be banned, picked, or selected as the
-                decider.
-              </p>{" "}
-              <select className="w-full bg-slate-800 border border-slate-700 text-theme-text-base text-xs mb-2 focus:outline-none" style={{ padding: "10px 16px", borderRadius: "8px" }}>
-                {" "}
-                <option>Select Map...</option>{" "}
-                {currentMaps.map((m) => (
-                  <option key={m.id}>{m.name}</option>
-                ))}{" "}
-              </select>{" "}
-            </div>{" "}
-            <div className="flex" style={{ gap: "12px", marginTop: "12px" }}>
-              {" "}
-              <button className="flex-1 bg-red-900/30 text-red-400 border border-red-900/50 text-xs font-bold hover:bg-red-900/50 transition-colors" style={{ padding: "10px", borderRadius: "8px" }}>
-                Force Ban
-              </button>{" "}
-              <button className="flex-1 bg-blue-900/30 text-blue-400 border border-blue-900/50 text-xs font-bold hover:bg-blue-900/50 transition-colors" style={{ padding: "10px", borderRadius: "8px" }}>
-                Force Pick
-              </button>{" "}
-            </div>{" "}
-          </div>{" "}
+
           <div className="bg-slate-900 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-600 transition-colors" style={{ padding: "24px", gap: "24px" }}>
             {" "}
             <div>
@@ -1491,32 +1195,15 @@ const Mapping = ({ globalGame, globalTournament }) => {
               </button>{" "}
             </div>{" "}
           </div>{" "}
-          <div className="col-span-full bg-red-950/20 rounded-xl border border-red-900/30 flex flex-col items-center justify-center text-center" style={{ marginTop: "32px", padding: "32px", gap: "16px" }}>
-            {" "}
-            <ExclamationIcon />{" "}
-            <h3 className="text-lg font-black text-red-500 uppercase tracking-widest mb-2">
-              Danger Zone
-            </h3>{" "}
-            <p className="text-sm text-red-400/80 mb-6 max-w-lg">
-              Performing a hard reset will wipe all current veto progress, map
-              states, and timer data. This cannot be undone.
-            </p>{" "}
-            <button
-              onClick={resetVeto}
-              className="bg-red-600 text-theme-text-base font-black uppercase tracking-widest shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:bg-red-500 hover:scale-105 transition-all"
-              style={{ padding: "14px 48px", borderRadius: "12px" }}
-            >
-              Hard Reset Match Data
-            </button>{" "}
-          </div>{" "}
+
         </div>{" "}
       </div>
     );
   };
   return (
-    <div className="flex-1 bg-bg-100 overflow-y-auto w-full h-full text-theme-text-base font-sans custom-scrollbar flex flex-col items-center">
+    <div className={`flex-1 overflow-y-auto w-full h-full text-theme-text-base font-sans custom-scrollbar flex flex-col items-center ${activeTab === 'BAN HISTORY' ? 'bg-bg-base' : 'bg-bg-100'}`}>
       {" "}
-      <div className="w-full max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8">
+      <div className={`w-full flex-1 flex flex-col ${activeTab === 'BAN HISTORY' ? 'max-w-full px-0 py-0' : 'max-w-[1400px] px-8 lg:px-12 py-6 lg:py-8'}`}>
         {" "}
         <style
           dangerouslySetInnerHTML={{
@@ -1524,7 +1211,7 @@ const Mapping = ({ globalGame, globalTournament }) => {
           }}
         />{" "}
         {}{" "}
-        <div className="mapping-tab-nav flex flex-wrap justify-between items-center w-full bg-slate-900/60 rounded-2xl border border-slate-700/50 shadow-2xl" style={{ padding: "8px", gap: "8px", marginBottom: "32px" }}>
+        <div className={`mapping-tab-nav flex flex-wrap justify-between items-center bg-slate-900/60 rounded-2xl border border-slate-700/50 shadow-2xl ${activeTab === 'BAN HISTORY' ? 'mt-8 mx-8 lg:mx-12 shrink-0' : 'w-full'}`} style={{ padding: "8px", gap: "8px", marginBottom: "32px" }}>
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -1544,13 +1231,17 @@ const Mapping = ({ globalGame, globalTournament }) => {
           ))}
         </div>
         {}
-        <div className="mapping-card-container bg-bg-200 rounded-2xl border border-slate-800/60 shadow-2xl mb-12 min-h-[600px]">
-          {activeTab === "CURRENT MATCH" && renderCurrentMatch()}
-          {activeTab === "MAP POOL SETTINGS" && renderMapPoolSettings()}
-          {activeTab === "BAN HISTORY" && renderBanHistory()}
-          {activeTab === "TEAM SETTINGS" && renderTeamSettings()}
-          {activeTab === "ADMIN TOOLS" && renderAdminTools()}
-        </div>
+        {activeTab === "BAN HISTORY" ? (
+          <div className="flex-1 min-h-0 relative w-full overflow-hidden flex flex-col">
+            {renderBanHistory()}
+          </div>
+        ) : (
+          <div className="mapping-card-container bg-bg-200 rounded-2xl border border-slate-800/60 shadow-2xl mb-12 min-h-[600px]">
+            {activeTab === "CURRENT MATCH" && renderCurrentMatch()}
+            {activeTab === "MAP POOL SETTINGS" && renderMapPoolSettings()}
+            {activeTab === "ADMIN TOOLS" && renderAdminTools()}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -336,6 +336,15 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   const [selectedAction, setSelectedAction] = useState("Plant");
   const [manualX, setManualX] = useState("");
   const [manualY, setManualY] = useState("");
+  const [heatmapNotif, setHeatmapNotif] = useState(null);
+
+  const showHeatmapNotifMsg = (action, round) => {
+    setHeatmapNotif(`Recorded ${action} for Round ${round}`);
+    setTimeout(() => {
+      setHeatmapNotif(null);
+    }, 2000);
+  };
+
   const handleManualAdd = () => {
     if (manualX !== "" && manualY !== "") {
       setHeatmapData((prev) => [
@@ -350,10 +359,17 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       ]);
       setManualX("");
       setManualY("");
+      
+      showHeatmapNotifMsg(selectedAction, selectedRound);
+
+      const maxRounds = scoreA + scoreB || 1;
+      if (selectedRound < maxRounds) {
+        setSelectedRound((prev) => prev + 1);
+      }
     }
   };
   const handleMapClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setHeatmapData((prev) => [
@@ -366,6 +382,13 @@ const DataEntry = ({ globalGame, globalTournament }) => {
         y: y.toFixed(2),
       },
     ]);
+    
+    showHeatmapNotifMsg(selectedAction, selectedRound);
+
+    const maxRounds = scoreA + scoreB || 1;
+    if (selectedRound < maxRounds) {
+      setSelectedRound((prev) => prev + 1);
+    }
   };
   const removeHeatmapEvent = (id) => {
     setHeatmapData((prev) => prev.filter((h) => h.id !== id));
@@ -900,11 +923,70 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       setTimeoutARound(null);
       setTimeoutBRound(null);
       setTimeoutRowLogs(Array(25).fill(""));
-      setDeadRoundRowLogs(Array(25).fill(""));
     }
   };
+
+  const handleGridNavigation = (e) => {
+    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    const currentInput = e.target;
+    if (currentInput.tagName !== 'INPUT') return;
+
+    const td = currentInput.closest('td');
+    const tr = currentInput.closest('tr');
+    if (!td || !tr) return;
+
+    const tbody = tr.closest('tbody');
+    if (!tbody) return;
+
+    const allTrs = Array.from(tbody.querySelectorAll('tr'));
+    const allTdsInRow = Array.from(tr.querySelectorAll('td'));
+    const colIndex = allTdsInRow.indexOf(td);
+    const rowIndex = allTrs.indexOf(tr);
+
+    let nextInput = null;
+
+    if (e.key === 'ArrowUp' && rowIndex > 0) {
+      let r = rowIndex - 1;
+      while (r >= 0 && !nextInput) {
+        const targetTd = allTrs[r].querySelectorAll('td')[colIndex];
+        if (targetTd) nextInput = targetTd.querySelector('input');
+        r--;
+      }
+    } else if (e.key === 'ArrowDown' && rowIndex < allTrs.length - 1) {
+      let r = rowIndex + 1;
+      while (r < allTrs.length && !nextInput) {
+        const targetTd = allTrs[r].querySelectorAll('td')[colIndex];
+        if (targetTd) nextInput = targetTd.querySelector('input');
+        r++;
+      }
+    } else if (e.key === 'ArrowLeft' && colIndex > 0) {
+      let c = colIndex - 1;
+      while (c >= 0 && !nextInput) {
+        const prevTd = allTdsInRow[c];
+        if (prevTd) nextInput = prevTd.querySelector('input');
+        c--;
+      }
+    } else if (e.key === 'ArrowRight' && colIndex < allTdsInRow.length - 1) {
+      let c = colIndex + 1;
+      while (c < allTdsInRow.length && !nextInput) {
+        const nextTd = allTdsInRow[c];
+        if (nextTd) nextInput = nextTd.querySelector('input');
+        c++;
+      }
+    }
+
+    if (nextInput) {
+      e.preventDefault();
+      nextInput.focus();
+      nextInput.select();
+    }
+  };
+
   return (
-    <div className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800">
+    <div 
+      className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800"
+      onKeyDown={handleGridNavigation}
+    >
       <style>{`
         /* Hide number input spinners */
         input[type="number"]::-webkit-inner-spin-button,
@@ -963,10 +1045,12 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </span>
             </div>
           </div>
-          {/* ── Row 1: Match Header + Teams ── */}
+          {/* ── Row 1: Match Header & Win Probability (Left) + Teams (Right) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: "24px" }}>
-            {/* Match Header */}
-            <div className="lg:col-span-2 bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
+            {/* Left Side (Col 1 & 2): Match Header & Win Probability */}
+            <div className="lg:col-span-2 flex flex-col" style={{ gap: "24px" }}>
+              {/* Match Header */}
+              <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
               <SectionHeader
                 icon={<IconGame />}
                 label="Main Match Header"
@@ -1046,6 +1130,122 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 </Field>
               </div>
             </div>
+            
+            {/* ── Win Probability Module ── */}
+            {game === "Valorant" && (
+              <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
+                <SectionHeader
+                  icon={<IconGame />}
+                  label="Win Probability"
+                  sub="Live Assessment"
+                  accent="#f59e0b"
+                />
+                <div style={{ padding: "24px" }}>
+                  <div className="w-full">
+                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                           <span className="text-3xl font-black text-blue-100">{Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-blue-500">%</span></span>
+                        </div>
+                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
+                        <div className="flex flex-col items-end">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                           <span className="text-3xl font-black text-red-100">{Math.max(0, Math.min(100, 100 - Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-red-500">%</span></span>
+                        </div>
+                      </div>
+
+                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-hidden mt-2 group shadow-inner">
+                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {game === "Crossfire" && (
+              <div className="bg-[#0d131c] rounded-2xl border border-slate-800/50 overflow-hidden shadow-xl">
+                <SectionHeader
+                  icon={<IconGame />}
+                  label="Win Probability"
+                  sub="Live Assessment"
+                  accent="#f59e0b"
+                />
+                <div style={{ padding: "24px" }}>
+                  <div className="flex flex-wrap items-end gap-8">
+                    <div className="w-full max-w-xl">
+                      <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex flex-col">
+                             <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                             <span className="text-3xl font-black text-blue-100">{scoreA}<span className="text-xl text-blue-500">%</span></span>
+                          </div>
+                          <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
+                          <div className="flex flex-col items-end">
+                             <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                             <span className="text-3xl font-black text-red-100">{scoreB}<span className="text-xl text-red-500">%</span></span>
+                          </div>
+                        </div>
+
+                        <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-visible mt-2 group">
+                           <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-l-full pointer-events-none transition-all duration-150" style={{ width: `${scoreA}%` }} />
+                           <div className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 to-red-400 rounded-r-full pointer-events-none transition-all duration-150" style={{ width: `${scoreB}%` }} />
+                           
+                           <input 
+                              type="range" 
+                              min="0" 
+                              max="100" 
+                              value={scoreA}
+                              onChange={(e) => {
+                                 const val = Number(e.target.value);
+                                 setScoreA(val);
+                                 setScoreB(100 - val);
+                              }}
+                              className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-0 cursor-pointer h-10 z-10"
+                           />
+                           
+                           <div 
+                              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)] pointer-events-none transition-all duration-150 group-hover:scale-125 group-active:scale-95 border-2 border-slate-800"
+                              style={{ left: `calc(${scoreA}% - 12px)` }}
+                           />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 max-w-md">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+                          Live Win Probability
+                        </div>
+                      </div>
+                      <div className="bg-slate-800/50 border border-slate-700/70 rounded-lg p-3">
+                        <div className="flex justify-between text-[10px] font-black tracking-widest mb-2">
+                          <span className="text-blue-400">
+                            {teamA.name || "Team A"} ({winProb.a}%)
+                          </span>
+                          <span className="text-red-400">
+                            ({winProb.b}%) {teamB.name || "Team B"}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
+                          <div
+                            className="h-full bg-blue-500 transition-all duration-500"
+                            style={{ width: `${winProb.a}%` }}
+                          ></div>
+                          <div
+                            className="h-full bg-red-500 transition-all duration-500"
+                            style={{ width: `${winProb.b}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            </div>
+
             {/* Teams */}
             <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
               <SectionHeader
@@ -1150,155 +1350,9 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </div>
                   </div>
                 </div>
-                {/* Winner */}
-                <div className="bg-slate-800/40 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                      Winner:
-                    </div>
-                    <div
-                      className={`text-sm font-black ${winner === "A" ? "text-blue-400 light:text-blue-600" : "text-red-400 light:text-red-600"}`}
-                    >
-                      {winner === "A" ? teamA.name : teamB.name}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setWinner(winner === "A" ? "B" : "A")}
-                    className={`rounded-full transition-all duration-300 ${winner === "A" ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"}`}
-                    style={{ width: '64px', height: '32px', padding: '4px', display: 'flex', alignItems: 'center' }}
-                  >
-                    <div
-                      className={`bg-white rounded-full shadow-md transform transition-transform duration-300`}
-                      style={{ width: '24px', height: '24px', transform: winner === "B" ? "translateX(32px)" : "translateX(0)" }}
-                    />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
-          {/* ── Map Module (Visible when Valorant is selected) ── */}
-          {game === "Valorant" && (
-            <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-              <SectionHeader
-                icon={<IconMap />}
-                label="A. Valorant Map Module"
-                sub="Visible because valorant is selected"
-                accent="#f59e0b"
-              />
-              <div style={{ padding: "24px" }}>
-                {/* Score */}
-                <div className="flex flex-wrap items-end gap-4 mb-6">
-                  <div className="w-full max-w-xl">
-                    <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 text-center">
-                      Win Probability
-                    </div>
-                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex flex-col">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
-                           <span className="text-3xl font-black text-blue-100">{Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-blue-500">%</span></span>
-                        </div>
-                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
-                        <div className="flex flex-col items-end">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
-                           <span className="text-3xl font-black text-red-100">{Math.max(0, Math.min(100, 100 - Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-red-500">%</span></span>
-                        </div>
-                      </div>
-
-                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-hidden mt-2 group shadow-inner">
-                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Old Round Tracker Removed */}
-              </div>
-            </div>
-          )}
-          {/* ── Crossfire Map Module (Visible when Crossfire is selected) ── */}
-          {game === "Crossfire" && (
-            <div className="bg-[#0d131c] rounded-2xl border border-slate-800/50 overflow-hidden shadow-xl">
-              <SectionHeader
-                icon={<IconMap />}
-                label="A. Crossfire Map Module"
-                sub="Visible because crossfire is selected"
-                accent="#f59e0b"
-              />
-              <div style={{ padding: "24px" }}>
-                <div className="flex flex-wrap items-end gap-8">
-                  <div className="w-full max-w-xl">
-                    <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4 text-center">
-                      Win Probability
-                    </div>
-                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex flex-col">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
-                           <span className="text-3xl font-black text-blue-100">{scoreA}<span className="text-xl text-blue-500">%</span></span>
-                        </div>
-                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
-                        <div className="flex flex-col items-end">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
-                           <span className="text-3xl font-black text-red-100">{scoreB}<span className="text-xl text-red-500">%</span></span>
-                        </div>
-                      </div>
-
-                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-visible mt-2 group">
-                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-l-full pointer-events-none transition-all duration-150" style={{ width: `${scoreA}%` }} />
-                         <div className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 to-red-400 rounded-r-full pointer-events-none transition-all duration-150" style={{ width: `${scoreB}%` }} />
-                         
-                         <input 
-                            type="range" 
-                            min="0" 
-                            max="100" 
-                            value={scoreA}
-                            onChange={(e) => {
-                               const val = Number(e.target.value);
-                               setScoreA(val);
-                               setScoreB(100 - val);
-                            }}
-                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-0 cursor-pointer h-10 z-10"
-                         />
-                         
-                         <div 
-                            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)] pointer-events-none transition-all duration-150 group-hover:scale-125 group-active:scale-95 border-2 border-slate-800"
-                            style={{ left: `calc(${scoreA}% - 12px)` }}
-                         />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Live Win Probability Assessment */}
-                  <div className="flex-1 max-w-md">
-                    <div className="flex justify-between items-center mb-1.5">
-                      <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
-                        Live Win Probability
-                      </div>
-                    </div>
-                    <div className="bg-slate-800/50 border border-slate-700/70 rounded-lg p-3">
-                      <div className="flex justify-between text-[10px] font-black tracking-widest mb-2">
-                        <span className="text-blue-400">
-                          {teamA.name || "Team A"} ({winProb.a}%)
-                        </span>
-                        <span className="text-red-400">
-                          ({winProb.b}%) {teamB.name || "Team B"}
-                        </span>
-                      </div>
-                      <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
-                        <div
-                          className="h-full bg-blue-500 transition-all duration-500"
-                          style={{ width: `${winProb.a}%` }}
-                        ></div>
-                        <div
-                          className="h-full bg-red-500 transition-all duration-500"
-                          style={{ width: `${winProb.b}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
           {/* ── Detailed Round Log & Timeouts ── */}
           <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
             <SectionHeader
@@ -1737,32 +1791,23 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
                         Hero/Agent/Class
                       </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        K
+                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        PERFORMANCE SCORE
                       </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        D
-                      </th>
-                      <th className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold w-14" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        A
+                      <th colSpan="3" className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        KDA
                       </th>
                       <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        ACS
+                        TRADES
                       </th>
                       <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        Econ Rating
+                        FIRST BLOODS
                       </th>
                       <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        First Kills
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        Plants
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        Defuse
+                        PLANTS
                       </th>
                       <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        Ace
+                        DEFUSES
                       </th>
                     </tr>
                   )}
@@ -1830,6 +1875,21 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       )}
                       {game === "Valorant" ? (
                         <>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={`\${tableInput} text-emerald-400`}
+                              value={p.acs}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "A",
+                                  idx,
+                                  "acs",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
                           <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
@@ -1878,22 +1938,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                           <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
-                              className={`${tableInput} text-emerald-400`}
-                              value={p.acs}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "acs",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`${tableInput} text-emerald-400`}
+                              className={`\${tableInput} text-emerald-400`}
                               value={p.econ}
                               onChange={(e) =>
                                 updatePlayer(
@@ -1935,7 +1980,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -1945,21 +1990,6 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                   "A",
                                   idx,
                                   "defuse",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.ace}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "ace",
                                   Number(e.target.value) || 0,
                                 )
                               }
@@ -2142,6 +2172,21 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       )}
                       {game === "Valorant" ? (
                         <>
+                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                            <input
+                              type="number"
+                              className={`\${tableInput} text-[#f87171]`}
+                              value={p.acs}
+                              onChange={(e) =>
+                                updatePlayer(
+                                  "B",
+                                  idx,
+                                  "acs",
+                                  Number(e.target.value) || 0,
+                                )
+                              }
+                            />
+                          </td>
                           <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
@@ -2190,22 +2235,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                           <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
-                              className={`${tableInput} text-[#f87171]`}
-                              value={p.acs}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "acs",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`${tableInput} text-[#f87171]`}
+                              className={`\${tableInput} text-[#f87171]`}
                               value={p.econ}
                               onChange={(e) =>
                                 updatePlayer(
@@ -2247,7 +2277,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               }
                             />
                           </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
                             <input
                               type="number"
                               className={tableInput}
@@ -2257,21 +2287,6 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                                   "B",
                                   idx,
                                   "defuse",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.ace}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "ace",
                                   Number(e.target.value) || 0,
                                 )
                               }
@@ -2510,6 +2525,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
                   onClick={handleMapClick}
                 >
+                  {heatmapNotif && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 text-white px-4 py-2 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.4)] pointer-events-none animate-[slideUpFade_0.3s_ease]">
+                      {heatmapNotif}
+                    </div>
+                  )}
                   <img
                     key={mapName}
                     src={`/assets/${mapName.replace(/\s+/g, "_")}.png`}
@@ -2538,24 +2558,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
           <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
             <SectionHeader
               icon={<IconNotes />}
-              label="Notes & Submit"
-              sub="Match Commentary"
+              label="Submit"
+              sub="Match Data Submission"
               accent="#10b981"
             />
             <div style={{ display: 'flex', flexDirection: 'column', gap: "20px", padding: '56px 32px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-                <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                  Notes:
-                </span>
-                <textarea
-                  rows={2}
-                  className="w-full bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-sm rounded-xl outline-none focus:border-cyan-500/60 light:focus:border-blue-500/60 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all resize-none placeholder-slate-600 light:placeholder-slate-400"
-                  style={{ padding: '16px 24px' }}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add match notes, pause events, technical issues..."
-                />
-              </div>
               <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'flex-end' }}>
                 <button
                   onClick={handleSubmit}
@@ -2635,15 +2642,14 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       <th className="px-4 py-3 font-bold">Team</th>
                       <th className="px-4 py-3 font-bold">Player</th>
                       <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
+                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Performance Score</th>
                       <th className="px-3 py-3 font-bold text-center">Kills</th>
                       <th className="px-3 py-3 font-bold text-center">Deaths</th>
                       <th className="px-3 py-3 font-bold text-center">Assists</th>
-                      <th className="px-4 py-3 font-bold text-center text-emerald-400">ACS</th>
-                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Econ</th>
-                      <th className="px-4 py-3 font-bold text-center">First Kills</th>
+                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Trades</th>
+                      <th className="px-4 py-3 font-bold text-center">First Bloods</th>
                       <th className="px-4 py-3 font-bold text-center">Plants</th>
-                      <th className="px-4 py-3 font-bold text-center">Defuse</th>
-                      <th className="px-4 py-3 font-bold text-center">Ace</th>
+                      <th className="px-4 py-3 font-bold text-center">Defuses</th>
                       <th className="px-4 py-3 font-bold text-center">Agent</th>
                       <th className="px-4 py-3 font-bold text-center">Rounds</th>
                     </tr>
@@ -2662,15 +2668,14 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                           <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.team_name}</td>
                           <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.ign}</td>
                           <td className={`px-3 py-2 text-center font-bold ${rec.win ? 'text-emerald-400' : 'text-red-500'}`}>{rec.win ? 'Yes' : 'No'}</td>
+                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
                           <td className="px-3 py-2 text-center font-bold">{rec.kills}</td>
                           <td className="px-3 py-2 text-center font-bold">{rec.deaths}</td>
                           <td className="px-3 py-2 text-center font-bold">{rec.assists}</td>
-                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
                           <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.econ}</td>
                           <td className="px-4 py-2 text-center font-bold">{rec.first_kills || 0}</td>
                           <td className="px-4 py-2 text-center font-bold">{rec.plants || 0}</td>
                           <td className="px-4 py-2 text-center font-bold">{rec.defuse || 0}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.aces || 0}</td>
                           <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
                           <td className="px-4 py-2 text-center font-bold">{rec.rounds}</td>
                         </tr>

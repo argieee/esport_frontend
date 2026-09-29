@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { apiFetch } from '../../utils/api';
 const UsersIcon = () => (
-  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 );
 const TrophyIcon = () => (
-  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
   </svg>
 );
@@ -21,7 +21,7 @@ const ClipboardCheckIcon = () => (
   </svg>
 );
 const LockIcon = () => (
-  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
   </svg>
 );
@@ -35,6 +35,111 @@ const ChevronDownIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
   </svg>
 );
+const Card = ({ title, children, className = "" }) => (
+  <div
+    className={`bg-bg-300 light:bg-white rounded-xl border border-[#1c2532] light:border-slate-200 shadow-xl light:shadow-sm flex flex-col overflow-hidden relative group ${className}`}
+  >
+    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.01] light:from-blue-100/[0.1] to-transparent pointer-events-none z-0"></div>
+    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 light:via-blue-300 to-transparent"></div>
+    <div className="border-b border-[#1c2532] light:border-slate-200 bg-bg-300 light:bg-slate-50 relative z-10 flex justify-between items-center group-hover:bg-bg-300 light:group-hover:bg-slate-100 transition-colors" style={{ padding: "24px 32px" }}>
+      <h3 className="text-sm font-bold tracking-wider text-theme-text-base light:text-slate-700">
+        {title}
+      </h3>
+    </div>
+    <div className="flex-1 relative z-10" style={{ padding: "32px" }}>{children}</div>
+  </div>
+);
+const Toggle = ({ enabled, onChange, label, sublabel }) => (
+  <div className="flex items-center justify-between border-b border-gray-800/50 light:border-slate-200 last:border-0 hover:bg-white/[0.02] light:hover:bg-black/[0.02] rounded transition-colors" style={{ padding: "12px 16px", gap: "24px" }}>
+    <div className="flex flex-col">
+      <span className="text-xs font-bold text-theme-text-base light:text-slate-700">
+        {label}
+      </span>
+      {sublabel && (
+        <span className="text-[10px] text-theme-text-faint light:text-theme-text-muted">
+          {sublabel}
+        </span>
+      )}
+    </div>
+    <button
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${enabled ? "bg-blue-600 shadow-[0_0_8px_color-mix(in_srgb,var(--color--)_%,transparent)]" : "bg-bg-400 light:bg-slate-300"}`}
+      onClick={() => onChange(!enabled)}
+    >
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${enabled ? "translate-x-4" : "translate-x-0"}`}
+      />
+    </button>
+  </div>
+);
+const Select = ({ label, options, value, onChange, ...props }) => (
+  <div className="flex flex-col w-full">
+    {label && (
+      <label className="block text-[10px] font-bold text-theme-text-muted light:text-theme-text-muted tracking-wider uppercase" style={{ marginBottom: "8px" }}>
+        {label}
+      </label>
+    )}
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...props}
+        className="appearance-none w-full bg-theme-input border border-theme-input text-theme-text-base text-xs font-medium rounded-lg focus:outline-none focus:border-blue-500 transition-colors shadow-inner cursor-pointer"
+        style={{ padding: "12px 32px 12px 16px" }}
+      >
+        {options.map((opt, i) => (
+          <option key={i} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+        <svg className="w-4 h-4 text-theme-text-muted light:text-theme-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  </div>
+);
+const Input = ({ label, placeholder, type = "text", ...props }) => (
+  <div className="flex flex-col w-full">
+    {label && (
+      <label className="block text-[10px] font-bold text-theme-text-muted light:text-theme-text-muted tracking-wider uppercase" style={{ marginBottom: "8px" }}>
+        {label}
+      </label>
+    )}
+    <input
+      type={type}
+      placeholder={placeholder}
+      {...props}
+      className="w-full bg-theme-input border border-theme-input text-theme-text-base text-xs font-medium rounded-lg focus:outline-none focus:border-blue-500 transition-colors shadow-inner placeholder:text-theme-text-muted"
+      style={{ padding: "12px 16px" }}
+    />
+  </div>
+);
+const CloseIcon = () => (
+  <svg xmlns="http://www.w3.org/w0000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+const Modal = ({ isOpen, onClose, title, children, maxWidth = "max-w-2xl" }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+      <div className={`relative bg-bg-300 light:bg-white w-full ${maxWidth} rounded-2xl border border-[#1c2532] light:border-slate-200 shadow-2xl flex flex-col overflow-hidden max-h-[90vh]`}>
+        <div className="p-5 border-b border-[#1c2532] light:border-slate-200 flex justify-between items-center bg-bg-300 light:bg-slate-50">
+          <h2 className="text-xl font-black tracking-wider text-theme-text-base light:text-slate-900 uppercase">{title}</h2>
+          <button onClick={onClose} className="text-theme-text-muted hover:text-theme-text-base transition-colors">
+            <CloseIcon />
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto custom-scrollbar">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
 const userDirectoryData = [
   { ign: 'Argie', team: 'Valorant', location: 'Quezon City', country: 'PH', contact: '09xx-xxx-xxxx', verified: true },
   { ign: 'Argie', team: 'Valorant', location: 'Cebu City', country: 'PH', contact: '09xx-xxx-xxxx', verified: false, pending: true },
@@ -42,13 +147,7 @@ const userDirectoryData = [
   { ign: 'Sarah', team: 'Crossfire', location: 'Davao City', country: 'PH', contact: '09xx-xxx-xxxx', verified: false, info: 'Linked PH ID/Facebook Profile' },
   { ign: 'EliteSniper', team: 'TNC South', location: 'Makati', country: 'PH', contact: '09xx-xxx-xxxx', verified: true },
 ];
-const auditLogsData = [
-  { time: '[14:15]', ign: 'System', type: 'Manual Type', details: "Verified 'TNC South' seedings list" },
-  { time: '[14:15]', ign: 'Admin(Argie)', type: 'Action Overrides', details: "Updated Points Multiplier for TNC Community Cup" },
-  { time: '[14:02]', ign: 'Admin(Sarah)', type: 'Approved', details: "Approved 'TNC Luzon' Valorant Points Multiplier" },
-  { time: '[14:02]', ign: 'Admin(Sarah)', type: 'Audit Process', details: "Verified 5 new players" },
-  { time: '[13:45]', ign: 'System', type: 'Automated Event', details: "Season 4 Round Robin Bracket generated" },
-];
+
 const modes = ['Single Elimination', 'Round Robin'];
 const ToggleSwitch = ({ enabled, onChange }) => (
   <button 
@@ -182,7 +281,53 @@ const LiveMatchManager = ({ globalTournament, globalGame, teams }) => {
   );
 };
 const Admin = ({ globalGame, globalTournament }) => {
-  const [adminGame, setAdminGame] = useState('Game (VAL/CF)');
+  const [activeTab, setActiveTab] = React.useState("League Quick Stats");
+// Dynamic Formula State
+  const [formulas, setFormulas] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('Global');
+  
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [calcTarget, setCalcTarget] = useState('excel_formula');
+  const [calcString, setCalcString] = useState('');
+
+  const activeFormula = formulas.find(f => f.role === selectedRole) || {
+    id: null, kill_weight: 1.0, death_weight: 1.0, assist_weight: 0.5, acs_weight: 1.0, econ_weight: 1.0, first_kill_weight: 1.0, plants_weight: 1.0, defuse_weight: 1.0, ace_weight: 1.0, excel_formula: "", acs_formula: "", kda_formula: "", base_multiplier: 78.0, base_rating: 60.0
+  };
+
+  const fetchFormulas = async () => {
+    try {
+      const res = await fetch('/api/settings/formula');
+      const data = await res.json();
+      if (Array.isArray(data)) setFormulas(data);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleFormulaUpdate = async (field, value) => {
+    let finalValue = value;
+    if (field !== 'excel_formula' && field !== 'acs_formula' && field !== 'kda_formula') {
+      finalValue = parseFloat(value) || 0;
+    }
+    const updated = { ...activeFormula, [field]: finalValue };
+    setFormulas(prev => prev.map(f => f.role === selectedRole ? updated : f));
+  };
+
+  const saveFormula = async () => {
+    if (!activeFormula.id) return alert('Cannot save default formula directly. Ensure database is seeded.');
+    try {
+      const res = await fetch(`/api/settings/formula/${activeFormula.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activeFormula)
+      });
+      if (res.ok) alert('Formula successfully saved to the database!');
+      else alert('Failed to save formula.');
+    } catch (e) {
+      console.error(e);
+      alert('Error saving formula.');
+    }
+  };
+
+    const [adminGame, setAdminGame] = useState('Game (VAL/CF)');
   const effectiveGame = adminGame === 'Game (VAL/CF)' ? (globalGame || 'VALORANT') : adminGame;
   const maps = (effectiveGame.toUpperCase() === 'VALORANT')
     ? ['Ascent', 'Fracture', 'Pearl', 'Haven']
@@ -328,6 +473,7 @@ const Admin = ({ globalGame, globalTournament }) => {
         if (resUsers.ok) setAccounts(await resUsers.json());
         const resTournaments = await apiFetch('/api/tournaments');
         if (resTournaments.ok) setTournaments(await resTournaments.json());
+        fetchFormulas();
       } catch (e) {
         console.error(e);
       }
@@ -374,74 +520,92 @@ const Admin = ({ globalGame, globalTournament }) => {
             </div>
           )}
           {}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-6 p-2">
+              {['League Quick Stats', 'Admin Accounts & User Directory', 'Rulebook Viewer', 'Dynamic Formula Tuning Dashboard'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-green-500/20 text-green-500' : 'text-gray-400 hover:text-white'}`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeTab === 'League Quick Stats' && (
+            <>
             {}
-            <div className="xl:col-span-5 bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
-              <div className="border-b border-[#1c2532] bg-bg-300" style={{ padding: "24px 32px" }}>
-                 <h2 className="text-sm font-bold text-theme-text-base tracking-wide" style={{ paddingLeft: "12px" }}>League Quick Stats (PH Local Context)</h2>
+            <div className="bg-[#1c2532]/30 rounded-xl shadow-xl overflow-hidden flex flex-col border border-gray-800/40">
+              <div className="border-b border-gray-800/40 bg-transparent" style={{ padding: "24px 32px" }}>
+                 <h2 className="text-base font-bold text-white tracking-wide">League Quick Stats (PH Local Context)</h2>
               </div>
                <div className="grid grid-cols-2 flex-1" style={{ padding: "32px", gap: "24px" }}>
                  {}
-                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Total Registered Players</span>
-                    <div className="flex items-center gap-6 mb-3">
+                 <div className="flex flex-col items-center justify-center bg-transparent border border-gray-800/60 rounded-2xl p-6 shadow-inner">
+                    <span className="text-sm font-bold text-gray-300 mb-2 text-center">Total Registered Players</span>
+                    <div className="flex items-center gap-4 mb-2">
                        <UsersIcon />
                        <div className="flex flex-col">
-                         <span className="text-3xl font-black text-cyan-400 leading-none">12,500</span>
-                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Players</span>
+                         <span className="text-4xl font-black text-green-500 leading-none">12,500</span>
+                         <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">Players</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-theme-text-faint mt-6 text-center">Verified (PH: 98%)</span>
+                    <span className="text-[10px] text-gray-500 mt-2 text-center">Verified (PH: 98%)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Total Teams</span>
-                    <div className="flex items-center gap-6 mb-3">
+                 <div className="flex flex-col items-center justify-center bg-transparent border border-gray-800/60 rounded-2xl p-6 shadow-inner">
+                    <span className="text-sm font-bold text-gray-300 mb-2 text-center">Total Teams</span>
+                    <div className="flex items-center gap-4 mb-2">
                        <TrophyIcon />
                        <div className="flex flex-col">
-                         <span className="text-3xl font-black text-cyan-400 leading-none">620</span>
-                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Teams</span>
+                         <span className="text-4xl font-black text-green-500 leading-none">620</span>
+                         <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">Teams</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Active Teams (Local Leagues)</span>
+                    <span className="text-[10px] text-gray-500 mt-2 text-center text-balance">Active Teams (Local Leagues)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Active Tournaments</span>
-                    <div className="flex items-center gap-6 mb-3">
+                 <div className="flex flex-col items-center justify-center bg-transparent border border-gray-800/60 rounded-2xl p-6 shadow-inner">
+                    <span className="text-sm font-bold text-gray-300 mb-2 text-center">Active Tournaments</span>
+                    <div className="flex items-center gap-4 mb-2">
                        <CalendarIcon />
                        <div className="flex flex-col">
-                         <span className="text-3xl font-black text-orange-400 leading-none">15</span>
-                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Tournaments</span>
+                         <span className="text-4xl font-black text-orange-400 leading-none">15</span>
+                         <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">Tournaments</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
+                    <span className="text-[10px] text-gray-500 mt-2 text-center text-balance">Ongoing (Metro Manila, Cebu, etc.)</span>
                  </div>
-                 <div className="flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">Pending Verifications</span>
-                    <div className="flex items-center gap-6 mb-3">
+                 <div className="flex flex-col items-center justify-center bg-transparent border border-gray-800/60 rounded-2xl p-6 shadow-inner">
+                    <span className="text-sm font-bold text-gray-300 mb-2 text-center">Pending Verifications</span>
+                    <div className="flex items-center gap-4 mb-2">
                        <ClipboardCheckIcon />
                        <div className="flex flex-col">
-                         <span className="text-3xl font-black text-orange-400 leading-none">45</span>
-                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Verifications</span>
+                         <span className="text-4xl font-black text-orange-400 leading-none">45</span>
+                         <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">Verifications</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-theme-text-faint mt-6 text-center">New Player IDs to review</span>
+                    <span className="text-[10px] text-gray-500 mt-2 text-center">New Player IDs to review</span>
                  </div>
                  {}
-                 <div className="col-span-2 flex flex-col items-center justify-center bg-bg-300 border border-[#1c2532] rounded-xl p-6">
-                    <span className="text-sm font-medium text-theme-text-muted mb-6 text-center">New Admin Logins</span>
-                    <div className="flex items-center gap-6 mb-3">
+                 <div className="col-span-2 flex flex-col items-center justify-center bg-transparent border border-gray-800/60 rounded-2xl p-6 shadow-inner">
+                    <span className="text-sm font-bold text-gray-300 mb-2 text-center">New Admin Logins</span>
+                    <div className="flex items-center gap-4 mb-2">
                        <LockIcon />
                        <div className="flex flex-col">
-                         <span className="text-3xl font-black text-cyan-400 leading-none">12</span>
-                         <span className="text-[10px] text-theme-text-faint font-bold uppercase mt-1">Admins</span>
+                         <span className="text-4xl font-black text-green-500 leading-none">12</span>
+                         <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">Admins</span>
                        </div>
                     </div>
-                    <span className="text-[10px] text-theme-text-faint mt-6 text-center text-balance">Admins (Central & Local PH)</span>
+                    <span className="text-[10px] text-gray-500 mt-2 text-center text-balance">Admins (Central & Local PH)</span>
                  </div>
                </div>
             </div>
-            {}
-            <div className="xl:col-span-7 bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
+            </>
+          )}
+          {activeTab === 'Admin Accounts & User Directory' && (
+            <><div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl overflow-hidden flex flex-col">
               <div className="border-b border-[#1c2532] bg-bg-300 flex flex-wrap justify-between items-center" style={{ padding: "24px 32px", gap: "24px" }}>
                  <div className="flex flex-col flex-shrink-0 whitespace-nowrap" style={{ gap: "4px" }}>
                    <h2 className="text-sm font-bold text-theme-text-base tracking-wide">Admin Accounts & User Directory</h2>
@@ -522,10 +686,11 @@ const Admin = ({ globalGame, globalTournament }) => {
                  </div>
               </div>
             </div>
-          </div>
-          {}
-          <div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="border-b border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
+          </>
+          )}
+          {activeTab === 'Rulebook Viewer' && (
+            <><div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
+<div className="border-b border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
                  <h2 className="text-sm font-bold text-theme-text-base tracking-wide">Rulebook Viewer</h2>
                  <label className="bg-transparent border border-[#2a3648] text-cyan-400 text-[10px] font-bold hover:bg-bg-400 transition-colors cursor-pointer" style={{ padding: "12px 24px", borderRadius: "9999px" }}>
                     Upload New Rulebook
@@ -555,29 +720,71 @@ const Admin = ({ globalGame, globalTournament }) => {
                  )}
              </div>
           </div>
-          {}
-          <div className="bg-bg-300 rounded-xl border border-[#1c2532] shadow-xl flex flex-col">
-             <div className="border-b border-[#1c2532] bg-bg-300 flex justify-between items-center" style={{ padding: "24px 32px" }}>
-                 <h2 className="text-sm font-black text-theme-text-base tracking-widest uppercase">Recently Record <span className="text-red-500">(Super Admin Logs)</span></h2>
-                 <button className="bg-bg-400 border border-[#2a3648] text-cyan-400 text-xs font-bold hover:bg-bg-500 transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>Create Detailed Report</button>
-             </div>
-             <div className="flex flex-col" style={{ padding: "32px", gap: "16px" }}>
-                {auditLogsData.map((log, idx) => (
-                  <div key={idx} className="bg-bg-300 rounded-xl border border-[#1c2532] flex flex-col md:flex-row md:items-center justify-between transition-colors hover:border-cyan-500/30 hover:bg-bg-400" style={{ padding: "20px 24px", gap: "24px" }}>
-                     <div className="flex flex-col" style={{ gap: "8px", minWidth: "200px" }}>
-                        <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{log.type}</span>
-                        <span className="text-sm font-bold text-gray-200">{log.ign}</span>
+</>
+          )}
+          {activeTab === 'Dynamic Formula Tuning Dashboard' && (
+            <><Card title="Dynamic Formula Tuning Dashboard">
+              <div className="flex flex-col" style={{ gap: "24px" }}>
+                 <div className="flex items-center justify-between border-b border-[#1c2532]" style={{ paddingBottom: "24px" }}>
+                   <div className="flex items-center">
+                     <div className="flex flex-col" style={{ gap: "4px" }}>
+                       <h4 className="text-theme-text-base font-bold tracking-wide">Evaluation Formula</h4>
+                       <p className="text-theme-text-faint text-xs">Adjust weights for calculating the final rating.</p>
                      </div>
-                     <div className="flex-1 md:px-4">
-                        <span className="text-xs text-theme-text-muted leading-relaxed">{log.details}</span>
-                     </div>
-                     <div className="flex items-center justify-end" style={{ minWidth: "150px" }}>
-                        <span className="text-[10px] text-theme-text-faint font-mono bg-bg-200 rounded border border-[#1c2532]" style={{ padding: "8px 12px" }}>{log.time}</span>
-                     </div>
-                  </div>
-                ))}
-             </div>
-          </div>
+                   </div>
+                   <div className="flex flex-col w-48">
+                     <Select 
+                       label="Formula Role Target" 
+                       options={['Global', 'Rifler', 'Sniper']} 
+                       value={selectedRole} 
+                       onChange={(e) => setSelectedRole(e.target.value)} 
+                     />
+                   </div>
+                 </div>
+
+                 <div className="grid grid-cols-3" style={{ gap: "24px" }}>
+                    <Input label="Kill Weight" type="number" step="0.01" value={activeFormula.kill_weight} onChange={(e) => handleFormulaUpdate('kill_weight', e.target.value)} />
+                    <Input label="Death Weight" type="number" step="0.01" value={activeFormula.death_weight} onChange={(e) => handleFormulaUpdate('death_weight', e.target.value)} />
+                    <Input label="Assist Weight" type="number" step="0.01" value={activeFormula.assist_weight} onChange={(e) => handleFormulaUpdate('assist_weight', e.target.value)} />
+                 </div>
+                 
+                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
+                    <Input label="ACS Weight" type="number" step="0.01" value={activeFormula.acs_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('acs_weight', e.target.value)} />
+                    <Input label="ECON Weight" type="number" step="0.01" value={activeFormula.econ_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('econ_weight', e.target.value)} />
+                    <Input label="First Kill Weight" type="number" step="0.01" value={activeFormula.first_kill_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('first_kill_weight', e.target.value)} />
+                 </div>
+                 
+                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
+                    <Input label="Plants Weight" type="number" step="0.01" value={activeFormula.plants_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('plants_weight', e.target.value)} />
+                    <Input label="Defuse Weight" type="number" step="0.01" value={activeFormula.defuse_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('defuse_weight', e.target.value)} />
+                    <Input label="ACE Weight" type="number" step="0.01" value={activeFormula.ace_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('ace_weight', e.target.value)} />
+                 </div>
+                 
+                 <div className="grid grid-cols-2" style={{ gap: "24px" }}>
+                    <Input label="Base Multiplier (e.g. 78.0)" type="number" step="0.1" value={activeFormula.base_multiplier} onChange={(e) => handleFormulaUpdate('base_multiplier', e.target.value)} />
+                    <Input label="Base Rating (e.g. 60.0)" type="number" step="0.1" value={activeFormula.base_rating} onChange={(e) => handleFormulaUpdate('base_rating', e.target.value)} />
+                 </div>
+
+                 <div className="flex justify-between items-center border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
+                    <div className="flex flex-col">
+                      <h4 className="text-theme-text-base font-bold text-sm">Advanced Formula Editor</h4>
+                      <p className="text-theme-text-faint text-[10px]">Open scientific calculator to modify formulas for Performance Score, ACS, K/DA.</p>
+                    </div>
+                    <button onClick={() => { setCalcTarget('excel_formula'); setCalcString(activeFormula.excel_formula || ''); setCalculatorOpen(true); }} className="border border-purple-500/50 light:border-purple-300 bg-purple-900/20 light:bg-purple-50 text-purple-400 light:text-purple-600 font-bold tracking-wider text-xs hover:bg-purple-600 hover:text-white transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "12px 24px", borderRadius: "8px" }}>
+                      Open Editor
+                    </button>
+                 </div>
+
+                 <div className="flex justify-end border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
+                   <button onClick={saveFormula} className="bg-blue-600 hover:bg-blue-500 text-theme-text-base font-bold text-sm rounded shadow-[0_0_10px_color-mix(in_srgb,var(--color--)_%,transparent)] transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>
+                     Save Formula
+                   </button>
+                 </div>
+              </div>
+            </Card></>
+          )}
+
+
         </div>
       </div>
       {}
@@ -682,6 +889,64 @@ const Admin = ({ globalGame, globalTournament }) => {
           </div>
         </div>
       )}
+      <Modal isOpen={calculatorOpen} onClose={() => setCalculatorOpen(false)} title="Advanced Formula Editor" maxWidth="max-w-4xl">
+        <div className="flex flex-col gap-6 p-4">
+          <Select 
+            label="Target Calculation" 
+            options={['Performance Score Calculation', 'ACS Calculation', 'K/DA Calculation']}
+            value={calcTarget === 'excel_formula' ? 'Performance Score Calculation' : calcTarget === 'acs_formula' ? 'ACS Calculation' : 'K/DA Calculation'}
+            onChange={(val) => {
+              const tgt = val === 'Performance Score Calculation' ? 'excel_formula' : val === 'ACS Calculation' ? 'acs_formula' : 'kda_formula';
+              setCalcTarget(tgt);
+              setCalcString(activeFormula[tgt] || '');
+            }}
+          />
+          
+          <textarea 
+            className="w-full bg-theme-input light:bg-white rounded-lg border border-theme-input focus:border-blue-500 focus:outline-none p-4 text-theme-text-base font-mono text-lg min-h-[100px] shadow-inner resize-y transition-colors"
+            placeholder="Select variables and operations or type to build formula..."
+            value={calcString}
+            onChange={(e) => setCalcString(e.target.value)}
+          />
+
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-3 grid grid-cols-3 gap-3">
+               {['kills', 'deaths', 'assists', 'acs', 'econ', 'first_kills', 'plants', 'defuse', 'ace', 'rounds', '(', ')'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + btn)} className="bg-bg-400 hover:bg-bg-500 text-theme-text-base py-3 rounded text-sm font-bold shadow-md transition-colors border border-[#1c2532]">
+                   {btn}
+                 </button>
+               ))}
+               {[7, 8, 9, 4, 5, 6, 1, 2, 3, 0, '.'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + btn)} className="bg-theme-input hover:bg-blue-900/30 text-theme-text-base py-3 rounded text-xl font-bold shadow-md transition-colors border border-[#1c2532]">
+                   {btn}
+                 </button>
+               ))}
+            </div>
+            <div className="flex flex-col gap-3">
+               {['+', '-', '*', '/'].map(btn => (
+                 <button key={btn} onClick={() => setCalcString(prev => prev + ' ' + btn + ' ')} className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 py-4 rounded text-xl font-bold shadow-md border border-blue-500/30 transition-colors">
+                   {btn}
+                 </button>
+               ))}
+               <button onClick={() => setCalcString(prev => prev.slice(0, -1))} className="bg-red-600/20 hover:bg-red-600/40 text-red-400 py-4 rounded font-bold shadow-md border border-red-500/30 transition-colors">
+                 Backspace
+               </button>
+               <button onClick={() => setCalcString('')} className="bg-red-600 hover:bg-red-700 text-white py-4 rounded font-bold shadow-md border border-red-500 transition-colors">
+                 Clear
+               </button>
+            </div>
+          </div>
+          
+          <div className="flex justify-end pt-4 border-t border-[#1c2532]">
+             <button onClick={() => {
+                handleFormulaUpdate(calcTarget, calcString);
+                setCalculatorOpen(false);
+             }} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-all">
+                Apply Formula
+             </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

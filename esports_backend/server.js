@@ -22,13 +22,13 @@ app.use((req, res, next) => {
   if (!req.timedout) next();
 });
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 20000, 
+  windowMs: 15 * 60 * 1000,
+  max: 20000,
   message: { error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
-app.use(express.json({ limit: '10kb' })); 
+app.use(express.json({ limit: '10kb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,7 +39,7 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
@@ -158,7 +158,7 @@ const isAdmin = async (req, res, next) => {
 app.get('/api/streams/live', cacheMiddleware, async (req, res) => {
   const { game } = req.query;
   const channelId = game === 'crossfire' ? '@CrossfirePhilippines' : '@ValorantEsports';
-  
+
   try {
     const streamData = await getLiveStreamId(channelId);
     res.json(streamData);
@@ -463,7 +463,7 @@ app.get('/api/match_records', async (req, res) => {
     if (day) query = query.eq('day', day);
     if (match) query = query.eq('match', match);
     if (set_num) query = query.eq('set_num', set_num);
-    
+
     query = query
       .order('created_at', { ascending: false })
       .order('set_num', { ascending: false })
@@ -589,13 +589,13 @@ app.post('/api/stats/valorant/match', authenticateToken, isAdmin, async (req, re
       aces: Number(p.ace) || 0,
       rounds: Number(p.rounds) || 0
     }));
-    
+
     console.log("[VALORANT MATCH RECORDS] Attempting to insert matchRecords with agent:", matchRecords.map(r => ({ ign: r.ign, agent: r.agent })));
 
     const { error: matchRecordsError } = await supabase
       .from('match_records')
       .insert(matchRecords);
-      
+
     if (matchRecordsError) {
       console.error('[CRITICAL] Failed to insert match records:', JSON.stringify(matchRecordsError, null, 2));
     } else {
@@ -700,7 +700,7 @@ app.get('/api/vetoes', cacheMiddleware, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   try {
     const tournamentName = req.query.tournament || 'Default';
-    const game = req.query.game; 
+    const game = req.query.game;
     let query = supabase.from('map_vetoes').select('*').eq('tournament_name', tournamentName).order('created_at', { ascending: false });
     if (game) {
       query = query.eq('game', game);
@@ -836,7 +836,7 @@ async function acquireSyncLock(key) {
 app.post('/api/matches/sync-live', authenticateToken, isAdmin, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   const { tournament_name, team_a_id, team_b_id, map_name, game_title, team_a_score, team_b_score, status } = req.body;
-  
+
   const lockKey = `${tournament_name}_${team_a_id}_${team_b_id}`;
   await acquireSyncLock(lockKey);
 
@@ -863,9 +863,9 @@ app.post('/api/matches/sync-live', authenticateToken, isAdmin, async (req, res) 
     } else {
       // If we are trying to mark a match as finished but there is no live match, just ignore
       if (status === 'finished') {
-         return res.json({});
+        return res.json({});
       }
-      
+
       // Create new live match
       const { data, error } = await supabase
         .from('matches')
@@ -884,23 +884,23 @@ app.post('/api/matches/sync-live', authenticateToken, isAdmin, async (req, res) 
 app.post('/api/matches/finish-live', authenticateToken, isAdmin, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized.' });
   const { tournament_name, team_a_name, team_b_name, team_a_score, team_b_score } = req.body;
-  
+
   try {
     // We need to resolve team names to IDs if we only have names
     let tAId = req.body.team_a_id;
     let tBId = req.body.team_b_id;
 
     if (!tAId && team_a_name) {
-       const { data: ta } = await supabase.from('teams').select('team_id').eq('team_name', team_a_name).limit(1);
-       if (ta && ta.length) tAId = ta[0].team_id;
+      const { data: ta } = await supabase.from('teams').select('team_id').eq('team_name', team_a_name).limit(1);
+      if (ta && ta.length) tAId = ta[0].team_id;
     }
     if (!tBId && team_b_name) {
-       const { data: tb } = await supabase.from('teams').select('team_id').eq('team_name', team_b_name).limit(1);
-       if (tb && tb.length) tBId = tb[0].team_id;
+      const { data: tb } = await supabase.from('teams').select('team_id').eq('team_name', team_b_name).limit(1);
+      if (tb && tb.length) tBId = tb[0].team_id;
     }
 
     if (!tAId || !tBId) {
-       return res.status(400).json({ error: 'Could not resolve team IDs.' });
+      return res.status(400).json({ error: 'Could not resolve team IDs.' });
     }
 
     const lockKey = `${tournament_name}_${tAId}_${tBId}`;
@@ -919,10 +919,10 @@ app.post('/api/matches/finish-live', authenticateToken, isAdmin, async (req, res
       if (existingMatch && existingMatch.length > 0) {
         const { data, error } = await supabase
           .from('matches')
-          .update({ 
-             status: 'finished', 
-             team_a_score: team_a_score, 
-             team_b_score: team_b_score
+          .update({
+            status: 'finished',
+            team_a_score: team_a_score,
+            team_b_score: team_b_score
           })
           .eq('match_id', existingMatch[0].match_id)
           .select();
@@ -1000,10 +1000,10 @@ app.get('/api/predictions/matches', cacheMiddleware, async (req, res) => {
       .not('match_schedule', 'is', null)
       .order('match_schedule', { ascending: true });
     if (error) throw error;
-    let filtered = (data || []).filter(m => 
-      (m.team_a && m.team_a.tournament_name === tournamentName) || 
+    let filtered = (data || []).filter(m =>
+      (m.team_a && m.team_a.tournament_name === tournamentName) ||
       (m.team_b && m.team_b.tournament_name === tournamentName) ||
-      true 
+      true
     );
     filtered = await Promise.all(filtered.map(async (match) => {
       const system_prediction = await generatePrediction(supabase, match.team_a, match.team_b);
@@ -1080,7 +1080,7 @@ app.get('/api/brackets', async (req, res) => {
       team_a:team_a_id (team_name, logo_url),
       team_b:team_b_id (team_name, logo_url)
     `);
-    
+
     if (tournament) query = query.eq('tournament_name', tournament);
     if (game_title) query = query.eq('game_title', game_title);
 
@@ -1140,25 +1140,25 @@ app.get('/api/tournaments-dashboard', async (req, res) => {
   try {
     const { data: tourns, error: e1 } = await supabase.from('tournaments').select('*');
     if (e1) throw e1;
-    
+
     const { data: states, error: e2 } = await supabase.from('bracket_states').select('*');
     if (e2) throw e2;
-    
+
     const { data: results, error: e3 } = await supabase.from('bracket_results').select('tournament_name');
     if (e3) throw e3;
-    
+
     const completedSet = new Set(results.map(r => r.tournament_name));
     const dashboardList = [];
     const processedStates = new Set();
-    
+
     if (states) {
       states.forEach(s => {
         let status = 'IN PROGRESS';
         if (completedSet.has(s.tournament_name)) status = 'COMPLETE';
-        
+
         let pCount = 0;
         if (s.team_pool && Array.isArray(s.team_pool)) pCount = s.team_pool.length;
-        
+
         dashboardList.push({
           id: s.id,
           name: s.tournament_name,
@@ -1171,7 +1171,7 @@ app.get('/api/tournaments-dashboard', async (req, res) => {
         processedStates.add(s.tournament_name);
       });
     }
-    
+
     if (tourns) {
       tourns.forEach(t => {
         if (!processedStates.has(t.name)) {
@@ -1187,7 +1187,7 @@ app.get('/api/tournaments-dashboard', async (req, res) => {
         }
       });
     }
-    
+
     dashboardList.sort((a, b) => new Date(b.date) - new Date(a.date));
     res.json(dashboardList);
   } catch (err) {
@@ -1225,14 +1225,14 @@ app.get('/api/bracket-state', async (req, res) => {
 app.post('/api/bracket-state', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { tournament_name, game_title, format, team_pool, bracket_data } = req.body;
-    
+
     // check if exists
     const { data: existing } = await supabase.from('bracket_states')
       .select('id')
       .eq('tournament_name', tournament_name)
       .eq('game_title', game_title)
       .eq('format', format);
-      
+
     let query;
     if (existing && existing.length > 0) {
       query = supabase.from('bracket_states')
@@ -1242,7 +1242,7 @@ app.post('/api/bracket-state', authenticateToken, isAdmin, async (req, res) => {
       query = supabase.from('bracket_states')
         .insert([{ tournament_name, game_title, format, team_pool, bracket_data }]);
     }
-    
+
     const { data, error } = await query.select();
     if (error) throw error;
     res.status(200).json(data[0]);
@@ -1259,7 +1259,7 @@ app.delete('/api/bracket-state', authenticateToken, isAdmin, async (req, res) =>
       .delete()
       .eq('tournament_name', tournament_name)
       .eq('game_title', game_title);
-      
+
     if (error) throw error;
     res.json({ message: 'Bracket state cleared successfully' });
   } catch (err) {
@@ -1273,14 +1273,14 @@ app.delete('/api/bracket-state', authenticateToken, isAdmin, async (req, res) =>
 app.post('/api/bracket-results', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { tournament_name, game_title, format, results } = req.body;
-    
+
     // First, delete existing results for this tournament & format to avoid duplicates
     await supabase.from('bracket_results')
       .delete()
       .eq('tournament_name', tournament_name)
       .eq('game_title', game_title)
       .eq('format', format);
-      
+
     // Insert new results
     const insertData = results.map(r => ({
       tournament_name,
@@ -1290,10 +1290,10 @@ app.post('/api/bracket-results', authenticateToken, isAdmin, async (req, res) =>
       placement_rank: r.placement_rank,
       logo_url: r.logo_url
     }));
-    
+
     const { data, error } = await supabase.from('bracket_results').insert(insertData);
     if (error) throw error;
-    
+
     res.json({ message: 'Results saved successfully!', data });
   } catch (err) {
     console.error('Save Bracket Results Error:', err);
@@ -1305,11 +1305,11 @@ app.get('/api/bracket-results', authenticateToken, async (req, res) => {
   try {
     const { tournament_name, game_title, format } = req.query;
     let query = supabase.from('bracket_results').select('*').order('placement_rank', { ascending: true });
-    
+
     if (tournament_name) query = query.eq('tournament_name', tournament_name);
     if (game_title) query = query.eq('game_title', game_title);
     if (format) query = query.eq('format', format);
-    
+
     const { data, error } = await query;
     if (error) throw error;
     res.json(data);
@@ -1325,7 +1325,7 @@ app.get('/api/settings/admins', async (req, res) => {
   try {
     const { data, error } = await supabase.from('users').select('*').order('username');
     if (error) throw error;
-    
+
     // Map to what Settings.jsx expects
     const mappedAdmins = data.map(user => ({
       id: user.user_id || user.id,
@@ -1334,7 +1334,7 @@ app.get('/api/settings/admins', async (req, res) => {
       status: 'Online',
       lastActive: 'Active'
     }));
-    
+
     res.json(mappedAdmins);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -1444,14 +1444,14 @@ app.get('/api/settings/bans', async (req, res) => {
 app.post('/api/settings/bans', async (req, res) => {
   try {
     const { player_name, reason, duration, report_id } = req.body;
-    
+
     const { data, error } = await supabase.from('bans').insert([{ player_name, reason, duration }]).select();
     if (error) throw error;
 
     if (report_id) {
       await supabase.from('cheat_reports').delete().eq('id', report_id);
     }
-    
+
     res.status(200).json(data[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -1505,7 +1505,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', () => { });
 });
 
 server.listen(PORT, () => {

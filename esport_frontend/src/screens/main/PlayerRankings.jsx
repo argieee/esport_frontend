@@ -18,7 +18,7 @@ const SearchIcon = () => (
 );
 
 const ValorantRankingTable = ({ title, data, valueKey, valueLabel, colors }) => (
-  <div className="bg-bg-200 rounded-2xl border border-theme-input shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col h-[400px] overflow-hidden relative group">
+  <div className="bg-bg-200 rounded-2xl border border-theme-input shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex flex-col min-h-[320px] overflow-hidden relative group">
     <div className={`absolute inset-0 bg-gradient-to-br ${colors.bgGradient} to-transparent pointer-events-none z-0`}></div>
     <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent ${colors.borderGradient} to-transparent`}></div>
     <div className="border-b border-theme-input bg-bg-300 relative z-10" style={{ padding: "16px" }}>
@@ -512,7 +512,7 @@ const PlayerRankings = ({ globalGame, globalTournament }) => {
     p.name.toLowerCase().includes(weeklySearch.toLowerCase()),
   );
   return (
-    <div className="flex-1 bg-bg-100 text-theme-text-base overflow-y-auto flex flex-col h-full custom-scrollbar">
+    <div className="flex-1 bg-bg-100 text-theme-text-base overflow-y-auto flex flex-col custom-scrollbar">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -524,11 +524,11 @@ const PlayerRankings = ({ globalGame, globalTournament }) => {
         table td:first-child { padding-left: 24px !important; }
       `}</style>
       <div
-        className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center h-full"
+        className="flex-1 flex flex-col items-center w-full"
         style={{ padding: "80px 48px 64px 48px" }}
       >
         <div
-          className="w-full max-w-[1600px] h-full flex flex-col"
+          className="w-full max-w-[1600px] flex flex-col"
           style={{ gap: "32px" }}
         >
           <div

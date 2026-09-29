@@ -15,7 +15,7 @@ const SideNav = ({ activePage, setActivePage, onLogout }) => {
       items: [
         { name: 'Dashboard', icon: LayoutDashboard },
         { name: 'Tournament', icon: Trophy },
-        { name: 'Bracket', icon: GitMerge },
+
         { name: 'Tournament History', icon: Archive },
         { name: 'Predictions', icon: LineChart },
       ]

@@ -637,6 +637,7 @@ const StrategyMap = ({
     ? heatmapEvents.filter(
         (h) =>
           h.match_id &&
+          selectedMap &&
           h.match_id.includes(selectedMap) &&
           h.game &&
           h.game.toUpperCase() === activeGame.toUpperCase(),
@@ -667,41 +668,37 @@ const StrategyMap = ({
         })
       }
     >
-      <div
-        className="absolute top-2 left-4 z-20"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <select
-          value={selectedMap}
-          onChange={(e) => setSelectedMap(e.target.value)}
-          className="bg-bg-300/90 backdrop-blur border border-[#232f40] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer appearance-none"
-          style={{ padding: "4px 8px" }}
+      {availableMaps && availableMaps.length > 0 && (
+        <div
+          className="absolute top-2 left-4 z-20"
+          onClick={(e) => e.stopPropagation()}
         >
-          {availableMaps && availableMaps.length > 0 ? (
-            availableMaps.map((m) => (
+          <select
+            value={selectedMap}
+            onChange={(e) => setSelectedMap(e.target.value)}
+            className="bg-bg-300/90 backdrop-blur border border-[#232f40] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer appearance-none"
+            style={{ padding: "4px 8px" }}
+          >
+            {availableMaps.map((m) => (
               <option key={m} value={m}>
                 {m}
               </option>
-            ))
-          ) : (
-            <option value="">No Data</option>
-          )}
-        </select>
-      </div>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="relative w-full max-w-[800px] aspect-[4/3] bg-bg-100 rounded-xl border border-[#2a3648] overflow-hidden shadow-2xl flex items-center justify-center group-hover:border-blue-500 transition-all">
-        <img
-          src={
-            selectedMap
-              ? `/assets/${selectedMap.replace(/ /g, "_")}.png`
-              : "/assets/map_placeholder.png"
-          }
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/assets/map_placeholder.png";
-          }}
-          className="absolute inset-0 w-full h-full object-contain opacity-80"
-          alt="Map"
-        />
+        {selectedMap && selectedMap !== "No Data" ? (
+          <>
+            <img
+              src={`/assets/${selectedMap.replace(/ /g, "_")}.png`}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+              }}
+              className="absolute inset-0 w-full h-full object-contain opacity-80"
+              alt="Map"
+            />
         {mapEvents.map((h) => (
           <div
             key={h.id}
@@ -732,6 +729,12 @@ const StrategyMap = ({
           ></div>
         ))}
         <Tooltip {...tooltip} />
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-theme-text-muted gap-2">
+            <span className="text-xs font-black uppercase tracking-widest">No Map Data</span>
+          </div>
+        )}
       </div>
       {}
       <div
@@ -1128,28 +1131,26 @@ const Analytics = ({ globalGame, globalTournament }) => {
             </p>
             {modalData.data?.type === "Heatmap" ? (
               <div className="relative w-full aspect-[4/3] bg-bg-100 rounded-xl border border-[#2a3648] overflow-hidden shadow-inner flex items-center justify-center mt-4">
-                <img
-                  src={
-                    modalData.data.area && modalData.data.area !== "No Data"
-                      ? `/assets/${modalData.data.area.replace(/ /g, "_")}.png`
-                      : "/assets/map_placeholder.png"
-                  }
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/assets/map_placeholder.png";
-                  }}
-                  className="absolute inset-0 w-full h-full object-contain opacity-90"
-                  alt="Map Full"
-                />
-                {heatmapEvents &&
-                  heatmapEvents
-                    .filter(
-                      (h) =>
-                        h.match_id &&
-                        h.match_id.includes(modalData.data.area) &&
-                        h.game &&
-                        h.game.toUpperCase() === activeGame.toUpperCase(),
-                    )
+                {modalData.data.area && modalData.data.area !== "No Data" ? (
+                  <>
+                    <img
+                      src={`/assets/${modalData.data.area.replace(/ /g, "_")}.png`}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                      }}
+                      className="absolute inset-0 w-full h-full object-contain opacity-90"
+                      alt="Map Full"
+                    />
+                    {heatmapEvents &&
+                      heatmapEvents
+                        .filter(
+                          (h) =>
+                            h.match_id &&
+                            h.match_id.includes(modalData.data.area) &&
+                            h.game &&
+                            h.game.toUpperCase() === activeGame.toUpperCase(),
+                        )
                     .map((h) => (
                       <div
                         key={h.id}
@@ -1182,6 +1183,12 @@ const Analytics = ({ globalGame, globalTournament }) => {
                         onMouseLeave={() => setModalTooltip({ visible: false })}
                       ></div>
                     ))}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-theme-text-muted gap-2">
+                    <span className="text-xs font-black uppercase tracking-widest">No Map Data</span>
+                  </div>
+                )}
                 <Tooltip {...modalTooltip} />
                 {}
                 <div className="absolute bottom-6 right-6 bg-bg-100/90 p-4 rounded-xl border border-[#232f40] flex flex-col items-start backdrop-blur-md shadow-2xl">
