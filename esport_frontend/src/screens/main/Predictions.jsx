@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarX, Trophy, ClipboardList, ArrowRight } from 'lucide-react';
+import { CalendarX, ClipboardList } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
+
 const Predictions = ({ globalGame, globalTournament }) => {
   const [matches, setMatches] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
+
   const [myPredictions, setMyPredictions] = useState([]);
-  const [username, setUsername] = useState('Player1'); 
+  const [username, setUsername] = useState('Player1');
   const activeGame = (globalGame || 'VALORANT').toLowerCase();
   const accent = activeGame === 'valorant' ? '#06b6d4' : '#f59e0b';
-  const secondaryAccent = activeGame === 'valorant' ? '#f43f5e' : '#8b5cf6';
-  const API_URL = 'http://localhost:5000/api';
+
   useEffect(() => {
     fetchMatches();
-    fetchLeaderboard();
     fetchMyPredictions();
   }, [activeGame, username, globalTournament]);
+
   const fetchMatches = async () => {
     try {
       const res = await apiFetch(`/api/predictions/matches?tournament=${encodeURIComponent(globalTournament || 'Default')}`);
@@ -24,15 +24,8 @@ const Predictions = ({ globalGame, globalTournament }) => {
       console.error('Error fetching matches:', err);
     }
   };
-  const fetchLeaderboard = async () => {
-    try {
-      const res = await apiFetch(`/api/predictions/leaderboard`);
-      const data = await res.json();
-      setLeaderboard(data);
-    } catch (err) {
-      console.error('Error fetching leaderboard:', err);
-    }
-  };
+
+
   const fetchMyPredictions = async () => {
     try {
       const res = await apiFetch(`/api/predictions/user/${username}`);
@@ -42,6 +35,7 @@ const Predictions = ({ globalGame, globalTournament }) => {
       console.error('Error fetching user predictions:', err);
     }
   };
+
   const handlePredict = async (matchId, teamId) => {
     try {
       await apiFetch(`/api/predictions`, {
@@ -58,202 +52,538 @@ const Predictions = ({ globalGame, globalTournament }) => {
       console.error('Error submitting prediction:', err);
     }
   };
+
   const getPredictionForMatch = (matchId) => {
     return myPredictions.find(p => p.match_id === matchId);
   };
+
+  /* ── inline styles (no external CSS needed) ── */
+  const styles = {
+    page: {
+      width: '100%',
+      height: '100%',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      scrollbarWidth: 'thin',
+      scrollbarColor: '#1e293b transparent',
+      fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+      color: '#e2e8f0',
+      position: 'relative',
+    },
+    ambientGlow: {
+      position: 'fixed',
+      inset: 0,
+      pointerEvents: 'none',
+      zIndex: 0,
+      overflow: 'hidden',
+    },
+    glowOrb: {
+      position: 'absolute',
+      top: '-80px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: 700,
+      height: 350,
+      borderRadius: '50%',
+      filter: 'blur(140px)',
+      opacity: 0.07,
+      backgroundColor: accent,
+    },
+    inner: {
+      position: 'relative',
+      zIndex: 10,
+      width: '100%',
+      maxWidth: 1400,
+      padding: '28px 40px 64px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 28,
+    },
+    /* header */
+    header: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: 16,
+    },
+    headerLeft: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+    },
+    headerBar: {
+      width: 3,
+      height: 32,
+      borderRadius: 999,
+      background: `linear-gradient(180deg, ${accent}, #3b82f6)`,
+      boxShadow: `0 0 14px ${accent}60`,
+    },
+    headerSub: {
+      fontSize: 9,
+      fontWeight: 800,
+      letterSpacing: '0.3em',
+      textTransform: 'uppercase',
+      color: '#64748b',
+    },
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: 900,
+      letterSpacing: '0.12em',
+      textTransform: 'uppercase',
+      margin: 0,
+      lineHeight: 1.1,
+    },
+    userPill: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      background: 'rgba(30,41,59,0.7)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: 999,
+      padding: '8px 16px 8px 20px',
+      backdropFilter: 'blur(12px)',
+    },
+    userLabel: {
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.12em',
+      textTransform: 'uppercase',
+      color: '#64748b',
+      whiteSpace: 'nowrap',
+    },
+    userInput: {
+      background: 'transparent',
+      border: 'none',
+      outline: 'none',
+      fontSize: 14,
+      fontWeight: 800,
+      color: '#e2e8f0',
+      width: 100,
+    },
+    /* grid */
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: '1fr',
+      gap: 28,
+    },
+    /* section label */
+    sectionLabel: (color) => ({
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      paddingLeft: 4,
+      marginBottom: 12,
+    }),
+    sectionDot: (color) => ({
+      width: 4,
+      height: 16,
+      borderRadius: 999,
+      backgroundColor: color,
+      boxShadow: `0 0 8px ${color}60`,
+    }),
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: 900,
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase',
+    },
+    /* card wrapper */
+    card: {
+      background: 'rgba(15,23,42,0.65)',
+      backdropFilter: 'blur(16px)',
+      borderRadius: 16,
+      border: '1px solid rgba(255,255,255,0.05)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+      overflow: 'hidden',
+      transition: 'border-color 0.4s',
+    },
+    /* match card */
+    matchCard: {
+      padding: 20,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 14,
+      borderBottom: '1px solid rgba(255,255,255,0.03)',
+      position: 'relative',
+    },
+    matchDate: {
+      textAlign: 'center',
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase',
+      color: '#475569',
+    },
+    matchBody: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 0,
+    },
+    teamBtn: (isSelected, isA) => ({
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 8,
+      padding: '16px 12px',
+      borderRadius: 12,
+      cursor: 'pointer',
+      transition: 'all 0.25s ease',
+      border: isSelected ? `1.5px solid ${isA ? accent : '#f43f5e'}` : '1.5px solid transparent',
+      background: isSelected
+        ? (isA ? `${accent}18` : 'rgba(244,63,94,0.09)')
+        : 'rgba(15,23,42,0.5)',
+      transform: isSelected ? 'scale(1.03)' : 'scale(1)',
+      position: 'relative',
+      zIndex: isSelected ? 2 : 1,
+    }),
+    teamAvatar: (isA) => ({
+      width: 48,
+      height: 48,
+      borderRadius: 10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 900,
+      fontSize: 16,
+      letterSpacing: '0.05em',
+      background: isA
+        ? 'linear-gradient(135deg, rgba(6,182,212,0.18), rgba(59,130,246,0.12))'
+        : 'linear-gradient(135deg, rgba(244,63,94,0.18), rgba(168,85,247,0.12))',
+      color: isA ? accent : '#f43f5e',
+      border: `1px solid ${isA ? 'rgba(6,182,212,0.2)' : 'rgba(244,63,94,0.2)'}`,
+    }),
+    teamName: {
+      fontSize: 13,
+      fontWeight: 700,
+      textAlign: 'center',
+      lineHeight: 1.2,
+    },
+    /* probability center */
+    probCenter: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: 160,
+      padding: '0 8px',
+      gap: 6,
+      zIndex: 3,
+    },
+    probNumbers: {
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'center',
+      gap: 10,
+      width: '100%',
+    },
+    probA: {
+      fontSize: 22,
+      fontWeight: 900,
+      color: accent,
+      letterSpacing: '-0.02em',
+    },
+    probVs: {
+      fontSize: 10,
+      fontWeight: 800,
+      color: '#475569',
+      letterSpacing: '0.1em',
+    },
+    probB: {
+      fontSize: 22,
+      fontWeight: 900,
+      color: '#f43f5e',
+      letterSpacing: '-0.02em',
+    },
+    /* horizontal probability bar */
+    probBarOuter: {
+      width: '100%',
+      height: 6,
+      borderRadius: 999,
+      background: 'rgba(30,41,59,0.8)',
+      overflow: 'hidden',
+      display: 'flex',
+      position: 'relative',
+    },
+    probBarA: (pct) => ({
+      width: `${pct}%`,
+      height: '100%',
+      background: `linear-gradient(90deg, ${accent}, #38bdf8)`,
+      borderRadius: '999px 0 0 999px',
+      transition: 'width 1s cubic-bezier(0.4,0,0.2,1)',
+      boxShadow: `0 0 10px ${accent}50`,
+    }),
+    probBarB: (pct) => ({
+      width: `${pct}%`,
+      height: '100%',
+      background: 'linear-gradient(90deg, #fb7185, #f43f5e)',
+      borderRadius: '0 999px 999px 0',
+      transition: 'width 1s cubic-bezier(0.4,0,0.2,1)',
+      boxShadow: '0 0 10px rgba(244,63,94,0.3)',
+      marginLeft: 'auto',
+    }),
+    probLabel: {
+      fontSize: 9,
+      fontWeight: 700,
+      letterSpacing: '0.18em',
+      textTransform: 'uppercase',
+      color: '#475569',
+    },
+    vsPlain: {
+      fontSize: 18,
+      fontWeight: 900,
+      fontStyle: 'italic',
+      color: '#334155',
+      padding: '0 20px',
+      userSelect: 'none',
+    },
+    /* empty state */
+    emptyBox: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '56px 24px',
+      borderRadius: 12,
+      border: '1.5px dashed rgba(71,85,105,0.3)',
+      background: 'rgba(15,23,42,0.25)',
+      textAlign: 'center',
+    },
+    emptyTitle: {
+      fontSize: 14,
+      fontWeight: 600,
+      color: '#cbd5e1',
+      marginBottom: 4,
+    },
+    emptySub: {
+      fontSize: 12,
+      color: '#64748b',
+    },
+    /* table */
+    table: {
+      width: '100%',
+      textAlign: 'left',
+      borderCollapse: 'collapse',
+      whiteSpace: 'nowrap',
+    },
+    th: (first, last) => ({
+      padding: '14px 24px',
+      ...(first && { paddingLeft: 28 }),
+      ...(last && { paddingRight: 28, textAlign: 'right' }),
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.16em',
+      textTransform: 'uppercase',
+      color: '#64748b',
+      borderBottom: '1px solid rgba(51,65,85,0.35)',
+    }),
+    td: (first, last) => ({
+      padding: '14px 24px',
+      ...(first && { paddingLeft: 28 }),
+      ...(last && { paddingRight: 28, textAlign: 'right' }),
+      fontSize: 13,
+      borderBottom: '1px solid rgba(30,41,59,0.4)',
+    }),
+    statusBadge: (status) => {
+      const won = status?.toLowerCase() === 'won' || status?.toLowerCase() === 'correct';
+      const lost = status?.toLowerCase() === 'lost' || status?.toLowerCase() === 'incorrect';
+      return {
+        display: 'inline-block',
+        padding: '3px 10px',
+        borderRadius: 6,
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.06em',
+        textTransform: 'capitalize',
+        background: won ? 'rgba(34,197,94,0.12)' : lost ? 'rgba(244,63,94,0.12)' : 'rgba(51,65,85,0.5)',
+        color: won ? '#4ade80' : lost ? '#fb7185' : '#94a3b8',
+        border: `1px solid ${won ? 'rgba(34,197,94,0.2)' : lost ? 'rgba(244,63,94,0.2)' : 'rgba(71,85,105,0.3)'}`,
+      };
+    },
+    pointsCell: {
+      fontWeight: 900,
+      color: '#4ade80',
+    },
+  };
+
+
   return (
-    <div className="w-full h-full bg-bg-base text-theme-text-base overflow-y-auto flex flex-col items-center" style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e293b transparent' }}>
-      {}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-10" style={{ backgroundColor: accent }} />
+    <div className="w-full h-full bg-bg-base" style={styles.page}>
+      {/* Ambient glow */}
+      <div style={styles.ambientGlow}>
+        <div style={styles.glowOrb} />
       </div>
-      <div className="relative z-10 w-full max-w-[1400px] px-8 md:px-12 py-6 pb-16 flex flex-col gap-7">
-        {}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-8 rounded-full" style={{ background: `linear-gradient(180deg, ${accent}, #3b82f6)`, boxShadow: `0 0 12px ${accent}80` }} />
+
+      <div style={styles.inner}>
+        {/* ── Header ── */}
+        <div style={styles.header}>
+          <div style={styles.headerLeft}>
+            <div style={styles.headerBar} />
             <div>
-              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-theme-text-muted">Community</div>
-              <h1 className="text-xl font-black uppercase tracking-[0.15em] text-theme-text-base">Predictions</h1>
+              <div style={styles.headerSub}>Community</div>
+              <h1 style={styles.headerTitle}>Predictions</h1>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-bg-300/80 border border-white/5 pl-6 pr-4 py-2 rounded-full shadow-sm backdrop-blur-sm shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-theme-text-muted whitespace-nowrap shrink-0">Playing as:</span>
-            <input 
-              type="text" 
+          <div style={styles.userPill}>
+            <span style={styles.userLabel}>Playing as:</span>
+            <input
+              type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="bg-transparent text-sm font-black text-theme-text-base focus:outline-none w-24 placeholder-slate-600"
+              style={styles.userInput}
               placeholder="Username"
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {}
-          <div className="xl:col-span-2 flex flex-col gap-8">
-            {/* UPCOMING MATCHES SECTION */}
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 pl-2">
-                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
-                <h2 className="text-sm font-black uppercase tracking-widest text-theme-text-base">Upcoming Matches</h2>
+
+        {/* ── Main grid ── */}
+        <div style={styles.grid}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+
+            {/* ── Upcoming Matches ── */}
+            <div>
+              <div style={styles.sectionLabel(accent)}>
+                <div style={styles.sectionDot(accent)} />
+                <h2 style={styles.sectionTitle}>Upcoming Matches</h2>
               </div>
-              <div className="bg-bg-300/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl hover:border-white/10 transition-colors duration-500 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
-              <div className="p-6">
-              {matches.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 bg-slate-900/20 rounded-xl border border-slate-700/30 border-dashed group">
-                  <CalendarX size={48} strokeWidth={1} className="text-slate-600 mb-4 group-hover:text-cyan-500/70 transition-colors duration-500" />
-                  <div className="text-theme-text-base font-semibold text-sm mb-2">No upcoming matches right now.</div>
-                  <div className="text-theme-text-muted text-xs">Check back when the new season drops!</div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {matches.map(match => {
-                    const prediction = getPredictionForMatch(match.match_id);
-                    return (
-                      <div key={match.match_id} className="bg-white/[0.03] border border-white/5 rounded-xl p-5 flex flex-col gap-4">
-                        <div className="text-[10px] text-theme-text-muted font-bold uppercase tracking-widest text-center">
-                          {new Date(match.match_schedule).toLocaleString()}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          {}
-                          <div 
-                            onClick={() => handlePredict(match.match_id, match.team_a.team_id)}
-                            className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl cursor-pointer transition-all border ${prediction?.predicted_winner_team_id === match.team_a.team_id ? 'bg-cyan-500/20 border-cyan-500/50 scale-105 z-10' : 'bg-slate-900/50 border-transparent hover:bg-slate-800'}`}
-                          >
-                            <div className="w-12 h-12 rounded bg-slate-800 flex items-center justify-center font-black">
-                              {match.team_a.logo_url ? <img src={match.team_a.logo_url} alt="" className="w-8 h-8 object-contain" /> : match.team_a.team_name.substring(0, 2)}
-                            </div>
-                            <div className="text-sm font-bold text-center">{match.team_a.team_name}</div>
-                          </div>
-                          {}
-                          {match.system_prediction ? (
-                            <div className="flex flex-col items-center justify-center mx-4 w-32 gap-3 z-10">
-                               <div className="flex justify-between items-center w-full px-1 font-black text-xl">
-                                  <span className="text-cyan-400 drop-shadow-md">{match.system_prediction.probability_a}%</span>
-                                  <span className="text-[10px] text-theme-text-muted mx-2 mt-1">VS</span>
-                                  <span className="text-red-400 drop-shadow-md">{match.system_prediction.probability_b}%</span>
-                               </div>
-                               <div className="flex items-end gap-2 h-20">
-                                  {}
-                                  <div className="w-6 bg-slate-800/80 rounded-t-lg relative flex items-end justify-center h-full shadow-inner overflow-hidden">
-                                     <div 
-                                        className="w-full bg-gradient-to-t from-cyan-600 to-cyan-400 rounded-t-lg transition-all duration-1000 ease-out"
-                                        style={{ height: `${match.system_prediction.probability_a}%` }}
-                                     ></div>
-                                  </div>
-                                  {}
-                                  <div className="w-6 bg-slate-800/80 rounded-t-lg relative flex items-end justify-center h-full shadow-inner overflow-hidden">
-                                     <div 
-                                        className="w-full bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg transition-all duration-1000 ease-out"
-                                        style={{ height: `${match.system_prediction.probability_b}%` }}
-                                     ></div>
-                                  </div>
-                               </div>
-                               <div className="text-[9px] text-theme-text-muted font-bold tracking-widest uppercase">Win Probability</div>
-                            </div>
-                          ) : (
-                            <div className="text-xl font-black italic text-slate-700 mx-6">VS</div>
-                          )}
-                          {}
-                          <div 
-                            onClick={() => handlePredict(match.match_id, match.team_b.team_id)}
-                            className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl cursor-pointer transition-all border ${prediction?.predicted_winner_team_id === match.team_b.team_id ? 'bg-red-500/20 border-red-500/50 scale-105 z-10' : 'bg-slate-900/50 border-transparent hover:bg-slate-800'}`}
-                          >
-                            <div className="w-12 h-12 rounded bg-slate-800 flex items-center justify-center font-black text-red-400">
-                              {match.team_b.team_name[0]}
-                            </div>
-                            <span className="font-bold text-sm">{match.team_b.team_name}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              </div>
-              </div>
-            </div>
-            
-            {/* MY PAST PREDICTIONS SECTION */}
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 pl-2">
-                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
-                <h2 className="text-sm font-black uppercase tracking-widest text-theme-text-base">My Past Predictions</h2>
-              </div>
-              <div className="bg-bg-300/90 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl hover:border-white/10 transition-colors duration-500 relative overflow-hidden">
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
-              <div className="w-full overflow-x-auto">
-                <table className="w-full text-left whitespace-nowrap">
-                  <thead>
-                    <tr className="text-[11px] uppercase tracking-[0.15em] font-semibold text-theme-text-base border-b border-slate-700/50">
-                      <th className="py-4" style={{ paddingLeft: '32px', paddingRight: '24px' }}>Match ID</th>
-                      <th className="py-4" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Predicted Winner</th>
-                      <th className="py-4" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Status</th>
-                      <th className="py-4 text-right" style={{ paddingLeft: '24px', paddingRight: '32px' }}>Points</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/50">
-                    {myPredictions.filter(p => p.status !== 'pending').length === 0 && (
-                      <tr><td colSpan="4" className="py-12 px-6 text-center">
-                        <div className="flex flex-col items-center justify-center">
-                          <ClipboardList size={32} strokeWidth={1} className="text-slate-600 mb-3" />
-                          <div className="text-theme-text-base text-sm font-semibold mb-1">No predictions on record yet.</div>
-                          <div className="text-theme-text-muted text-xs">Make a call on an upcoming match!</div>
-                        </div>
-                      </td></tr>
-                    )}
-                    {myPredictions.filter(p => p.status !== 'pending').map(p => (
-                      <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 text-sm text-theme-text-muted" style={{ paddingLeft: '32px', paddingRight: '24px' }}>#{p.match_id}</td>
-                        <td className="py-4 text-sm font-bold text-theme-text-base" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Team {p.predicted_winner_team_id}</td>
-                        <td className="py-4 text-xs" style={{ paddingLeft: '24px', paddingRight: '24px' }}>
-                          <span className="px-2 py-1 rounded bg-slate-800 text-theme-text-base">{p.status}</span>
-                        </td>
-                        <td className="py-4 text-sm font-black text-right text-green-400" style={{ paddingLeft: '24px', paddingRight: '32px' }}>+{p.points_awarded}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              </div>
-            </div>
-          </div>
-          {}
-          <div className="xl:col-span-1 flex flex-col gap-8">
-             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 pl-2">
-                <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: accent }}></div>
-                <div>
-                  <h2 className="text-sm font-black uppercase tracking-widest text-theme-text-base leading-none">Global Leaderboard</h2>
-                  <p className="text-[9px] text-theme-text-muted mt-1 font-bold tracking-widest uppercase">Top prediction scores</p>
-                </div>
-              </div>
-              <div className="bg-bg-300/90 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden flex flex-col shadow-xl hover:border-white/10 transition-colors duration-500 relative">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
-              <div className="flex-1 p-5 overflow-y-auto max-h-[500px] custom-scrollbar">
-                {leaderboard.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 bg-slate-900/20 rounded-xl border border-slate-700/30 border-dashed m-1 group">
-                    <Trophy size={40} strokeWidth={1} className="text-slate-600 mb-3 group-hover:text-amber-500/60 transition-colors" />
-                    <div className="text-theme-text-base font-semibold text-sm mb-1">No scores posted yet.</div>
-                    <div className="text-theme-text-muted text-xs">Be the first to claim the top spot!</div>
+
+              <div style={styles.card}>
+                {matches.length === 0 ? (
+                  <div style={{ padding: 24 }}>
+                    <div style={styles.emptyBox}>
+                      <CalendarX size={44} strokeWidth={1.2} style={{ color: '#334155', marginBottom: 14 }} />
+                      <div style={styles.emptyTitle}>No upcoming matches right now.</div>
+                      <div style={styles.emptySub}>Check back when the new season drops!</div>
+                    </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
-                    {leaderboard.map((user, idx) => (
-                      <div key={user.username} className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-slate-800">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 rounded flex items-center justify-center text-xs font-black ${idx === 0 ? 'bg-yellow-500/20 text-yellow-500' : idx === 1 ? 'bg-slate-300/20 text-theme-text-base' : idx === 2 ? 'bg-amber-700/20 text-amber-600' : 'bg-slate-800 text-theme-text-muted'}`}>
-                            {idx + 1}
-                          </div>
-                          <span className="font-bold text-sm">{user.username}</span>
+                  matches.map((match, i) => {
+                    const prediction = getPredictionForMatch(match.match_id);
+                    const pA = match.system_prediction?.probability_a ?? 50;
+                    const pB = match.system_prediction?.probability_b ?? 50;
+                    const isLast = i === matches.length - 1;
+                    return (
+                      <div
+                        key={match.match_id}
+                        style={{
+                          ...styles.matchCard,
+                          ...(isLast && { borderBottom: 'none' }),
+                        }}
+                      >
+                        {/* Date */}
+                        <div style={styles.matchDate}>
+                          {new Date(match.match_schedule).toLocaleString('en-US', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                          })}
                         </div>
-                        <span className="font-black" style={{ color: accent }}>{user.total_points}</span>
+
+                        {/* Teams + probability */}
+                        <div style={styles.matchBody}>
+                          {/* Team A */}
+                          <div
+                            style={styles.teamBtn(prediction?.predicted_winner_team_id === match.team_a.team_id, true)}
+                            onClick={() => handlePredict(match.match_id, match.team_a.team_id)}
+                          >
+                            <div style={styles.teamAvatar(true)}>
+                              {match.team_a.logo_url
+                                ? <img src={match.team_a.logo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                                : match.team_a.team_name.substring(0, 2)}
+                            </div>
+                            <div style={styles.teamName}>{match.team_a.team_name}</div>
+                          </div>
+
+                          {/* Probability center */}
+                          {match.system_prediction ? (
+                            <div style={styles.probCenter}>
+                              <div style={styles.probNumbers}>
+                                <span style={styles.probA}>{pA}%</span>
+                                <span style={styles.probVs}>VS</span>
+                                <span style={styles.probB}>{pB}%</span>
+                              </div>
+                              {/* Horizontal bar */}
+                              <div style={styles.probBarOuter}>
+                                <div style={styles.probBarA(pA)} />
+                                <div style={styles.probBarB(pB)} />
+                              </div>
+                              <div style={styles.probLabel}>Win Probability</div>
+                            </div>
+                          ) : (
+                            <div style={styles.vsPlain}>VS</div>
+                          )}
+
+                          {/* Team B */}
+                          <div
+                            style={styles.teamBtn(prediction?.predicted_winner_team_id === match.team_b.team_id, false)}
+                            onClick={() => handlePredict(match.match_id, match.team_b.team_id)}
+                          >
+                            <div style={styles.teamAvatar(false)}>
+                              {match.team_b.logo_url
+                                ? <img src={match.team_b.logo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                                : match.team_b.team_name.substring(0, 2)}
+                            </div>
+                            <div style={styles.teamName}>{match.team_b.team_name}</div>
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })
                 )}
               </div>
+            </div>
+
+            {/* ── My Past Predictions ── */}
+            <div>
+              <div style={styles.sectionLabel(accent)}>
+                <div style={styles.sectionDot(accent)} />
+                <h2 style={styles.sectionTitle}>My Past Predictions</h2>
+              </div>
+
+              <div style={{ ...styles.card, overflowX: 'auto' }}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={styles.th(true, false)}>Match</th>
+                      <th style={styles.th(false, false)}>Predicted Winner</th>
+                      <th style={styles.th(false, false)}>Status</th>
+                      <th style={styles.th(false, true)}>Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myPredictions.filter(p => p.status !== 'pending').length === 0 ? (
+                      <tr>
+                        <td colSpan="4" style={{ padding: '48px 24px', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <ClipboardList size={30} strokeWidth={1.2} style={{ color: '#334155', marginBottom: 12 }} />
+                            <div style={styles.emptyTitle}>No predictions on record yet.</div>
+                            <div style={styles.emptySub}>Make a call on an upcoming match!</div>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      myPredictions.filter(p => p.status !== 'pending').map(p => (
+                        <tr key={p.id} style={{ transition: 'background 0.2s' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <td style={{ ...styles.td(true, false), color: '#64748b', fontWeight: 600 }}>#{p.match_id}</td>
+                          <td style={{ ...styles.td(false, false), fontWeight: 700 }}>Team {p.predicted_winner_team_id}</td>
+                          <td style={styles.td(false, false)}>
+                            <span style={styles.statusBadge(p.status)}>{p.status}</span>
+                          </td>
+                          <td style={{ ...styles.td(false, true), ...styles.pointsCell }}>+{p.points_awarded}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -262,4 +592,6 @@ const Predictions = ({ globalGame, globalTournament }) => {
     </div>
   );
 };
+
 export default Predictions;
+

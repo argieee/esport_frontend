@@ -1061,13 +1061,6 @@ const Analytics = ({ globalGame, globalTournament }) => {
           </Card>
           {activeGame.toUpperCase() !== "CROSSFIRE" && (
             <>
-              <Card title="Economic Efficiency over Rounds">
-                <EconChart
-                  data={currentData.econ}
-                  theme={currentData.theme}
-                  onSelect={openEconOverview}
-                />
-              </Card>
               <Card title="Agent/Map Synergies" className="min-h-[350px]">
                 <BubbleChart
                   data={filteredSynergy}

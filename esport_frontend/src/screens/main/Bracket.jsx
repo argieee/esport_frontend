@@ -481,8 +481,12 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
 
           const stateData = tournamentStates.length > 0 ? tournamentStates[0] : null;
 
+          const currentTeamPool = stateData && stateData.team_pool 
+            ? stateData.team_pool.map(t => typeof t === 'object' && t !== null ? (t.name || t.team_name || JSON.stringify(t)) : t) 
+            : dbTeams;
+
           if (stateData && stateData.team_pool) {
-            setTeamPool(stateData.team_pool.map(t => typeof t === 'object' && t !== null ? (t.name || t.team_name || JSON.stringify(t)) : t));
+            setTeamPool(currentTeamPool);
           } else {
             setTeamPool(dbTeams);
           }
@@ -496,14 +500,14 @@ const Bracket = ({ globalGame, globalTournament, isReadOnly = false }) => {
               setActiveFormat(normalizedFormat);
             }
             setIsFormatLocked(true);
-            if (normalizedFormat === "Single Elimination") setSingleElimData(stateData.bracket_data);
-            if (normalizedFormat === "Double Elimination") setDoubleElimData(stateData.bracket_data);
-            if (normalizedFormat === "Round Robin") setRoundRobinData(stateData.bracket_data);
+            setSingleElimData(normalizedFormat === "Single Elimination" ? stateData.bracket_data : generateSingleElimBracket(currentTeamPool.length, currentTeamPool));
+            setDoubleElimData(normalizedFormat === "Double Elimination" ? stateData.bracket_data : generateDoubleElimBracket(currentTeamPool.length, currentTeamPool));
+            setRoundRobinData(normalizedFormat === "Round Robin" ? stateData.bracket_data : generateRoundRobin(currentTeamPool, roundRobinEncounters));
           } else {
             setIsFormatLocked(false);
-            if (activeFormat.toLowerCase() === "single elimination") setSingleElimData(generateSingleElimBracket(dbTeams.length, dbTeams));
-            if (activeFormat.toLowerCase() === "double elimination") setDoubleElimData(generateDoubleElimBracket(dbTeams.length, dbTeams));
-            if (activeFormat.toLowerCase() === "round robin") setRoundRobinData(generateRoundRobin(dbTeams, roundRobinEncounters));
+            setSingleElimData(generateSingleElimBracket(dbTeams.length, dbTeams));
+            setDoubleElimData(generateDoubleElimBracket(dbTeams.length, dbTeams));
+            setRoundRobinData(generateRoundRobin(dbTeams, roundRobinEncounters));
           }
         }
       } catch (err) {

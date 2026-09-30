@@ -881,6 +881,7 @@ const ResultTab = ({ game, globalTournament }) => {
   const d = DATA[game];
   const medalColors = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
   const [liveBrackets, setLiveBrackets] = useState([]);
+  const [bracketResults, setBracketResults] = useState([]);
   useEffect(() => {
     fetch(
       `http://localhost:5000/api/brackets?tournament=${globalTournament?.name || "Default"}&game_title=${game}`,
@@ -902,6 +903,11 @@ const ResultTab = ({ game, globalTournament }) => {
         ),
       )
       .catch(console.error);
+
+    fetch(`http://localhost:5000/api/bracket-results?tournament_name=${globalTournament?.name || "Default"}&game_title=${game}&format=Results`)
+      .then(res => res.json())
+      .then(data => setBracketResults(data || []))
+      .catch(console.error);
   }, [game, globalTournament?.name]);
 
   // Dynamically group matches by their league property
@@ -915,7 +921,7 @@ const ResultTab = ({ game, globalTournament }) => {
   }, {});
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="dashboard-wrapper" style={{ gridTemplateColumns: '1fr' }}>
 
       {/* Top Left: Leaderboard Panel */}
       <div className="glass-panel">
@@ -934,12 +940,18 @@ const ResultTab = ({ game, globalTournament }) => {
             </tr>
           </thead>
           <tbody>
-            {d.results.table.map((row) => {
-              const rank = row.rank;
+            {(bracketResults.length > 0 ? bracketResults : d.results.table).map((row, i) => {
+              const rank = row.placement_rank || row.rank;
+              const teamName = row.team_name || row.team;
+              const abbr = row.abbr || teamName.substring(0, 2).toUpperCase();
+              const logo = row.logo_url;
+              const prize = row.prize_money || row.prize || '—';
+              const record = row.series_score || row.record || '—';
+              const pts = row.total_points || row.pts || '—';
               const rankClass = rank <= 3 ? `rank-${rank}` : 'text-gray-400';
 
               return (
-                <tr key={row.rank} className="rounded-lg">
+                <tr key={row.id || row.rank || i} className="rounded-lg">
                   <td>
                     <div className="flex items-center gap-2">
                       <span className={`rank-pill ${rankClass}`}>{rank}</span>
@@ -949,16 +961,20 @@ const ResultTab = ({ game, globalTournament }) => {
                     </div>
                   </td>
                   <td className="text-white font-semibold flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-[10px] shadow-sm">
-                      {row.abbr}
-                    </div>
-                    {row.team}
+                    {logo ? (
+                      <img src={logo} alt={teamName} className="w-8 h-8 rounded-full border border-slate-600 object-cover" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-[10px] shadow-sm">
+                        {abbr}
+                      </div>
+                    )}
+                    {teamName}
                   </td>
                   <td className="text-center text-emerald-400 font-mono">
-                    {row.prize}
+                    {prize}
                   </td>
-                  <td className="text-center text-slate-300 font-mono">{row.record}</td>
-                  <td className="text-center text-white font-bold">{row.pts}</td>
+                  <td className="text-center text-slate-300 font-mono">{record}</td>
+                  <td className="text-center text-white font-bold">{pts}</td>
                 </tr>
               );
             })}
@@ -966,65 +982,12 @@ const ResultTab = ({ game, globalTournament }) => {
         </table>
       </div>
 
-      {/* Top Right: Bracket Visualization */}
-      <div className="bracket-panel">
-        <h2 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
-          <span className="text-cyan-400"><IconTrend /></span> BRACKET RESULTS
-        </h2>
-        {liveBrackets.length > 0 ? (
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-4">
-            {liveBrackets.map((b, i) => (
-              <div
-                key={i}
-                className="bg-slate-900/40 rounded-xl border border-slate-800/50 p-4 transition-colors shadow-sm hover:border-slate-700/80"
-              >
-                <div className="flex justify-between items-center mb-2.5 text-[9px] uppercase tracking-widest font-bold text-slate-400">
-                  <span>{b.round}</span>
-                  <span className="text-cyan-500">{b.bestOf}</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
-                      {b.team1Logo ? <img src={b.team1Logo} className="w-full h-full object-contain" /> : b.team1[0]}
-                    </div>
-                    <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team1}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-lg font-black text-white">{b.score1}</span>
-                      <span className="text-slate-600 font-bold">–</span>
-                      <span className="text-lg font-black text-slate-400">{b.score2}</span>
-                    </div>
-                    <span className="text-[8px] text-slate-500 font-mono">{b.map}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-inner overflow-hidden">
-                      {b.team2Logo ? <img src={b.team2Logo} className="w-full h-full object-contain" /> : b.team2[0]}
-                    </div>
-                    <span className="text-[9px] font-bold text-slate-400 text-center leading-tight truncate w-full">{b.team2}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-bracket-placeholder">
-            <span className="text-sm tracking-wider uppercase">
-              Bracket data pending
-            </span>
-          </div>
-        )}
-      </div>
-
       {/* Bottom Full Width: Timeline Section */}
-      <div className="glass-panel w-full" style={{ gridColumn: 'span 2' }}>
+      <div className="glass-panel w-full">
         <div className="flex justify-between items-center" style={{ marginBottom: "40px" }}>
           <h2 className="text-white font-bold text-lg flex items-center gap-2">
             <span className="text-purple-400">🗓️</span> TOURNAMENT MATCH TIMELINE
           </h2>
-          <button className="btn-glow-cyan flex items-center gap-2 text-[10px] uppercase tracking-widest">
-            <span className="mr-1">🔄</span> TOURNAMENT REPLAY
-          </button>
         </div>
 
         {/* Dynamically render a separate row for each league */}

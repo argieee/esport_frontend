@@ -1301,7 +1301,7 @@ app.post('/api/bracket-results', authenticateToken, isAdmin, async (req, res) =>
   }
 });
 
-app.get('/api/bracket-results', authenticateToken, async (req, res) => {
+app.get('/api/bracket-results', async (req, res) => {
   try {
     const { tournament_name, game_title, format } = req.query;
     let query = supabase.from('bracket_results').select('*').order('placement_rank', { ascending: true });
