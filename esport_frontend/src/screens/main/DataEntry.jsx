@@ -991,7 +991,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
 
   return (
     <div
-      className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800"
+      className="w-full min-h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800"
       onKeyDown={handleGridNavigation}
     >
       <style>{`
@@ -1022,8 +1022,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
         .round-btn { transition: all 0.15s ease; }
         .round-btn:active { transform: scale(0.88); }
       `}</style>
-      {/* ── Scrollable Content ── */}
-      <div className="flex-1 overflow-y-auto de-scroll flex flex-col items-center">
+      {/* ── Content ── */}
+      <div className="w-full flex flex-col items-center">
         <div className="w-full max-w-[1400px] flex flex-col" style={{ padding: '32px', gap: '24px' }}>
           {/* ── Top Bar: Broadcast Toggle ── */}
           <div className="flex items-center justify-end gap-3">
@@ -2442,27 +2442,27 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               <h3 className="text-xl font-black text-white light:text-slate-900 tracking-wider">SUBMITTED RECORDS</h3>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{game.toUpperCase()} | REGULAR SEASON | W{week} D{day} M{match} (ALL SETS)</span>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-[600px] de-scroll">
               <table className="w-full text-left border-collapse text-sm text-slate-300 light:text-slate-700 whitespace-nowrap">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100">
-                    <th className="px-3 py-3 font-bold text-center">Week</th>
-                    <th className="px-3 py-3 font-bold text-center">Day</th>
-                    <th className="px-3 py-3 font-bold text-center">Match</th>
-                    <th className="px-3 py-3 font-bold text-center">Set</th>
-                    <th className="px-4 py-3 font-bold">Team</th>
-                    <th className="px-4 py-3 font-bold">Player</th>
+                    <th className="px-3 py-3 font-bold text-center">STAGE #</th>
+                    <th className="px-3 py-3 font-bold text-center">DAY #</th>
+                    <th className="px-3 py-3 font-bold text-center">MATCH #</th>
+                    <th className="px-3 py-3 font-bold text-center">MAP #</th>
+                    <th className="px-4 py-3 font-bold text-left">TEAM</th>
+                    <th className="px-4 py-3 font-bold text-left">PLAYER</th>
+                    <th className="px-4 py-3 font-bold text-center">AGENTS</th>
                     <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
-                    <th className="px-4 py-3 font-bold text-center text-emerald-400">Performance Score</th>
-                    <th className="px-3 py-3 font-bold text-center">Kills</th>
-                    <th className="px-3 py-3 font-bold text-center">Deaths</th>
-                    <th className="px-3 py-3 font-bold text-center">Assists</th>
-                    <th className="px-4 py-3 font-bold text-center text-emerald-400">Trades</th>
-                    <th className="px-4 py-3 font-bold text-center">First Bloods</th>
-                    <th className="px-4 py-3 font-bold text-center">Plants</th>
-                    <th className="px-4 py-3 font-bold text-center">Defuses</th>
-                    <th className="px-4 py-3 font-bold text-center">Agent</th>
-                    <th className="px-4 py-3 font-bold text-center">Rounds</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">ACS</th>
+                    <th className="px-3 py-3 font-bold text-center">KILLS</th>
+                    <th className="px-3 py-3 font-bold text-center">DEATHS</th>
+                    <th className="px-3 py-3 font-bold text-center">ASSIST</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">ECON</th>
+                    <th className="px-4 py-3 font-bold text-center">FIRST KILLS</th>
+                    <th className="px-4 py-3 font-bold text-center">PLANTS</th>
+                    <th className="px-4 py-3 font-bold text-center">DEFUSE</th>
+                    <th className="px-4 py-3 font-bold text-center">ACE</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
@@ -2476,8 +2476,9 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         <td className="px-3 py-2 text-center text-xs font-bold">{rec.day}</td>
                         <td className="px-3 py-2 text-center text-xs font-bold">{rec.match}</td>
                         <td className="px-3 py-2 text-center text-xs font-bold">{rec.set_num}</td>
-                        <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.team_name}</td>
-                        <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.ign}</td>
+                        <td className={`px-4 py-2 text-left font-bold ${teamColorClass}`}>{rec.team_name}</td>
+                        <td className={`px-4 py-2 text-left font-bold ${teamColorClass}`}>{rec.ign}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
                         <td className={`px-3 py-2 text-center font-bold ${rec.win ? 'text-emerald-400' : 'text-red-500'}`}>{rec.win ? 'Yes' : 'No'}</td>
                         <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
                         <td className="px-3 py-2 text-center font-bold">{rec.kills}</td>
@@ -2487,8 +2488,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         <td className="px-4 py-2 text-center font-bold">{rec.first_kills || 0}</td>
                         <td className="px-4 py-2 text-center font-bold">{rec.plants || 0}</td>
                         <td className="px-4 py-2 text-center font-bold">{rec.defuse || 0}</td>
-                        <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
-                        <td className="px-4 py-2 text-center font-bold">{rec.rounds}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.aces ?? rec.ace ?? 0}</td>
                       </tr>
                     );
                   })}
