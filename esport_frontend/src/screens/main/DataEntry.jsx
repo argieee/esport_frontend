@@ -1352,7 +1352,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </div>
             </div>
           </div>
-          {/* ── Detailed Round Log & Timeouts ── */}
+          {/* Detailed Round Log & Timeouts */}
           <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
             <SectionHeader
               icon={<IconBroadcast />}
@@ -1360,1356 +1360,1171 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               sub="Tracker"
               accent="#ec4899"
             />
-            <div className="overflow-x-auto de-scroll" style={{ padding: "24px" }}>
-              <table className="w-full text-center border-collapse min-w-max text-sm font-black uppercase tracking-wider text-slate-300 light:text-slate-600">
-                <thead>
-                  <tr className="bg-slate-800/80 light:bg-slate-100 border-b border-slate-700/50 light:border-slate-300">
-                    <th className="py-2 px-3 border-r border-slate-700/50 light:border-slate-300 text-left w-48" style={{ padding: '16px 12px' }}>
-                      Team
-                    </th>
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-16" style={{ padding: '16px 12px' }}>
-                      Win
-                    </th>
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20" style={{ padding: '16px 12px' }}>
-                      Side
-                    </th>
-                    {Array(40)
-                      .fill(null)
-                      .map((_, i) => (
-                        <th
-                          key={i}
-                          className={`py-2 px-1 w-7 min-w-[36px] relative ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500 light:border-slate-400" : "border-r border-slate-700/50 light:border-slate-300"}`}
-                        >
-                          R{i + 1}
-                        </th>
-                      ))}
-                    <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20 text-emerald-400 light:text-emerald-600" style={{ padding: '16px 12px' }}>
-                      R. Score
-                    </th>
-                    <th className="py-2 px-2 text-emerald-400 light:text-emerald-600" style={{ padding: '16px 12px' }}>
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Team A Row */}
-                  <tr className="border-b border-slate-700/50 bg-blue-900/10">
-                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-blue-400" style={{ padding: '16px 12px' }}>
-                      {teamA.name || "Team A"}
-                    </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
-                      <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
-                        value={matchWin === "A" ? "Yes" : "No"}
-                        onChange={(e) =>
-                          setMatchWin(e.target.value === "Yes" ? "A" : "B")
-                        }
-                      >
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
-                    </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
-                      <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
-                        value={sideA}
-                        onChange={(e) => setSideA(e.target.value)}
-                      >
-                        {game === "Valorant" ? (
-                          <>
-                            <option>ATK</option>
-                            <option>DEF</option>
-                          </>
-                        ) : (
-                          <>
-                            <option>GR</option>
-                            <option>BL</option>
-                          </>
-                        )}
-                      </select>
-                    </td>
-                    {Array.from({ length: 40 }, (_, i) => roundLogsA[i] || "").map((val, i) => (
-                      <td
-                        key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
-                      >
-                        <div
-                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-emerald-500/20 border-emerald-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
-                        >
-                          <input
-                            type="text"
-                            maxLength="1"
-                            value={val}
-                            onChange={(e) =>
-                              updateRoundEvent("A", i, e.target.value)
-                            }
-                            onFocus={(e) => e.target.select()}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              textAlign: "center",
-                              backgroundColor: "transparent",
-                              color: val ? "#34d399" : "transparent",
-                              fontSize: "18px",
-                              fontWeight: "bold",
-                              textTransform: "uppercase",
-                              padding: 0,
-                              margin: 0,
-                              border: "none",
-                              outline: "none",
-                              cursor: "text",
-                            }}
-                          />
-                        </div>
-                      </td>
-                    ))}
-                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}>
-                      {autoScoreA}
-                    </td>
-                    <td
-                      className="py-2 px-2 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}
-                      rowSpan={2}
-                    >
-                      <input
-                        type="number"
-                        className="bg-transparent text-center w-12 font-black text-lg outline-none"
-                        value={scoreA + scoreB}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  {/* Team B Row */}
-                  <tr className="bg-red-900/10">
-                    <td className="py-2 px-3 border-r border-slate-700/50 text-left text-red-400" style={{ padding: '16px 12px' }}>
-                      {teamB.name || "Team B"}
-                    </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
-                      <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
-                        value={matchWin === "B" ? "Yes" : "No"}
-                        onChange={(e) =>
-                          setMatchWin(e.target.value === "Yes" ? "B" : "A")
-                        }
-                      >
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
-                    </td>
-                    <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
-                      <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
-                        value={sideB}
-                        onChange={(e) => setSideB(e.target.value)}
-                      >
-                        {game === "Valorant" ? (
-                          <>
-                            <option>ATK</option>
-                            <option>DEF</option>
-                          </>
-                        ) : (
-                          <>
-                            <option>GR</option>
-                            <option>BL</option>
-                          </>
-                        )}
-                      </select>
-                    </td>
-                    {Array.from({ length: 40 }, (_, i) => roundLogsB[i] || "").map((val, i) => (
-                      <td
-                        key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
-                      >
-                        <div
-                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-pink-500/20 border-pink-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
-                        >
-                          <input
-                            type="text"
-                            maxLength="1"
-                            value={val}
-                            onChange={(e) =>
-                              updateRoundEvent("B", i, e.target.value)
-                            }
-                            onFocus={(e) => e.target.select()}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              textAlign: "center",
-                              backgroundColor: "transparent",
-                              color: val ? "#f472b6" : "transparent",
-                              fontSize: "18px",
-                              fontWeight: "bold",
-                              textTransform: "uppercase",
-                              padding: 0,
-                              margin: 0,
-                              border: "none",
-                              outline: "none",
-                              cursor: "text",
-                            }}
-                          />
-                        </div>
-                      </td>
-                    ))}
-                    <td className="py-2 px-2 border-r border-slate-700/50 text-emerald-400 text-sm" style={{ padding: '16px 12px' }}>
-                      {autoScoreB}
-                    </td>
-                  </tr>
-                  {/* Timeouts Row */}
-                  <tr className="border-t-2 border-slate-700/80 bg-amber-900/10">
-                    <td
-                      colSpan={3}
-                      className="py-2 px-3 border-r border-slate-700/50 text-right text-amber-500 font-black tracking-widest text-[10px]" style={{ padding: '16px 12px' }}
-                    >
-                      TIMEOUTS
-                    </td>
-                    {Array.from({ length: 40 }, (_, i) => timeoutRowLogs[i] || "").map((val, i) => (
-                      <td
-                        key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
-                      >
-                        <div
-                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-amber-500/20 border-amber-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
-                        >
-                          <input
-                            type="text"
-                            maxLength="1"
-                            value={val}
-                            onChange={(e) => {
-                              const logs = [...timeoutRowLogs];
-                              logs[i] = e.target.value.toUpperCase().slice(-1);
-                              setTimeoutRowLogs(logs);
-                            }}
-                            onFocus={(e) => e.target.select()}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              textAlign: "center",
-                              backgroundColor: "transparent",
-                              color: val ? "#f59e0b" : "transparent",
-                              fontSize: "18px",
-                              fontWeight: "bold",
-                              textTransform: "uppercase",
-                              padding: 0,
-                              margin: 0,
-                              border: "none",
-                              outline: "none",
-                              cursor: "text",
-                            }}
-                          />
-                        </div>
-                      </td>
-                    ))}
-                    <td
-                      colSpan={2}
-                      className="py-2 px-2 border-slate-700/50" style={{ padding: '16px 12px' }}
-                    ></td>
-                  </tr>
-                  {/* Dead Rounds Row */}
-                  <tr className="border-b border-slate-700/50 bg-purple-900/10">
-                    <td
-                      colSpan={3}
-                      className="py-2 px-3 border-r border-slate-700/50 text-right text-purple-500 font-black tracking-widest text-[10px]" style={{ padding: '16px 12px' }}
-                    >
-                      DEAD ROUNDS
-                    </td>
-                    {Array.from({ length: 40 }, (_, i) => deadRoundRowLogs[i] || "").map((val, i) => (
-                      <td
-                        key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
-                      >
-                        <div
-                          className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-purple-500/20 border-purple-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
-                        >
-                          <input
-                            type="text"
-                            maxLength="1"
-                            value={val}
-                            onChange={(e) => {
-                              const logs = [...deadRoundRowLogs];
-                              logs[i] = e.target.value.toUpperCase().slice(-1);
-                              setDeadRoundRowLogs(logs);
-                            }}
-                            onFocus={(e) => e.target.select()}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              textAlign: "center",
-                              backgroundColor: "transparent",
-                              color: val ? "#a855f7" : "transparent",
-                              fontSize: "18px",
-                              fontWeight: "bold",
-                              textTransform: "uppercase",
-                              padding: 0,
-                              margin: 0,
-                              border: "none",
-                              outline: "none",
-                              cursor: "text",
-                            }}
-                          />
-                        </div>
-                      </td>
-                    ))}
-                    <td
-                      colSpan={2}
-                      className="py-2 px-2 border-slate-700/50" style={{ padding: '16px 12px' }}
-                    ></td>
-                  </tr>
-                </tbody>
-              </table>
-              {/* Timeouts and Current Round Display */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: "20px", marginTop: '32px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', overflow: 'hidden', width: '192px' }}>
-                  <div className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase text-center border-b border-amber-500/30" style={{ padding: '8px' }}>
-                    Timeout Indicator
+            <div style={{ padding: "28px 32px 32px" }}>
+              <style>{`
+                @keyframes pulse-beacon { 0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.5); } 50% { box-shadow: 0 0 0 10px rgba(251,191,36,0); } }
+                .round-beacon { animation: pulse-beacon 1.8s ease-in-out infinite; }
+                .round-dot-input:focus { outline: none; }
+              `}</style>
+
+              {/* Live Round Beacon */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', gap: '16px' }}>
+                <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to right, transparent, rgba(251,191,36,0.3))' }} />
+                <div className="round-beacon" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '80px', height: '80px', borderRadius: '50%', border: '2px solid rgba(251,191,36,0.6)', background: 'rgba(251,191,36,0.08)' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.15em', color: 'rgba(251,191,36,0.7)', textTransform: 'uppercase' }}>Round</span>
+                  <span style={{ fontSize: '28px', fontWeight: 900, color: '#fbbf24', lineHeight: 1 }}>{currentRoundNo}</span>
+                </div>
+                <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to left, transparent, rgba(251,191,36,0.3))' }} />
+              </div>
+
+              {/* Team A Panel */}
+              <div style={{ marginBottom: '16px', borderRadius: '14px', border: '1px solid rgba(96,165,250,0.25)', background: 'rgba(59,130,246,0.05)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid rgba(96,165,250,0.15)', background: 'rgba(59,130,246,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#60a5fa', boxShadow: '0 0 8px #60a5fa' }} />
+                    <span style={{ fontWeight: 900, fontSize: '13px', color: '#93c5fd', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{teamA.name || 'Team A'}</span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <select
-                      className={`text-xs font-bold text-center outline-none cursor-pointer border-b border-amber-500/10 appearance-none ${timeoutA === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
-                      style={{ padding: '12px' }}
-                      value={timeoutA}
-                      onChange={(e) => handleTimeoutChange("A", e.target.value)}
-                    >
-                      <option value="AVAILABLE">AVAILABLE</option>
-                      <option value="USED">USED</option>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <select value={sideA} onChange={(e) => setSideA(e.target.value)} style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(96,165,250,0.3)', color: '#93c5fd', fontSize: '10px', fontWeight: 900, borderRadius: '999px', padding: '4px 12px', outline: 'none', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', appearance: 'none' }}>
+                      {game === 'Valorant' ? (<><option>ATK</option><option>DEF</option></>) : (<><option>GR</option><option>BL</option></>)}
                     </select>
-                    <select
-                      className={`text-xs font-bold text-center outline-none cursor-pointer appearance-none ${timeoutB === "USED" ? "bg-red-900/30 text-red-400" : "bg-emerald-900/30 text-emerald-400"}`}
-                      style={{ padding: '12px' }}
-                      value={timeoutB}
-                      onChange={(e) => handleTimeoutChange("B", e.target.value)}
-                    >
-                      <option value="AVAILABLE">AVAILABLE</option>
-                      <option value="USED">USED</option>
-                    </select>
+                    <button onClick={() => setMatchWin(matchWin === 'A' ? 'B' : 'A')} style={{ background: matchWin === 'A' ? 'rgba(34,197,94,0.2)' : 'rgba(100,116,139,0.15)', border: matchWin === 'A' ? '1px solid rgba(34,197,94,0.5)' : '1px solid rgba(100,116,139,0.3)', color: matchWin === 'A' ? '#4ade80' : '#64748b', fontSize: '10px', fontWeight: 900, borderRadius: '999px', padding: '4px 14px', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.2s' }}>
+                      {matchWin === 'A' ? 'WIN' : 'LOSS'}
+                    </button>
+                    <div style={{ minWidth: '40px', textAlign: 'center', fontSize: '22px', fontWeight: 900, color: '#4ade80', textShadow: '0 0 12px rgba(74,222,128,0.5)' }}>{autoScoreA}</div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', overflow: 'hidden', width: '160px' }}>
-                  <div className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase text-center border-b border-amber-500/30" style={{ padding: '8px' }}>
-                    Current Round No.
+                <div style={{ padding: '16px 20px' }}>
+                  {[{ label: game === 'Valorant' ? 'Half 1 â€” Rounds 1â€“12' : 'Half 1 â€” Rounds 1â€“9', count: game === 'Valorant' ? 12 : 9, offset: 0, size: 36 }, { label: game === 'Valorant' ? 'Half 2 â€” Rounds 13â€“24' : 'Half 2 â€” Rounds 10â€“18', count: game === 'Valorant' ? 12 : 9, offset: game === 'Valorant' ? 12 : 9, size: 36 }, { label: game === 'Valorant' ? 'Overtime â€” Rounds 25+' : 'Overtime â€” Rounds 19+', count: game === 'Valorant' ? 16 : 22, offset: game === 'Valorant' ? 24 : 18, size: 32 }].map(({ label, count, offset, size }) => (
+                    <div key={label} style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(148,163,184,0.5)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px' }}>{label}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {Array.from({ length: count }, (_, j) => {
+                          const i = offset + j;
+                          const val = roundLogsA[i] || '';
+                          const colorMap = { K: { bg: 'rgba(74,222,128,0.2)', border: 'rgba(74,222,128,0.6)', text: '#4ade80', glow: '0 0 8px rgba(74,222,128,0.4)' }, D: { bg: 'rgba(248,113,113,0.2)', border: 'rgba(248,113,113,0.6)', text: '#f87171', glow: '0 0 8px rgba(248,113,113,0.4)' }, P: { bg: 'rgba(167,139,250,0.2)', border: 'rgba(167,139,250,0.6)', text: '#a78bfa', glow: '0 0 8px rgba(167,139,250,0.4)' }, T: { bg: 'rgba(251,191,36,0.2)', border: 'rgba(251,191,36,0.6)', text: '#fbbf24', glow: '0 0 8px rgba(251,191,36,0.4)' } };
+                          const c = colorMap[val] || { bg: 'rgba(30,41,59,0.6)', border: 'rgba(51,65,85,0.5)', text: 'transparent', glow: 'none' };
+                          return (
+                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                              <div style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(100,116,139,0.6)', letterSpacing: '0.05em' }}>R{i + 1}</div>
+                              <div style={{ width: `${size}px`, height: `${size}px`, borderRadius: '10px', background: c.bg, border: `1px solid ${c.border}`, boxShadow: c.glow, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s', cursor: 'text' }}>
+                                <input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('A', i, e.target.value)} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Team B Panel */}
+              <div style={{ marginBottom: '20px', borderRadius: '14px', border: '1px solid rgba(248,113,113,0.25)', background: 'rgba(239,68,68,0.05)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid rgba(248,113,113,0.15)', background: 'rgba(239,68,68,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f87171', boxShadow: '0 0 8px #f87171' }} />
+                    <span style={{ fontWeight: 900, fontSize: '13px', color: '#fca5a5', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{teamB.name || 'Team B'}</span>
                   </div>
-                  <div className="bg-amber-500/10 text-amber-400 text-2xl font-black text-center" style={{ padding: '16px' }}>
-                    {currentRoundNo}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <select value={sideB} onChange={(e) => setSideB(e.target.value)} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(248,113,113,0.3)', color: '#fca5a5', fontSize: '10px', fontWeight: 900, borderRadius: '999px', padding: '4px 12px', outline: 'none', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', appearance: 'none' }}>
+                      {game === 'Valorant' ? (<><option>ATK</option><option>DEF</option></>) : (<><option>GR</option><option>BL</option></>)}
+                    </select>
+                    <button onClick={() => setMatchWin(matchWin === 'B' ? 'A' : 'B')} style={{ background: matchWin === 'B' ? 'rgba(34,197,94,0.2)' : 'rgba(100,116,139,0.15)', border: matchWin === 'B' ? '1px solid rgba(34,197,94,0.5)' : '1px solid rgba(100,116,139,0.3)', color: matchWin === 'B' ? '#4ade80' : '#64748b', fontSize: '10px', fontWeight: 900, borderRadius: '999px', padding: '4px 14px', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.2s' }}>
+                      {matchWin === 'B' ? 'WIN' : 'LOSS'}
+                    </button>
+                    <div style={{ minWidth: '40px', textAlign: 'center', fontSize: '22px', fontWeight: 900, color: '#f87171', textShadow: '0 0 12px rgba(248,113,113,0.5)' }}>{autoScoreB}</div>
+                  </div>
+                </div>
+                <div style={{ padding: '16px 20px' }}>
+                  {[{ label: game === 'Valorant' ? 'Half 1 â€” Rounds 1â€“12' : 'Half 1 â€” Rounds 1â€“9', count: game === 'Valorant' ? 12 : 9, offset: 0, size: 36 }, { label: game === 'Valorant' ? 'Half 2 â€” Rounds 13â€“24' : 'Half 2 â€” Rounds 10â€“18', count: game === 'Valorant' ? 12 : 9, offset: game === 'Valorant' ? 12 : 9, size: 36 }, { label: game === 'Valorant' ? 'Overtime â€” Rounds 25+' : 'Overtime â€” Rounds 19+', count: game === 'Valorant' ? 16 : 22, offset: game === 'Valorant' ? 24 : 18, size: 32 }].map(({ label, count, offset, size }) => (
+                    <div key={label} style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(148,163,184,0.5)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px' }}>{label}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {Array.from({ length: count }, (_, j) => {
+                          const i = offset + j;
+                          const val = roundLogsB[i] || '';
+                          const colorMap = { K: { bg: 'rgba(244,114,182,0.2)', border: 'rgba(244,114,182,0.6)', text: '#f472b6', glow: '0 0 8px rgba(244,114,182,0.4)' }, D: { bg: 'rgba(248,113,113,0.2)', border: 'rgba(248,113,113,0.6)', text: '#f87171', glow: '0 0 8px rgba(248,113,113,0.4)' }, P: { bg: 'rgba(167,139,250,0.2)', border: 'rgba(167,139,250,0.6)', text: '#a78bfa', glow: '0 0 8px rgba(167,139,250,0.4)' }, T: { bg: 'rgba(251,191,36,0.2)', border: 'rgba(251,191,36,0.6)', text: '#fbbf24', glow: '0 0 8px rgba(251,191,36,0.4)' } };
+                          const c = colorMap[val] || { bg: 'rgba(30,41,59,0.6)', border: 'rgba(51,65,85,0.5)', text: 'transparent', glow: 'none' };
+                          return (
+                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                              <div style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(100,116,139,0.6)', letterSpacing: '0.05em' }}>R{i + 1}</div>
+                              <div style={{ width: `${size}px`, height: `${size}px`, borderRadius: '10px', background: c.bg, border: `1px solid ${c.border}`, boxShadow: c.glow, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s', cursor: 'text' }}>
+                                <input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('B', i, e.target.value)} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Legend + Timeouts + Special Rows */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginTop: '4px' }}>
+                <div style={{ borderRadius: '12px', border: '1px solid rgba(51,65,85,0.5)', background: 'rgba(15,23,42,0.5)', padding: '16px' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(100,116,139,0.8)', textTransform: 'uppercase', marginBottom: '12px' }}>Key Legend</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {[['K', '#4ade80', 'Kill / Round Win'], ['D', '#f87171', 'Death / Round Loss'], ['P', '#a78bfa', 'Plant'], ['T', '#fbbf24', 'Timeout']].map(([key, color, label]) => (
+                      <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: `${color}22`, border: `1px solid ${color}88`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, fontSize: '12px', fontWeight: 900, flexShrink: 0 }}>{key}</div>
+                        <span style={{ fontSize: '10px', color: 'rgba(148,163,184,0.8)', fontWeight: 600 }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ borderRadius: '12px', border: '1px solid rgba(245,158,11,0.25)', background: 'rgba(251,191,36,0.04)', padding: '16px' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(251,191,36,0.7)', textTransform: 'uppercase', marginBottom: '12px' }}>Timeout Status</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {[['A', timeoutA, teamA.name || 'Team A'], ['B', timeoutB, teamB.name || 'Team B']].map(([team, tval, tname]) => (
+                      <div key={team} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: team === 'A' ? '#93c5fd' : '#fca5a5', textTransform: 'uppercase', letterSpacing: '0.05em', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tname}</span>
+                        <button onClick={() => handleTimeoutChange(team, tval === 'AVAILABLE' ? 'USED' : 'AVAILABLE')} style={{ flexShrink: 0, borderRadius: '999px', padding: '5px 14px', fontSize: '9px', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', border: tval === 'AVAILABLE' ? '1px solid rgba(34,197,94,0.5)' : '1px solid rgba(239,68,68,0.5)', background: tval === 'AVAILABLE' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: tval === 'AVAILABLE' ? '#4ade80' : '#f87171', transition: 'all 0.2s' }}>
+                          {tval}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ borderRadius: '12px', border: '1px solid rgba(167,139,250,0.2)', background: 'rgba(167,139,250,0.03)', padding: '16px' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(167,139,250,0.7)', textTransform: 'uppercase', marginBottom: '12px' }}>Special Rounds</div>
+                  <div style={{ marginBottom: '10px' }}>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(251,191,36,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>Timeouts</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {Array.from({ length: 12 }, (_, i) => { const val = timeoutRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(251,191,36,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(251,191,36,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...timeoutRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setTimeoutRowLogs(logs); }} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#fbbf24' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(167,139,250,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>Dead Rounds</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {Array.from({ length: 12 }, (_, i) => { const val = deadRoundRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(167,139,250,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(167,139,250,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...deadRoundRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setDeadRoundRowLogs(logs); }} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#a78bfa' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* ── Player Stats ── */}
-          <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
-            <SectionHeader
-              icon={<IconStats />}
-              label="Player Stats"
-              sub="Adaptive Columns (Scroll Horizontally)"
-              accent="#8b5cf6"
-            />
-            <div className="overflow-x-auto de-scroll relative">
-              <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead>
-                  {game === "Crossfire" ? (
-                    <>
-                      <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
-                        <th
-                          rowSpan={2}
-                          className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]"
-                          style={{ paddingLeft: '32px', paddingRight: '20px' }}
-                        >
-                          Player IGN
-                        </th>
-                        {cfGroups.map((g) => (
-                          <th
-                            key={g.id}
-                            colSpan={4}
-                            className="px-2 py-3 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold relative min-w-[200px]"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              <input
-                                type="text"
-                                className="bg-transparent border-b border-slate-700 light:border-slate-300 hover:border-slate-500 light:hover:border-slate-400 focus:border-[#00ffcc] light:focus:border-blue-500 text-slate-300 light:text-slate-700 w-full max-w-[120px] text-center text-[10px] uppercase tracking-widest outline-none transition-colors font-black"
-                                value={g.label}
-                                onChange={(e) =>
-                                  handleUpdateCfGroupLabel(g.id, e.target.value)
-                                }
-                              />
-                              {!g.isTotal && (
-                                <button
-                                  onClick={() => handleRemoveCfGroup(g.id)}
-                                  className="text-red-500/70 hover:text-red-400 p-1 rounded-md hover:bg-red-500/10 transition-colors flex items-center justify-center"
-                                  title="Delete Stats Group"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    />
-                                  </svg>
-                                </button>
-                              )}
-                            </div>
-                          </th>
-                        ))}
-                        <th rowSpan={2} className="px-3 py-3 text-center w-24" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                          <button
-                            onClick={handleAddCfGroup}
-                            className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap font-bold"
-                          >
-                            + ADD STATS
-                          </button>
-                        </th>
-                      </tr>
-                      <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 relative z-10">
-                        {cfGroups.map((g) => (
-                          <React.Fragment key={`${g.id}-sub`}>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                              K
-                            </th>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                              D
-                            </th>
-                            <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                              A
-                            </th>
-                            <th className="px-3 py-2 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold min-w-[70px] text-[#00ffcc] light:text-blue-600" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                              H
-                            </th>
-                          </React.Fragment>
-                        ))}
-                      </tr>
-                    </>
-                  ) : (
+        </div>
+        {/* ── Player Stats ── */}
+        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
+          <SectionHeader
+            icon={<IconStats />}
+            label="Player Stats"
+            sub="Adaptive Columns (Scroll Horizontally)"
+            accent="#8b5cf6"
+          />
+          <div className="overflow-x-auto de-scroll relative">
+            <table className="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+                {game === "Crossfire" ? (
+                  <>
                     <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
-                      <th className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]" style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '32px', paddingRight: '20px' }}>
+                      <th
+                        rowSpan={2}
+                        className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]"
+                        style={{ paddingLeft: '32px', paddingRight: '20px' }}
+                      >
                         Player IGN
                       </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        Hero/Agent/Class
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        PERFORMANCE SCORE
-                      </th>
-                      <th colSpan="3" className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        KDA
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        TRADES
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        FIRST BLOODS
-                      </th>
-                      <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        PLANTS
-                      </th>
-                      <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        DEFUSES
-                      </th>
-                    </tr>
-                  )}
-                </thead>
-                <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
-                  { }
-                  {playersA.map((p, idx) => (
-                    <tr
-                      key={`a-${idx}`}
-                      className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
-                    >
-                      <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
-                        <select
-                          className={`bg-transparent text-[#38bdf8] light:text-blue-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
-                          value={p.ign}
-                          onChange={(e) =>
-                            updatePlayer("A", idx, "ign", e.target.value)
-                          }
+                      {cfGroups.map((g) => (
+                        <th
+                          key={g.id}
+                          colSpan={4}
+                          className="px-2 py-3 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold relative min-w-[200px]"
                         >
-                          <option value="" className="text-black">
-                            Select Player
-                          </option>
-                          {dbPlayers
-                            .filter((dbP) => {
-                              const team = dbTeams.find(
-                                (t) => t.team_name === teamA.name,
-                              );
-                              return team ? dbP.team_id === team.team_id : true;
-                            })
-                            .map((dbP) => (
-                              <option
-                                key={dbP.player_id}
-                                value={dbP.player_name}
-                                className="text-black"
+                          <div className="flex items-center justify-center gap-2">
+                            <input
+                              type="text"
+                              className="bg-transparent border-b border-slate-700 light:border-slate-300 hover:border-slate-500 light:hover:border-slate-400 focus:border-[#00ffcc] light:focus:border-blue-500 text-slate-300 light:text-slate-700 w-full max-w-[120px] text-center text-[10px] uppercase tracking-widest outline-none transition-colors font-black"
+                              value={g.label}
+                              onChange={(e) =>
+                                handleUpdateCfGroupLabel(g.id, e.target.value)
+                              }
+                            />
+                            {!g.isTotal && (
+                              <button
+                                onClick={() => handleRemoveCfGroup(g.id)}
+                                className="text-red-500/70 hover:text-red-400 p-1 rounded-md hover:bg-red-500/10 transition-colors flex items-center justify-center"
+                                title="Delete Stats Group"
                               >
-                                {dbP.player_name}
-                              </option>
-                            ))}
-                          <option value={p.ign} className="hidden">
-                            {p.ign}
-                          </option>
-                        </select>
-                      </td>
-                      {game === "Valorant" && (
-                        <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
-                              {p.agent ? p.agent[0] : ""}
-                            </div>
-                            <select
-                              className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
-                              value={p.agent}
-                              onChange={(e) =>
-                                updatePlayer("A", idx, "agent", e.target.value)
-                              }
-                            >
-                              {agents.map((a) => (
-                                <option key={a} value={a}>
-                                  {a}
-                                </option>
-                              ))}
-                            </select>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
+                              </button>
+                            )}
                           </div>
-                        </td>
-                      )}
-                      {game === "Valorant" ? (
-                        <>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`\${tableInput} text-emerald-400`}
-                              value={p.acs}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "acs",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.k}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "k",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.d}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "d",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.a}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "a",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`\${tableInput} text-emerald-400`}
-                              value={p.econ}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "econ",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.first_kills}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "first_kills",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.plants}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "plants",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.defuse}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "A",
-                                  idx,
-                                  "defuse",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          {cfGroups.map((g) => {
-                            if (g.isTotal) {
-                              return (
-                                <React.Fragment key={g.id}>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                    {getCfTotal(p, "k")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                    {getCfTotal(p, "d")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                    {getCfTotal(p, "a")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                    {getCfTotal(p, "h")}
-                                  </td>
-                                </React.Fragment>
-                              );
-                            }
-                            return (
-                              <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_k`] !== undefined
-                                        ? p[`${g.id}_k`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "A",
-                                        idx,
-                                        `${g.id}_k`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_d`] !== undefined
-                                        ? p[`${g.id}_d`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "A",
-                                        idx,
-                                        `${g.id}_d`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_a`] !== undefined
-                                        ? p[`${g.id}_a`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "A",
-                                        idx,
-                                        `${g.id}_a`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
-                                </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  <input
-                                    type="number"
-                                    className={`${tableInput} text-[#00ffcc]`}
-                                    value={
-                                      p[`${g.id}_h`] !== undefined
-                                        ? p[`${g.id}_h`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "A",
-                                        idx,
-                                        `${g.id}_h`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
-                                </td>
-                              </React.Fragment>
-                            );
-                          })}
-                          <td className="px-2 py-2" style={{ paddingTop: '8px', paddingBottom: '8px' }}></td>
-                        </>
-                      )}
+                        </th>
+                      ))}
+                      <th rowSpan={2} className="px-3 py-3 text-center w-24" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                        <button
+                          onClick={handleAddCfGroup}
+                          className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap font-bold"
+                        >
+                          + ADD STATS
+                        </button>
+                      </th>
                     </tr>
-                  ))}
-                  { }
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="h-0.5 bg-slate-700/30 light:bg-slate-300"
-                    ></td>
+                    <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 relative z-10">
+                      {cfGroups.map((g) => (
+                        <React.Fragment key={`${g.id}-sub`}>
+                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                            K
+                          </th>
+                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                            D
+                          </th>
+                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                            A
+                          </th>
+                          <th className="px-3 py-2 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold min-w-[70px] text-[#00ffcc] light:text-blue-600" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                            H
+                          </th>
+                        </React.Fragment>
+                      ))}
+                    </tr>
+                  </>
+                ) : (
+                  <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
+                    <th className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]" style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '32px', paddingRight: '20px' }}>
+                      Player IGN
+                    </th>
+                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      Hero/Agent/Class
+                    </th>
+                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      PERFORMANCE SCORE
+                    </th>
+                    <th colSpan="3" className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      KDA
+                    </th>
+                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      TRADES
+                    </th>
+                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      FIRST BLOODS
+                    </th>
+                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      PLANTS
+                    </th>
+                    <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+                      DEFUSES
+                    </th>
                   </tr>
-                  { }
-                  {playersB.map((p, idx) => (
-                    <tr
-                      key={`b-${idx}`}
-                      className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
-                    >
-                      <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
-                        <select
-                          className={`bg-transparent text-[#f87171] light:text-red-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
-                          value={p.ign}
-                          onChange={(e) =>
-                            updatePlayer("B", idx, "ign", e.target.value)
-                          }
-                        >
-                          <option value="" className="text-black">
-                            Select Player
-                          </option>
-                          {dbPlayers
-                            .filter((dbP) => {
-                              const team = dbTeams.find(
-                                (t) => t.team_name === teamB.name,
-                              );
-                              return team ? dbP.team_id === team.team_id : true;
-                            })
-                            .map((dbP) => (
-                              <option
-                                key={dbP.player_id}
-                                value={dbP.player_name}
-                                className="text-black"
-                              >
-                                {dbP.player_name}
+                )}
+              </thead>
+              <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
+                { }
+                {playersA.map((p, idx) => (
+                  <tr
+                    key={`a-${idx}`}
+                    className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
+                  >
+                    <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
+                      <select
+                        className={`bg-transparent text-[#38bdf8] light:text-blue-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
+                        value={p.ign}
+                        onChange={(e) =>
+                          updatePlayer("A", idx, "ign", e.target.value)
+                        }
+                      >
+                        <option value="" className="text-black">
+                          Select Player
+                        </option>
+                        {dbPlayers
+                          .filter((dbP) => {
+                            const team = dbTeams.find(
+                              (t) => t.team_name === teamA.name,
+                            );
+                            return team ? dbP.team_id === team.team_id : true;
+                          })
+                          .map((dbP) => (
+                            <option
+                              key={dbP.player_id}
+                              value={dbP.player_name}
+                              className="text-black"
+                            >
+                              {dbP.player_name}
+                            </option>
+                          ))}
+                        <option value={p.ign} className="hidden">
+                          {p.ign}
+                        </option>
+                      </select>
+                    </td>
+                    {game === "Valorant" && (
+                      <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
+                            {p.agent ? p.agent[0] : ""}
+                          </div>
+                          <select
+                            className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
+                            value={p.agent}
+                            onChange={(e) =>
+                              updatePlayer("A", idx, "agent", e.target.value)
+                            }
+                          >
+                            {agents.map((a) => (
+                              <option key={a} value={a}>
+                                {a}
                               </option>
                             ))}
-                          <option value={p.ign} className="hidden">
-                            {p.ign}
-                          </option>
-                        </select>
+                          </select>
+                        </div>
                       </td>
-                      {game === "Valorant" && (
-                        <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
-                              {p.agent ? p.agent[0] : ""}
-                            </div>
-                            <select
-                              className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
-                              value={p.agent}
-                              onChange={(e) =>
-                                updatePlayer("B", idx, "agent", e.target.value)
-                              }
-                            >
-                              {agents.map((a) => (
-                                <option key={a} value={a}>
-                                  {a}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </td>
-                      )}
-                      {game === "Valorant" ? (
-                        <>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`\${tableInput} text-[#f87171]`}
-                              value={p.acs}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "acs",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.k}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "k",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.d}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "d",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.a}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "a",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={`\${tableInput} text-[#f87171]`}
-                              value={p.econ}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "econ",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.first_kills}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "first_kills",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.plants}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "plants",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                            <input
-                              type="number"
-                              className={tableInput}
-                              value={p.defuse}
-                              onChange={(e) =>
-                                updatePlayer(
-                                  "B",
-                                  idx,
-                                  "defuse",
-                                  Number(e.target.value) || 0,
-                                )
-                              }
-                            />
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          {cfGroups.map((g) => {
-                            if (g.isTotal) {
-                              return (
-                                <React.Fragment key={g.id}>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                    {getCfTotal(p, "k")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                    {getCfTotal(p, "d")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                    {getCfTotal(p, "a")}
-                                  </td>
-                                  <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                    {getCfTotal(p, "h")}
-                                  </td>
-                                </React.Fragment>
-                              );
+                    )}
+                    {game === "Valorant" ? (
+                      <>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={`\${tableInput} text-emerald-400`}
+                            value={p.acs}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "acs",
+                                Number(e.target.value) || 0,
+                              )
                             }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.k}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "k",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.d}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "d",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.a}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "a",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={`\${tableInput} text-emerald-400`}
+                            value={p.econ}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "econ",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.first_kills}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "first_kills",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.plants}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "plants",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.defuse}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "A",
+                                idx,
+                                "defuse",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        {cfGroups.map((g) => {
+                          if (g.isTotal) {
                             return (
                               <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_k`] !== undefined
-                                        ? p[`${g.id}_k`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "B",
-                                        idx,
-                                        `${g.id}_k`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                  {getCfTotal(p, "k")}
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_d`] !== undefined
-                                        ? p[`${g.id}_d`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "B",
-                                        idx,
-                                        `${g.id}_d`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                  {getCfTotal(p, "d")}
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                  <input
-                                    type="number"
-                                    className={tableInput}
-                                    value={
-                                      p[`${g.id}_a`] !== undefined
-                                        ? p[`${g.id}_a`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "B",
-                                        idx,
-                                        `${g.id}_a`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                  {getCfTotal(p, "a")}
                                 </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ padding: '16px 12px' }}>
-                                  <input
-                                    type="number"
-                                    className={`${tableInput} text-[#00ffcc]`}
-                                    value={
-                                      p[`${g.id}_h`] !== undefined
-                                        ? p[`${g.id}_h`]
-                                        : 0
-                                    }
-                                    onChange={(e) =>
-                                      updatePlayer(
-                                        "B",
-                                        idx,
-                                        `${g.id}_h`,
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
+                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                  {getCfTotal(p, "h")}
                                 </td>
                               </React.Fragment>
                             );
-                          })}
-                          <td className="px-2 py-2" style={{ padding: '16px 12px' }}></td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          { }
-          <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
-            <SectionHeader
-              icon={<IconMap />}
-              label="Heatmap Entry"
-              sub="Event Coordinate Plotting"
-              accent="#06b6d4"
-            />
-            <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: "20px" }}>
-              { }
-              <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
-                <Field label="Target Round">
-                  <div className="relative">
-                    <select
-                      className={selectBase}
-                      value={selectedRound}
-                      onChange={(e) => setSelectedRound(Number(e.target.value))}
-                    >
-                      {Array.from(
-                        { length: scoreA + scoreB || 1 },
-                        (_, i) => i + 1,
-                      ).map((r) => (
-                        <option key={r} value={r}>
-                          Round {r}
+                          }
+                          return (
+                            <React.Fragment key={g.id}>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_k`] !== undefined
+                                      ? p[`${g.id}_k`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "A",
+                                      idx,
+                                      `${g.id}_k`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_d`] !== undefined
+                                      ? p[`${g.id}_d`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "A",
+                                      idx,
+                                      `${g.id}_d`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_a`] !== undefined
+                                      ? p[`${g.id}_a`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "A",
+                                      idx,
+                                      `${g.id}_a`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                                <input
+                                  type="number"
+                                  className={`${tableInput} text-[#00ffcc]`}
+                                  value={
+                                    p[`${g.id}_h`] !== undefined
+                                      ? p[`${g.id}_h`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "A",
+                                      idx,
+                                      `${g.id}_h`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                            </React.Fragment>
+                          );
+                        })}
+                        <td className="px-2 py-2" style={{ paddingTop: '8px', paddingBottom: '8px' }}></td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+                { }
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="h-0.5 bg-slate-700/30 light:bg-slate-300"
+                  ></td>
+                </tr>
+                { }
+                {playersB.map((p, idx) => (
+                  <tr
+                    key={`b-${idx}`}
+                    className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
+                  >
+                    <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
+                      <select
+                        className={`bg-transparent text-[#f87171] light:text-red-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
+                        value={p.ign}
+                        onChange={(e) =>
+                          updatePlayer("B", idx, "ign", e.target.value)
+                        }
+                      >
+                        <option value="" className="text-black">
+                          Select Player
                         </option>
-                      ))}
-                    </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                      ▾
-                    </div>
-                  </div>
-                </Field>
-                <Field label="Action Marker">
-                  <div style={{ display: 'flex', gap: '16px' }}>
-                    <button
-                      onClick={() => setSelectedAction("Plant")}
-                      className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Plant" ? "bg-red-500/20 border-red-500 text-red-400 light:text-red-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
-                      style={{ flex: 1, padding: '12px' }}
-                    >
-                      Plant
-                    </button>
-                    <button
-                      onClick={() => setSelectedAction("Defuse")}
-                      className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Defuse" ? "bg-blue-500/20 border-blue-500 text-blue-400 light:text-blue-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
-                      style={{ flex: 1, padding: '12px' }}
-                    >
-                      Defuse
-                    </button>
-                  </div>
-                </Field>
-                <Field label="Manual Input (X/Y %)">
-                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <input
-                      type="number"
-                      className={inputBase}
-                      style={{ flex: 1 }}
-                      placeholder="X %"
-                      value={manualX}
-                      onChange={(e) => setManualX(e.target.value)}
-                    />
-                    <input
-                      type="number"
-                      className={inputBase}
-                      style={{ flex: 1 }}
-                      placeholder="Y %"
-                      value={manualY}
-                      onChange={(e) => setManualY(e.target.value)}
-                    />
-                    <button
-                      onClick={handleManualAdd}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-[10px] uppercase tracking-widest transition-colors shadow-lg"
-                      style={{ padding: '12px 24px' }}
-                    >
-                      Add
-                    </button>
-                  </div>
-                </Field>
-                <div className="flex-1">
-                  <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-3">
-                    Round {selectedRound} Events
-                  </div>
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto de-scroll pr-1">
-                    {heatmapData
-                      .filter((h) => h.round === selectedRound)
-                      .map((h) => (
-                        <div
-                          key={h.id}
-                          className="flex items-center justify-between bg-slate-800/40 light:bg-slate-100 border border-slate-700/50 light:border-slate-300 rounded p-2"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div
-                              className={`w-2 h-2 rounded-full ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_8px_#ef4444]" : "bg-blue-500 shadow-[0_0_8px_#3b82f6]"}`}
-                            ></div>
-                            <span className="text-[10px] font-bold text-slate-300 light:text-slate-700">
-                              {h.type}
-                            </span>
+                        {dbPlayers
+                          .filter((dbP) => {
+                            const team = dbTeams.find(
+                              (t) => t.team_name === teamB.name,
+                            );
+                            return team ? dbP.team_id === team.team_id : true;
+                          })
+                          .map((dbP) => (
+                            <option
+                              key={dbP.player_id}
+                              value={dbP.player_name}
+                              className="text-black"
+                            >
+                              {dbP.player_name}
+                            </option>
+                          ))}
+                        <option value={p.ign} className="hidden">
+                          {p.ign}
+                        </option>
+                      </select>
+                    </td>
+                    {game === "Valorant" && (
+                      <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
+                            {p.agent ? p.agent[0] : ""}
                           </div>
-                          <button
-                            onClick={() => removeHeatmapEvent(h.id)}
-                            className="text-slate-500 hover:text-red-400"
+                          <select
+                            className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
+                            value={p.agent}
+                            onChange={(e) =>
+                              updatePlayer("B", idx, "agent", e.target.value)
+                            }
                           >
-                            ✕
-                          </button>
+                            {agents.map((a) => (
+                              <option key={a} value={a}>
+                                {a}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      ))}
-                    {heatmapData.filter((h) => h.round === selectedRound)
-                      .length === 0 && (
-                        <div className="text-[10px] text-slate-500 italic text-center py-4">
-                          No events logged for this round. Click on the map to add
-                          one.
-                        </div>
-                      )}
+                      </td>
+                    )}
+                    {game === "Valorant" ? (
+                      <>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={`\${tableInput} text-[#f87171]`}
+                            value={p.acs}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "acs",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.k}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "k",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.d}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "d",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.a}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "a",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={`\${tableInput} text-[#f87171]`}
+                            value={p.econ}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "econ",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.first_kills}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "first_kills",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.plants}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "plants",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+                          <input
+                            type="number"
+                            className={tableInput}
+                            value={p.defuse}
+                            onChange={(e) =>
+                              updatePlayer(
+                                "B",
+                                idx,
+                                "defuse",
+                                Number(e.target.value) || 0,
+                              )
+                            }
+                          />
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        {cfGroups.map((g) => {
+                          if (g.isTotal) {
+                            return (
+                              <React.Fragment key={g.id}>
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
+                                  {getCfTotal(p, "k")}
+                                </td>
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
+                                  {getCfTotal(p, "d")}
+                                </td>
+                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
+                                  {getCfTotal(p, "a")}
+                                </td>
+                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
+                                  {getCfTotal(p, "h")}
+                                </td>
+                              </React.Fragment>
+                            );
+                          }
+                          return (
+                            <React.Fragment key={g.id}>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_k`] !== undefined
+                                      ? p[`${g.id}_k`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "B",
+                                      idx,
+                                      `${g.id}_k`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_d`] !== undefined
+                                      ? p[`${g.id}_d`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "B",
+                                      idx,
+                                      `${g.id}_d`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
+                                <input
+                                  type="number"
+                                  className={tableInput}
+                                  value={
+                                    p[`${g.id}_a`] !== undefined
+                                      ? p[`${g.id}_a`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "B",
+                                      idx,
+                                      `${g.id}_a`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ padding: '16px 12px' }}>
+                                <input
+                                  type="number"
+                                  className={`${tableInput} text-[#00ffcc]`}
+                                  value={
+                                    p[`${g.id}_h`] !== undefined
+                                      ? p[`${g.id}_h`]
+                                      : 0
+                                  }
+                                  onChange={(e) =>
+                                    updatePlayer(
+                                      "B",
+                                      idx,
+                                      `${g.id}_h`,
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </td>
+                            </React.Fragment>
+                          );
+                        })}
+                        <td className="px-2 py-2" style={{ padding: '16px 12px' }}></td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        { }
+        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
+          <SectionHeader
+            icon={<IconMap />}
+            label="Heatmap Entry"
+            sub="Event Coordinate Plotting"
+            accent="#06b6d4"
+          />
+          <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: "20px" }}>
+            { }
+            <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
+              <Field label="Target Round">
+                <div className="relative">
+                  <select
+                    className={selectBase}
+                    value={selectedRound}
+                    onChange={(e) => setSelectedRound(Number(e.target.value))}
+                  >
+                    {Array.from(
+                      { length: scoreA + scoreB || 1 },
+                      (_, i) => i + 1,
+                    ).map((r) => (
+                      <option key={r} value={r}>
+                        Round {r}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                    ▾
                   </div>
                 </div>
-              </div>
-              { }
-              <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]" style={{ padding: '24px' }}>
-                <div
-                  className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
-                  onClick={handleMapClick}
-                >
-                  {heatmapNotif && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 text-white px-4 py-2 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.4)] pointer-events-none animate-[slideUpFade_0.3s_ease]">
-                      {heatmapNotif}
-                    </div>
-                  )}
-                  <img
-                    key={mapName}
-                    src={`/assets/${mapName.replace(/\s+/g, "_")}.png`}
-                    alt={`${mapName} Map`}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/assets/map_placeholder.png";
-                    }}
-                    className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity"
+              </Field>
+              <Field label="Action Marker">
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <button
+                    onClick={() => setSelectedAction("Plant")}
+                    className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Plant" ? "bg-red-500/20 border-red-500 text-red-400 light:text-red-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                    style={{ flex: 1, padding: '12px' }}
+                  >
+                    Plant
+                  </button>
+                  <button
+                    onClick={() => setSelectedAction("Defuse")}
+                    className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Defuse" ? "bg-blue-500/20 border-blue-500 text-blue-400 light:text-blue-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
+                    style={{ flex: 1, padding: '12px' }}
+                  >
+                    Defuse
+                  </button>
+                </div>
+              </Field>
+              <Field label="Manual Input (X/Y %)">
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    className={inputBase}
+                    style={{ flex: 1 }}
+                    placeholder="X %"
+                    value={manualX}
+                    onChange={(e) => setManualX(e.target.value)}
                   />
-                  { }
+                  <input
+                    type="number"
+                    className={inputBase}
+                    style={{ flex: 1 }}
+                    placeholder="Y %"
+                    value={manualY}
+                    onChange={(e) => setManualY(e.target.value)}
+                  />
+                  <button
+                    onClick={handleManualAdd}
+                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-[10px] uppercase tracking-widest transition-colors shadow-lg"
+                    style={{ padding: '12px 24px' }}
+                  >
+                    Add
+                  </button>
+                </div>
+              </Field>
+              <div className="flex-1">
+                <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-3">
+                  Round {selectedRound} Events
+                </div>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto de-scroll pr-1">
                   {heatmapData
                     .filter((h) => h.round === selectedRound)
                     .map((h) => (
                       <div
                         key={h.id}
-                        className={`absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white animate-in zoom-in ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_12px_#ef4444]" : "bg-blue-500 shadow-[0_0_12px_#3b82f6]"}`}
-                        style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                      ></div>
+                        className="flex items-center justify-between bg-slate-800/40 light:bg-slate-100 border border-slate-700/50 light:border-slate-300 rounded p-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_8px_#ef4444]" : "bg-blue-500 shadow-[0_0_8px_#3b82f6]"}`}
+                          ></div>
+                          <span className="text-[10px] font-bold text-slate-300 light:text-slate-700">
+                            {h.type}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => removeHeatmapEvent(h.id)}
+                          className="text-slate-500 hover:text-red-400"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     ))}
+                  {heatmapData.filter((h) => h.round === selectedRound)
+                    .length === 0 && (
+                      <div className="text-[10px] text-slate-500 italic text-center py-4">
+                        No events logged for this round. Click on the map to add
+                        one.
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
-          </div>
-          { }
-          <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-            <SectionHeader
-              icon={<IconNotes />}
-              label="Submit"
-              sub="Match Data Submission"
-              accent="#10b981"
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: "20px", padding: '56px 32px' }}>
-              <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'flex-end' }}>
-                <button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className={`flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 ${submitSuccess
-                      ? "bg-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.4)] success-flash"
-                      : isSubmitting
-                        ? "opacity-70 cursor-wait"
-                        : "submit-pulse hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]"
-                    }`}
-                  style={{
-                    padding: '12px 32px',
-                    borderRadius: '9999px',
-                    ...(!submitSuccess ? { background: "linear-gradient(135deg, #0d9488, #2563eb)" } : {})
+            { }
+            <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]" style={{ padding: '24px' }}>
+              <div
+                className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
+                onClick={handleMapClick}
+              >
+                {heatmapNotif && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 text-white px-4 py-2 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.4)] pointer-events-none animate-[slideUpFade_0.3s_ease]">
+                    {heatmapNotif}
+                  </div>
+                )}
+                <img
+                  key={mapName}
+                  src={`/assets/${mapName.replace(/\s+/g, "_")}.png`}
+                  alt={`${mapName} Map`}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/assets/map_placeholder.png";
                   }}
-                >
-                  {isSubmitting ? (
-                    <svg
-                      className="animate-spin w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                  ) : (
-                    <IconSave />
-                  )}
-                  {submitSuccess
-                    ? "Submitted!"
-                    : isSubmitting
-                      ? "Submitting..."
-                      : "Submit Data"}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 xl:flex-none px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 border border-red-500/40 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-                  style={{
-                    padding: '12px 32px',
-                    borderRadius: '9999px',
-                    background: "linear-gradient(135deg, #991b1b, #dc2626)",
-                  }}
-                >
-                  Clear All
-                </button>
+                  className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity"
+                />
+                { }
+                {heatmapData
+                  .filter((h) => h.round === selectedRound)
+                  .map((h) => (
+                    <div
+                      key={h.id}
+                      className={`absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white animate-in zoom-in ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_12px_#ef4444]" : "bg-blue-500 shadow-[0_0_12px_#3b82f6]"}`}
+                      style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                    ></div>
+                  ))}
               </div>
             </div>
           </div>
-          { }
-
-          {submittedRecords.length > 0 && (
-            <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/60 light:border-slate-200 overflow-hidden shadow-2xl">
-              <div className="px-6 py-4 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/50 light:bg-slate-50 flex flex-col gap-1">
-                <h3 className="text-xl font-black text-white light:text-slate-900 tracking-wider">SUBMITTED RECORDS</h3>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{game.toUpperCase()} | REGULAR SEASON | W{week} D{day} M{match} (ALL SETS)</span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-sm text-slate-300 light:text-slate-700 whitespace-nowrap">
-                  <thead>
-                    <tr className="text-[10px] uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100">
-                      <th className="px-3 py-3 font-bold text-center">Week</th>
-                      <th className="px-3 py-3 font-bold text-center">Day</th>
-                      <th className="px-3 py-3 font-bold text-center">Match</th>
-                      <th className="px-3 py-3 font-bold text-center">Set</th>
-                      <th className="px-4 py-3 font-bold">Team</th>
-                      <th className="px-4 py-3 font-bold">Player</th>
-                      <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
-                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Performance Score</th>
-                      <th className="px-3 py-3 font-bold text-center">Kills</th>
-                      <th className="px-3 py-3 font-bold text-center">Deaths</th>
-                      <th className="px-3 py-3 font-bold text-center">Assists</th>
-                      <th className="px-4 py-3 font-bold text-center text-emerald-400">Trades</th>
-                      <th className="px-4 py-3 font-bold text-center">First Bloods</th>
-                      <th className="px-4 py-3 font-bold text-center">Plants</th>
-                      <th className="px-4 py-3 font-bold text-center">Defuses</th>
-                      <th className="px-4 py-3 font-bold text-center">Agent</th>
-                      <th className="px-4 py-3 font-bold text-center">Rounds</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
-                    {submittedRecords.map((rec, idx) => {
-                      const isTeamA = rec.team_name === (teamA.name || "Team A");
-                      const teamColorClass = isTeamA ? "text-blue-400" : "text-red-400";
-
-                      return (
-                        <tr key={idx} className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
-                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.week}</td>
-                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.day}</td>
-                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.match}</td>
-                          <td className="px-3 py-2 text-center text-xs font-bold">{rec.set_num}</td>
-                          <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.team_name}</td>
-                          <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.ign}</td>
-                          <td className={`px-3 py-2 text-center font-bold ${rec.win ? 'text-emerald-400' : 'text-red-500'}`}>{rec.win ? 'Yes' : 'No'}</td>
-                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
-                          <td className="px-3 py-2 text-center font-bold">{rec.kills}</td>
-                          <td className="px-3 py-2 text-center font-bold">{rec.deaths}</td>
-                          <td className="px-3 py-2 text-center font-bold">{rec.assists}</td>
-                          <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.econ}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.first_kills || 0}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.plants || 0}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.defuse || 0}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
-                          <td className="px-4 py-2 text-center font-bold">{rec.rounds}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-          <div className="h-4" />
         </div>
+        { }
+        <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
+          <SectionHeader
+            icon={<IconNotes />}
+            label="Submit"
+            sub="Match Data Submission"
+            accent="#10b981"
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: "20px", padding: '56px 32px' }}>
+            <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'flex-end' }}>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 ${submitSuccess
+                  ? "bg-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.4)] success-flash"
+                  : isSubmitting
+                    ? "opacity-70 cursor-wait"
+                    : "submit-pulse hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+                  }`}
+                style={{
+                  padding: '12px 32px',
+                  borderRadius: '9999px',
+                  ...(!submitSuccess ? { background: "linear-gradient(135deg, #0d9488, #2563eb)" } : {})
+                }}
+              >
+                {isSubmitting ? (
+                  <svg
+                    className="animate-spin w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                ) : (
+                  <IconSave />
+                )}
+                {submitSuccess
+                  ? "Submitted!"
+                  : isSubmitting
+                    ? "Submitting..."
+                    : "Submit Data"}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="flex-1 xl:flex-none px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 border border-red-500/40 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                style={{
+                  padding: '12px 32px',
+                  borderRadius: '9999px',
+                  background: "linear-gradient(135deg, #991b1b, #dc2626)",
+                }}
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+        { }
+
+        {submittedRecords.length > 0 && (
+          <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/60 light:border-slate-200 overflow-hidden shadow-2xl">
+            <div className="px-6 py-4 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/50 light:bg-slate-50 flex flex-col gap-1">
+              <h3 className="text-xl font-black text-white light:text-slate-900 tracking-wider">SUBMITTED RECORDS</h3>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{game.toUpperCase()} | REGULAR SEASON | W{week} D{day} M{match} (ALL SETS)</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm text-slate-300 light:text-slate-700 whitespace-nowrap">
+                <thead>
+                  <tr className="text-[10px] uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100">
+                    <th className="px-3 py-3 font-bold text-center">Week</th>
+                    <th className="px-3 py-3 font-bold text-center">Day</th>
+                    <th className="px-3 py-3 font-bold text-center">Match</th>
+                    <th className="px-3 py-3 font-bold text-center">Set</th>
+                    <th className="px-4 py-3 font-bold">Team</th>
+                    <th className="px-4 py-3 font-bold">Player</th>
+                    <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">Performance Score</th>
+                    <th className="px-3 py-3 font-bold text-center">Kills</th>
+                    <th className="px-3 py-3 font-bold text-center">Deaths</th>
+                    <th className="px-3 py-3 font-bold text-center">Assists</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">Trades</th>
+                    <th className="px-4 py-3 font-bold text-center">First Bloods</th>
+                    <th className="px-4 py-3 font-bold text-center">Plants</th>
+                    <th className="px-4 py-3 font-bold text-center">Defuses</th>
+                    <th className="px-4 py-3 font-bold text-center">Agent</th>
+                    <th className="px-4 py-3 font-bold text-center">Rounds</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
+                  {submittedRecords.map((rec, idx) => {
+                    const isTeamA = rec.team_name === (teamA.name || "Team A");
+                    const teamColorClass = isTeamA ? "text-blue-400" : "text-red-400";
+
+                    return (
+                      <tr key={idx} className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
+                        <td className="px-3 py-2 text-center text-xs font-bold">{rec.week}</td>
+                        <td className="px-3 py-2 text-center text-xs font-bold">{rec.day}</td>
+                        <td className="px-3 py-2 text-center text-xs font-bold">{rec.match}</td>
+                        <td className="px-3 py-2 text-center text-xs font-bold">{rec.set_num}</td>
+                        <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.team_name}</td>
+                        <td className={`px-4 py-2 font-bold ${teamColorClass}`}>{rec.ign}</td>
+                        <td className={`px-3 py-2 text-center font-bold ${rec.win ? 'text-emerald-400' : 'text-red-500'}`}>{rec.win ? 'Yes' : 'No'}</td>
+                        <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.acs}</td>
+                        <td className="px-3 py-2 text-center font-bold">{rec.kills}</td>
+                        <td className="px-3 py-2 text-center font-bold">{rec.deaths}</td>
+                        <td className="px-3 py-2 text-center font-bold">{rec.assists}</td>
+                        <td className="px-4 py-2 text-center font-bold text-emerald-400">{rec.econ}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.first_kills || 0}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.plants || 0}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.defuse || 0}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.agent}</td>
+                        <td className="px-4 py-2 text-center font-bold">{rec.rounds}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        <div className="h-4" />
       </div>
+    </div>
 
       { }
-      {submitSuccess && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-          <span className="text-sm font-bold tracking-wide">
-            Data submitted successfully!
-          </span>
-        </div>
-      )}
-    </div>
+  {
+    submitSuccess && (
+      <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        <span className="text-sm font-bold tracking-wide">
+          Data submitted successfully!
+        </span>
+      </div>
+    )
+  }
+    </div >
   );
 };
 export default DataEntry;
