@@ -989,6 +989,35 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     }
   };
 
+  const handleRoundInputKeyDown = (e, rowId, index) => {
+    if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      e.preventDefault();
+      let nextRow = rowId;
+      let nextIdx = index;
+
+      if (e.key === 'ArrowRight') nextIdx = index + 1;
+      else if (e.key === 'ArrowLeft') nextIdx = index - 1;
+      else if (e.key === 'ArrowDown') {
+        if (rowId === 'A') nextRow = 'B';
+        else if (rowId === 'B') nextRow = 'T';
+        else if (rowId === 'T') nextRow = 'D';
+      } else if (e.key === 'ArrowUp') {
+        if (rowId === 'D') nextRow = 'T';
+        else if (rowId === 'T') nextRow = 'B';
+        else if (rowId === 'B') nextRow = 'A';
+      }
+
+      let nextInput = document.getElementById(`round-input-${nextRow}-${nextIdx}`);
+      if (!nextInput && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && nextIdx > 11 && (nextRow === 'T' || nextRow === 'D')) {
+        nextInput = document.getElementById(`round-input-${nextRow}-11`);
+      }
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }
+  };
+
   return (
     <div
       className="w-full min-h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800"
@@ -1364,7 +1393,12 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               <style>{`
                 @keyframes pulse-beacon { 0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.5); } 50% { box-shadow: 0 0 0 10px rgba(251,191,36,0); } }
                 .round-beacon { animation: pulse-beacon 1.8s ease-in-out infinite; }
-                .round-dot-input:focus { outline: none; }
+                .round-dot-input:focus { 
+                  outline: 2px solid #38bdf8 !important; 
+                  outline-offset: 2px; 
+                  background-color: rgba(56, 189, 248, 0.15) !important;
+                  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5) !important;
+                }
               `}</style>
 
               {/* Live Round Beacon */}
@@ -1408,7 +1442,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                               <div style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(100,116,139,0.6)', letterSpacing: '0.05em' }}>R{i + 1}</div>
                               <div style={{ width: `${size}px`, height: `${size}px`, borderRadius: '10px', background: c.bg, border: `1px solid ${c.border}`, boxShadow: c.glow, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s', cursor: 'text' }}>
-                                <input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('A', i, e.target.value)} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
+                                <input id={`round-input-A-${i}`} className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('A', i, e.target.value)} onFocus={(e) => e.target.select()} onKeyDown={(e) => handleRoundInputKeyDown(e, 'A', i)} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
                               </div>
                             </div>
                           );
@@ -1450,7 +1484,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                               <div style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(100,116,139,0.6)', letterSpacing: '0.05em' }}>R{i + 1}</div>
                               <div style={{ width: `${size}px`, height: `${size}px`, borderRadius: '10px', background: c.bg, border: `1px solid ${c.border}`, boxShadow: c.glow, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s', cursor: 'text' }}>
-                                <input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('B', i, e.target.value)} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
+                                <input id={`round-input-B-${i}`} className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => updateRoundEvent('B', i, e.target.value)} onFocus={(e) => e.target.select()} onKeyDown={(e) => handleRoundInputKeyDown(e, 'B', i)} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: c.text, fontSize: size === 36 ? '14px' : '12px', fontWeight: 900, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'text', borderRadius: '10px' }} />
                               </div>
                             </div>
                           );
@@ -1492,13 +1526,13 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   <div style={{ marginBottom: '10px' }}>
                     <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(251,191,36,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>Timeouts</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {Array.from({ length: 12 }, (_, i) => { const val = timeoutRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(251,191,36,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(251,191,36,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...timeoutRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setTimeoutRowLogs(logs); }} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#fbbf24' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
+                      {Array.from({ length: 12 }, (_, i) => { const val = timeoutRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(251,191,36,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(251,191,36,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input id={`round-input-T-${i}`} className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...timeoutRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setTimeoutRowLogs(logs); }} onFocus={(e) => e.target.select()} onKeyDown={(e) => handleRoundInputKeyDown(e, 'T', i)} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#fbbf24' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
                     </div>
                   </div>
                   <div>
                     <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(167,139,250,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>Dead Rounds</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {Array.from({ length: 12 }, (_, i) => { const val = deadRoundRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(167,139,250,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(167,139,250,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...deadRoundRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setDeadRoundRowLogs(logs); }} onFocus={(e) => e.target.select()} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#a78bfa' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
+                      {Array.from({ length: 12 }, (_, i) => { const val = deadRoundRowLogs[i] || ''; return (<div key={i} style={{ width: '26px', height: '26px', borderRadius: '6px', background: val ? 'rgba(167,139,250,0.2)' : 'rgba(30,41,59,0.5)', border: val ? '1px solid rgba(167,139,250,0.5)' : '1px solid rgba(51,65,85,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input id={`round-input-D-${i}`} className="round-dot-input" type="text" maxLength="1" value={val} onChange={(e) => { const logs = [...deadRoundRowLogs]; logs[i] = e.target.value.toUpperCase().slice(-1); setDeadRoundRowLogs(logs); }} onFocus={(e) => e.target.select()} onKeyDown={(e) => handleRoundInputKeyDown(e, 'D', i)} style={{ width: '100%', height: '100%', textAlign: 'center', background: 'transparent', color: val ? '#a78bfa' : 'transparent', fontSize: '11px', fontWeight: 900, border: 'none', outline: 'none', cursor: 'text', borderRadius: '6px' }} /></div>); })}
                     </div>
                   </div>
                 </div>
