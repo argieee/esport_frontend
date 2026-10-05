@@ -2499,32 +2499,28 @@ const DataEntry = ({ globalGame, globalTournament }) => {
         )}
         <div className="h-4" />
       </div>
+      
+      {submitSuccess && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span className="text-sm font-bold tracking-wide">
+            Data submitted successfully!
+          </span>
+        </div>
+      )}
     </div>
-
-      { }
-  {
-    submitSuccess && (
-      <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-        <span className="text-sm font-bold tracking-wide">
-          Data submitted successfully!
-        </span>
-      </div>
-    )
-  }
-    </div >
   );
 };
 export default DataEntry;
