@@ -212,6 +212,28 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.post('/api/refresh', async (req, res) => {
+  if (!supabase) {
+    return res.status(500).json({ error: 'Supabase client not initialized.' });
+  }
+  const { refresh_token } = req.body;
+  if (!refresh_token) {
+    return res.status(400).json({ error: 'Refresh token is required.' });
+  }
+  try {
+    const authClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+    const { data, error } = await authClient.auth.refreshSession({ refresh_token });
+    if (error) {
+      return res.status(401).json({ error: error.message });
+    }
+    res.json({ message: 'Token refreshed', session: data.session });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.post('/api/admin/create-user', authenticateToken, isAdmin, async (req, res) => {
   if (!req.adminUser.is_super_admin) {
     return res.status(403).json({ error: 'Access denied. Only Super Admins can create new accounts.' });
