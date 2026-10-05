@@ -1500,7 +1500,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 <div style={{ borderRadius: '12px', border: '1px solid rgba(51,65,85,0.5)', background: 'rgba(15,23,42,0.5)', padding: '16px' }}>
                   <div style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(100,116,139,0.8)', textTransform: 'uppercase', marginBottom: '12px' }}>Key Legend</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {[['K', '#4ade80', 'Kill / Round Win'], ['D', '#f87171', 'Death / Round Loss'], ['P', '#a78bfa', 'Plant'], ['T', '#fbbf24', 'Timeout']].map(([key, color, label]) => (
+                    {[['K', '#4ade80', 'Kill / Round Win'], ['D', '#f87171', 'Death / Round Loss'], ['P', '#a78bfa', 'Plant'], ['T', '#fbbf24', 'Time']].map(([key, color, label]) => (
                       <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: `${color}22`, border: `1px solid ${color}88`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, fontSize: '12px', fontWeight: 900, flexShrink: 0 }}>{key}</div>
                         <span style={{ fontSize: '10px', color: 'rgba(148,163,184,0.8)', fontWeight: 600 }}>{label}</span>
