@@ -132,9 +132,9 @@ const Field = ({ label, children }) => (
   </div>
 );
 const inputBase =
-  "bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-xs font-bold px-3 py-2.5 rounded-lg outline-none focus:border-cyan-500/70 light:focus:border-blue-500/70 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all w-full placeholder-slate-600 light:placeholder-slate-400";
+  "bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-xs font-bold px-3 py-1.5 rounded-sm outline-none focus:border-cyan-500/70 light:focus:border-blue-500/70 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all w-full placeholder-slate-600 light:placeholder-slate-400";
 const selectBase =
-  "bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-xs font-bold px-3 py-2.5 rounded-lg outline-none focus:border-cyan-500/70 light:focus:border-blue-500/70 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all w-full cursor-pointer appearance-none";
+  "bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 text-white light:text-slate-900 text-xs font-bold px-3 py-1.5 rounded-sm outline-none focus:border-cyan-500/70 light:focus:border-blue-500/70 focus:ring-2 focus:ring-cyan-500/10 light:focus:ring-blue-500/10 transition-all w-full cursor-pointer appearance-none";
 const tableInput =
   "bg-transparent w-full text-center outline-none focus:bg-slate-800/70 light:focus:bg-slate-200 focus:ring-1 focus:ring-cyan-500/50 light:focus:ring-blue-500/50 rounded-md py-1.5 transition-all text-xs font-bold text-white light:text-slate-900";
 function useStickyState(defaultValue, key) {
@@ -149,7 +149,7 @@ function useStickyState(defaultValue, key) {
   });
 
   const isRemote = React.useRef(false);
-  
+
   useEffect(() => {
     window.sessionStorage.setItem(key, JSON.stringify(value));
     const room = window.currentDataEntryRoom || "Default";
@@ -177,7 +177,7 @@ function useStickyState(defaultValue, key) {
 }
 const DataEntry = ({ globalGame, globalTournament }) => {
   window.currentDataEntryRoom = `DataEntry_${globalTournament || "Default"}`;
-  
+
   useEffect(() => {
     socket.emit('joinRoom', window.currentDataEntryRoom);
   }, [globalTournament]);
@@ -205,11 +205,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   const [scoreA, setScoreA] = useStickyState(13, `${setScope}_scoreA`);
   const [scoreB, setScoreB] = useStickyState(11, `${setScope}_scoreB`);
   const [roundLogsA, setRoundLogsA] = useStickyState(
-    Array(25).fill(""),
+    Array(40).fill(""),
     `${setScope}_roundLogsA`,
   );
   const [roundLogsB, setRoundLogsB] = useStickyState(
-    Array(25).fill(""),
+    Array(40).fill(""),
     `${setScope}_roundLogsB`,
   );
   const [sideA, setSideA] = useStickyState("GR", `${setScope}_sideA`);
@@ -223,36 +223,23 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     `${setScope}_timeoutB`,
   );
   const [timeoutRowLogs, setTimeoutRowLogs] = useStickyState(
-    Array(25).fill(""),
+    Array(40).fill(""),
     `${setScope}_timeoutRowLogs`,
   );
   const [deadRoundRowLogs, setDeadRoundRowLogs] = useStickyState(
-    Array(25).fill(""),
+    Array(40).fill(""),
     `${setScope}_deadRoundRowLogs`,
   );
   const [matchWin, setMatchWin] = useStickyState("B", `${setScope}_matchWin`);
   const [playersA, setPlayersA] = useStickyState(() => {
-    const defaultAgents = ["Jett", "Fade", "Neon", "Clove", "Chamber"];
-    const defaultIGNs = [
-      "XIP Hotsauze",
-      "XIP Emman",
-      "XIP JA",
-      "XIP Fixyy",
-      "XIP Rizza",
-    ];
-    const defaultK = [20, 13, 11, 9, 5];
-    const defaultD = [15, 12, 12, 7, 6];
-    const defaultA = [5, 5, 6, 2, 3];
-    const defaultACS = [2019, 1571, 1901, 1673, 1666];
-    const defaultEcon = [561, 532, 521, 492, 438];
-    return defaultIGNs.map((ign, i) => ({
-      ign: ign,
-      agent: defaultAgents[i],
-      k: defaultK[i],
-      d: defaultD[i],
-      a: defaultA[i],
-      acs: defaultACS[i],
-      econ: defaultEcon[i],
+    return Array(5).fill(null).map(() => ({
+      ign: "",
+      agent: "",
+      k: 0,
+      d: 0,
+      a: 0,
+      acs: 0,
+      econ: 0,
       first_kills: 0,
       plants: 0,
       defuse: 0,
@@ -260,28 +247,19 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     }));
   }, `${setScope}_playersA`);
   const [playersB, setPlayersB] = useStickyState(() => {
-    const defaultAgents = ["Viper", "Omen", "Gekko"];
-    const defaultIGNs = ["XIP Hotsauze", "XIP Hotsauze", "XIP Hotsauze"];
-    const defaultK = [2, 2, 4];
-    const defaultD = [5, 6, 7];
-    const defaultA = [12, 0, 12];
-    const defaultACS = [1037, 941, 810];
-    const defaultEcon = [255, 234, 214];
-    return Array(5)
-      .fill(null)
-      .map((_, i) => ({
-        ign: i < 3 ? defaultIGNs[i] : "GOAT",
-        agent: i < 3 ? defaultAgents[i] : "Sage",
-        k: i < 3 ? defaultK[i] : 0,
-        d: i < 3 ? defaultD[i] : 0,
-        a: i < 3 ? defaultA[i] : 0,
-        acs: i < 3 ? defaultACS[i] : 0,
-        econ: i < 3 ? defaultEcon[i] : 0,
-        first_kills: 0,
-        plants: 0,
-        defuse: 0,
-        ace: 0,
-      }));
+    return Array(5).fill(null).map(() => ({
+      ign: "",
+      agent: "",
+      k: 0,
+      d: 0,
+      a: 0,
+      acs: 0,
+      econ: 0,
+      first_kills: 0,
+      plants: 0,
+      defuse: 0,
+      ace: 0,
+    }));
   }, `${setScope}_playersB`);
   const [notes, setNotes] = useStickyState(
     "Pause at 12:00 due to the technical issue",
@@ -295,7 +273,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     const fetchRecords = async () => {
       try {
         const queryParams = new URLSearchParams({
-           game: game
+          game: game
         }).toString();
         const res = await fetch(`http://localhost:5000/api/match_records?${queryParams}`);
         if (res.ok) {
@@ -305,7 +283,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
             const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
             // 1. Most recently sent first
-            if (dateA !== dateB) return dateB - dateA; 
+            if (dateA !== dateB) return dateB - dateA;
             // 1.5. If same time (e.g. null), sort by match number (highest/newest match first)
             const matchA = Number(a.match) || 0;
             const matchB = Number(b.match) || 0;
@@ -313,7 +291,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             // 2. If same time and match, sort by set number (highest/newest set first)
             const setA = Number(a.set_num) || 0;
             const setB = Number(b.set_num) || 0;
-            if (setA !== setB) return setB - setA; 
+            if (setA !== setB) return setB - setA;
             // 3. Within the same set, keep Team 1 above Team 15
             if (a.team_name !== b.team_name) return (a.team_name || "").localeCompare(b.team_name || "");
             // 4. Finally, sort by player name
@@ -347,19 +325,30 @@ const DataEntry = ({ globalGame, globalTournament }) => {
 
   const handleManualAdd = () => {
     if (manualX !== "" && manualY !== "") {
-      setHeatmapData((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          round: selectedRound,
-          type: selectedAction,
-          x: parseFloat(manualX).toFixed(2),
-          y: parseFloat(manualY).toFixed(2),
-        },
-      ]);
+      setHeatmapData((prev) => {
+        const newEvents = [
+          {
+            id: Date.now(),
+            round: selectedRound,
+            type: selectedAction,
+            x: parseFloat(manualX).toFixed(2),
+            y: parseFloat(manualY).toFixed(2),
+          }
+        ];
+        if (selectedAction === "Defuse") {
+          newEvents.push({
+            id: Date.now() + 1,
+            round: selectedRound,
+            type: "Plant",
+            x: parseFloat(manualX).toFixed(2),
+            y: parseFloat(manualY).toFixed(2),
+          });
+        }
+        return [...prev, ...newEvents];
+      });
       setManualX("");
       setManualY("");
-      
+
       showHeatmapNotifMsg(selectedAction, selectedRound);
 
       const maxRounds = scoreA + scoreB || 1;
@@ -372,17 +361,28 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setHeatmapData((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        round: selectedRound,
-        type: selectedAction,
-        x: x.toFixed(2),
-        y: y.toFixed(2),
-      },
-    ]);
-    
+    setHeatmapData((prev) => {
+      const newEvents = [
+        {
+          id: Date.now(),
+          round: selectedRound,
+          type: selectedAction,
+          x: x.toFixed(2),
+          y: y.toFixed(2),
+        }
+      ];
+      if (selectedAction === "Defuse") {
+        newEvents.push({
+          id: Date.now() + 1,
+          round: selectedRound,
+          type: "Plant",
+          x: x.toFixed(2),
+          y: y.toFixed(2),
+        });
+      }
+      return [...prev, ...newEvents];
+    });
+
     showHeatmapNotifMsg(selectedAction, selectedRound);
 
     const maxRounds = scoreA + scoreB || 1;
@@ -490,10 +490,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     } else {
       setTeamB({ ...teamB, name: teamName });
     }
-    setRoundLogsA(Array(25).fill(""));
-    setRoundLogsB(Array(25).fill(""));
-    setTimeoutRowLogs(Array(25).fill(""));
-    setDeadRoundRowLogs(Array(25).fill(""));
+    setRoundLogsA(Array(40).fill(""));
+    setRoundLogsB(Array(40).fill(""));
+    setTimeoutRowLogs(Array(40).fill(""));
+    setDeadRoundRowLogs(Array(40).fill(""));
     setTimeoutA("AVAILABLE");
     setTimeoutB("AVAILABLE");
     const team = dbTeams.find((t) => t.team_name === teamName);
@@ -554,10 +554,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   const autoScoreA = calcRoundScore(roundLogsA);
   const autoScoreB = calcRoundScore(roundLogsB);
   const currentRoundNo = Math.min(
-    25,
+    40,
     roundLogsA.filter((v) => v !== "").length +
-      roundLogsB.filter((v) => v !== "").length +
-      1,
+    roundLogsB.filter((v) => v !== "").length +
+    1,
   );
   const handleTimeoutChange = (team, val) => {
     if (team === "A") {
@@ -621,24 +621,24 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     if (game === "Crossfire") {
       setIsSubmitting(true);
 
-        // Finish Live Match if broadcasting
-        if (broadcast) {
-           try {
-             await apiFetch('/api/matches/finish-live', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                 tournament_name: globalTournament || "Default",
-                 team_a_name: teamA.name,
-                 team_b_name: teamB.name,
-                 team_a_score: scoreA,
-                 team_b_score: scoreB
-               })
-             });
-           } catch (e) {
-             console.error('Failed to finish live match', e);
-           }
+      // Finish Live Match if broadcasting
+      if (broadcast) {
+        try {
+          await apiFetch('/api/matches/finish-live', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tournament_name: globalTournament || "Default",
+              team_a_name: teamA.name,
+              team_b_name: teamB.name,
+              team_a_score: scoreA,
+              team_b_score: scoreB
+            })
+          });
+        } catch (e) {
+          console.error('Failed to finish live match', e);
         }
+      }
 
       try {
         const payloadMap = {};
@@ -649,11 +649,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             assists = 0,
             headshots = 0;
           if (cfStatsMode === "perRound") {
-            Array.from({ length: 25 }).forEach((_, i) => {
-              const rK = Number(p[`r${i+1}_k`]) || 0;
-              const rD = Number(p[`r${i+1}_d`]) || 0;
-              const rA = Number(p[`r${i+1}_a`]) || 0;
-              const rH = Number(p[`r${i+1}_h`]) || 0;
+            Array.from({ length: 40 }).forEach((_, i) => {
+              const rK = Number(p[`r${i + 1}_k`]) || 0;
+              const rD = Number(p[`r${i + 1}_d`]) || 0;
+              const rA = Number(p[`r${i + 1}_a`]) || 0;
+              const rH = Number(p[`r${i + 1}_h`]) || 0;
               if (p.ign) {
                 rawEntries.push({
                   ign: p.ign, kills: rK, deaths: rD, assists: rA, headshots: rH, team_name: teamName, win: isWin
@@ -730,7 +730,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
           }
         }
         if (heatmapData.length > 0) {
-          const match_id = `${teamA.name}_vs_${teamB.name}_${mapName}_${Date.now()}`;
+          const match_id = `${teamA.name}_vs_${teamB.name}_${mapName}_Set${setNum}_${Date.now()}`;
           const formattedHeatmap = heatmapData.map((h) => ({
             game: "Crossfire",
             match_id,
@@ -765,24 +765,24 @@ const DataEntry = ({ globalGame, globalTournament }) => {
     } else {
       setIsSubmitting(true);
 
-        // Finish Live Match if broadcasting
-        if (broadcast) {
-           try {
-             await apiFetch('/api/matches/finish-live', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                 tournament_name: globalTournament || "Default",
-                 team_a_name: teamA.name,
-                 team_b_name: teamB.name,
-                 team_a_score: scoreA,
-                 team_b_score: scoreB
-               })
-             });
-           } catch (e) {
-             console.error('Failed to finish live match', e);
-           }
+      // Finish Live Match if broadcasting
+      if (broadcast) {
+        try {
+          await apiFetch('/api/matches/finish-live', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tournament_name: globalTournament || "Default",
+              team_a_name: teamA.name,
+              team_b_name: teamB.name,
+              team_a_score: scoreA,
+              team_b_score: scoreB
+            })
+          });
+        } catch (e) {
+          console.error('Failed to finish live match', e);
         }
+      }
 
       try {
         const payloadMap = {};
@@ -812,7 +812,6 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 aces: Number(p.ace) || 0,
                 agent: p.agent || "",
                 rounds: scoreA + scoreB,
-                agentRole: "Rifler",
                 team_name: teamName,
                 win: isWin,
               };
@@ -842,7 +841,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
           }
         }
         if (heatmapData.length > 0) {
-          const match_id = `${teamA.name}_vs_${teamB.name}_${mapName}_${Date.now()}`;
+          const match_id = `${teamA.name}_vs_${teamB.name}_${mapName}_Set${setNum}_${Date.now()}`;
           const formattedHeatmap = heatmapData.map((h) => ({
             game: "Valorant",
             match_id,
@@ -888,19 +887,23 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       setMapName("Bind");
       setScoreA(0);
       setScoreB(0);
-      setRoundLogsA(Array(25).fill(""));
-      setRoundLogsB(Array(25).fill(""));
+      setRoundLogsA(Array(40).fill(""));
+      setRoundLogsB(Array(40).fill(""));
       setPlayersA(
         Array(5)
           .fill(null)
           .map((_, i) => ({
             ign: "",
-            agent: "Jett",
+            agent: "",
             k: 0,
             d: 0,
             a: 0,
             acs: 0,
             econ: 0,
+            first_kills: 0,
+            plants: 0,
+            defuse: 0,
+            ace: 0,
           })),
       );
       setPlayersB(
@@ -908,12 +911,16 @@ const DataEntry = ({ globalGame, globalTournament }) => {
           .fill(null)
           .map((_, i) => ({
             ign: "",
-            agent: "Jett",
+            agent: "",
             k: 0,
             d: 0,
             a: 0,
             acs: 0,
             econ: 0,
+            first_kills: 0,
+            plants: 0,
+            defuse: 0,
+            ace: 0,
           })),
       );
       setNotes("");
@@ -922,7 +929,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
       setCfGroups([{ id: "g1", label: "TOTAL PLAYER STATS", isTotal: true }]);
       setTimeoutARound(null);
       setTimeoutBRound(null);
-      setTimeoutRowLogs(Array(25).fill(""));
+      setTimeoutRowLogs(Array(40).fill(""));
     }
   };
 
@@ -983,7 +990,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   };
 
   return (
-    <div 
+    <div
       className="h-full flex flex-col bg-[#090e14] light:bg-[#f8fafc] text-slate-200 light:text-slate-800"
       onKeyDown={handleGridNavigation}
     >
@@ -1051,199 +1058,191 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             <div className="lg:col-span-2 flex flex-col" style={{ gap: "24px" }}>
               {/* Match Header */}
               <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
-              <SectionHeader
-                icon={<IconGame />}
-                label="Main Match Header"
-                sub="Configuration"
-              />
-              <div className="grid grid-cols-2 lg:grid-cols-4" style={{ padding: "24px", gap: "20px" }}>
-                <Field label="League/Tournament:">
-                  <input
-                    type="text"
-                    className={inputBase}
-                    value={league}
-                    onChange={(e) => setLeague(e.target.value)}
-                    placeholder="e.g. VCT Pacific"
-                  />
-                </Field>
-                <Field label="Week:">
-                  <input
-                    type="number"
-                    className={inputBase}
-                    value={week}
-                    onChange={(e) => setWeek(e.target.value)}
-                  />
-                </Field>
-                <Field label="Day:">
-                  <input
-                    type="number"
-                    className={inputBase}
-                    value={day}
-                    onChange={(e) => setDay(e.target.value)}
-                  />
-                </Field>
-                <Field label="Match:">
-                  <input
-                    type="number"
-                    className={inputBase}
-                    value={match}
-                    onChange={(e) => setMatch(e.target.value)}
-                  />
-                </Field>
-                <Field label="Set:">
-                  <input
-                    type="number"
-                    className={inputBase}
-                    value={setNum}
-                    onChange={(e) => setSetNum(e.target.value)}
-                  />
-                </Field>
-                <Field label="Map:">
-                  <div className="relative">
-                    <select
-                      className={selectBase}
-                      value={mapName}
-                      onChange={(e) => setMapName(e.target.value)}
-                    >
-                      {game === "Valorant" ? (
-                        valorantMaps.map((m) => (
-                          <option key={m} value={m}>
-                            {m}
-                          </option>
-                        ))
-                      ) : (
-                        <>
-                          <option>Ankara</option>
-                          <option>Black Widow</option>
-                          <option>Compound</option>
-                          <option>Eagle Eye</option>
-                          <option>Mexico</option>
-                          <option>Port</option>
-                          <option>Sub Base</option>
-                        </>
-                      )}
-                    </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                      ▾
-                    </div>
-                  </div>
-                </Field>
-              </div>
-            </div>
-            
-            {/* ── Win Probability Module ── */}
-            {game === "Valorant" && (
-              <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
                 <SectionHeader
                   icon={<IconGame />}
-                  label="Win Probability"
-                  sub="Live Assessment"
-                  accent="#f59e0b"
+                  label="Main Match Header"
+                  sub="Configuration"
                 />
-                <div style={{ padding: "24px" }}>
-                  <div className="w-full">
-                    <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex flex-col">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
-                           <span className="text-3xl font-black text-blue-100">{Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-blue-500">%</span></span>
-                        </div>
-                        <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
-                        <div className="flex flex-col items-end">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
-                           <span className="text-3xl font-black text-red-100">{Math.max(0, Math.min(100, 100 - Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-red-500">%</span></span>
-                        </div>
-                      </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4" style={{ padding: "24px", gap: "20px" }}>
 
-                      <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-hidden mt-2 group shadow-inner">
-                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}%` }} />
+                  <Field label="Week:">
+                    <input
+                      type="number"
+                      className={`${inputBase.replace('w-full', 'w-16 text-center')}`}
+                      value={week}
+                      onChange={(e) => setWeek(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Day:">
+                    <input
+                      type="number"
+                      className={`${inputBase.replace('w-full', 'w-16 text-center')}`}
+                      value={day}
+                      onChange={(e) => setDay(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Match:">
+                    <input
+                      type="number"
+                      className={`${inputBase.replace('w-full', 'w-16 text-center')}`}
+                      value={match}
+                      onChange={(e) => setMatch(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Set:">
+                    <input
+                      type="number"
+                      className={`${inputBase.replace('w-full', 'w-16 text-center')}`}
+                      value={setNum}
+                      onChange={(e) => setSetNum(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Map:">
+                    <div className="relative">
+                      <select
+                        className={selectBase}
+                        value={mapName}
+                        onChange={(e) => setMapName(e.target.value)}
+                      >
+                        {game === "Valorant" ? (
+                          valorantMaps.map((m) => (
+                            <option key={m} value={m}>
+                              {m}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option>Ankara</option>
+                            <option>Black Widow</option>
+                            <option>Compound</option>
+                            <option>Eagle Eye</option>
+                            <option>Mexico</option>
+                            <option>Port</option>
+                            <option>Sub Base</option>
+                          </>
+                        )}
+                      </select>
+                      <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        ▾
                       </div>
                     </div>
-                  </div>
+                  </Field>
                 </div>
               </div>
-            )}
-            {game === "Crossfire" && (
-              <div className="bg-[#0d131c] rounded-2xl border border-slate-800/50 overflow-hidden shadow-xl">
-                <SectionHeader
-                  icon={<IconGame />}
-                  label="Win Probability"
-                  sub="Live Assessment"
-                  accent="#f59e0b"
-                />
-                <div style={{ padding: "24px" }}>
-                  <div className="flex flex-wrap items-end gap-8">
-                    <div className="w-full max-w-xl">
+
+              {/* ── Win Probability Module ── */}
+              {game === "Valorant" && (
+                <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
+                  <SectionHeader
+                    icon={<IconGame />}
+                    label="Win Probability"
+                    sub="Live Assessment"
+                    accent="#f59e0b"
+                  />
+                  <div style={{ padding: "24px" }}>
+                    <div className="w-full">
                       <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex flex-col">
-                             <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
-                             <span className="text-3xl font-black text-blue-100">{scoreA}<span className="text-xl text-blue-500">%</span></span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                            <span className="text-3xl font-black text-blue-100">{Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-blue-500">%</span></span>
                           </div>
                           <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
                           <div className="flex flex-col items-end">
-                             <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
-                             <span className="text-3xl font-black text-red-100">{scoreB}<span className="text-xl text-red-500">%</span></span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                            <span className="text-3xl font-black text-red-100">{Math.max(0, Math.min(100, 100 - Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}<span className="text-xl text-red-500">%</span></span>
                           </div>
                         </div>
 
-                        <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-visible mt-2 group">
-                           <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-l-full pointer-events-none transition-all duration-150" style={{ width: `${scoreA}%` }} />
-                           <div className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 to-red-400 rounded-r-full pointer-events-none transition-all duration-150" style={{ width: `${scoreB}%` }} />
-                           
-                           <input 
-                              type="range" 
-                              min="0" 
-                              max="100" 
-                              value={scoreA}
-                              onChange={(e) => {
-                                 const val = Number(e.target.value);
-                                 setScoreA(val);
-                                 setScoreB(100 - val);
-                              }}
-                              className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-0 cursor-pointer h-10 z-10"
-                           />
-                           
-                           <div 
-                              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)] pointer-events-none transition-all duration-150 group-hover:scale-125 group-active:scale-95 border-2 border-slate-800"
-                              style={{ left: `calc(${scoreA}% - 12px)` }}
-                           />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 max-w-md">
-                      <div className="flex justify-between items-center mb-1.5">
-                        <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
-                          Live Win Probability
-                        </div>
-                      </div>
-                      <div className="bg-slate-800/50 border border-slate-700/70 rounded-lg p-3">
-                        <div className="flex justify-between text-[10px] font-black tracking-widest mb-2">
-                          <span className="text-blue-400">
-                            {teamA.name || "Team A"} ({winProb.a}%)
-                          </span>
-                          <span className="text-red-400">
-                            ({winProb.b}%) {teamB.name || "Team B"}
-                          </span>
-                        </div>
-                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
-                          <div
-                            className="h-full bg-blue-500 transition-all duration-500"
-                            style={{ width: `${winProb.a}%` }}
-                          ></div>
-                          <div
-                            className="h-full bg-red-500 transition-all duration-500"
-                            style={{ width: `${winProb.b}%` }}
-                          ></div>
+                        <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-hidden mt-2 group shadow-inner">
+                          <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, Math.round(50 + ((scoreA - scoreB) * (50 / 13)))))}%` }} />
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
+              )}
+              {game === "Crossfire" && (
+                <div className="bg-[#0d131c] rounded-2xl border border-slate-800/50 overflow-hidden shadow-xl">
+                  <SectionHeader
+                    icon={<IconGame />}
+                    label="Win Probability"
+                    sub="Live Assessment"
+                    accent="#f59e0b"
+                  />
+                  <div style={{ padding: "24px" }}>
+                    <div className="flex flex-wrap items-end gap-8">
+                      <div className="w-full max-w-xl">
+                        <div className="bg-slate-800/50 light:bg-slate-50 border border-slate-700/70 light:border-slate-300 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">{teamA.name || 'Team A'}</span>
+                              <span className="text-3xl font-black text-blue-100">{scoreA}<span className="text-xl text-blue-500">%</span></span>
+                            </div>
+                            <div className="text-[11px] font-black text-slate-500 tracking-widest">VS</div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">{teamB.name || 'Team B'}</span>
+                              <span className="text-3xl font-black text-red-100">{scoreB}<span className="text-xl text-red-500">%</span></span>
+                            </div>
+                          </div>
+
+                          <div className="relative w-full h-4 rounded-full bg-slate-900 overflow-visible mt-2 group">
+                            <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-l-full pointer-events-none transition-all duration-150" style={{ width: `${scoreA}%` }} />
+                            <div className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 to-red-400 rounded-r-full pointer-events-none transition-all duration-150" style={{ width: `${scoreB}%` }} />
+
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={scoreA}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                setScoreA(val);
+                                setScoreB(100 - val);
+                              }}
+                              className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-0 cursor-pointer h-10 z-10"
+                            />
+
+                            <div
+                              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)] pointer-events-none transition-all duration-150 group-hover:scale-125 group-active:scale-95 border-2 border-slate-800"
+                              style={{ left: `calc(${scoreA}% - 12px)` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 max-w-md">
+                        <div className="flex justify-between items-center mb-1.5">
+                          <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+                            Live Win Probability
+                          </div>
+                        </div>
+                        <div className="bg-slate-800/50 border border-slate-700/70 rounded-lg p-3">
+                          <div className="flex justify-between text-[10px] font-black tracking-widest mb-2">
+                            <span className="text-blue-400">
+                              {teamA.name || "Team A"} ({winProb.a}%)
+                            </span>
+                            <span className="text-red-400">
+                              ({winProb.b}%) {teamB.name || "Team B"}
+                            </span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
+                            <div
+                              className="h-full bg-blue-500 transition-all duration-500"
+                              style={{ width: `${winProb.a}%` }}
+                            ></div>
+                            <div
+                              className="h-full bg-red-500 transition-all duration-500"
+                              style={{ width: `${winProb.b}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
 
             {/* Teams */}
@@ -1362,7 +1361,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               accent="#ec4899"
             />
             <div className="overflow-x-auto de-scroll" style={{ padding: "24px" }}>
-              <table className="w-full text-center border-collapse min-w-[1200px] text-[10px] font-black uppercase tracking-wider text-slate-300 light:text-slate-600">
+              <table className="w-full text-center border-collapse min-w-max text-sm font-black uppercase tracking-wider text-slate-300 light:text-slate-600">
                 <thead>
                   <tr className="bg-slate-800/80 light:bg-slate-100 border-b border-slate-700/50 light:border-slate-300">
                     <th className="py-2 px-3 border-r border-slate-700/50 light:border-slate-300 text-left w-48" style={{ padding: '16px 12px' }}>
@@ -1374,12 +1373,12 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     <th className="py-2 px-2 border-r border-slate-700/50 light:border-slate-300 w-20" style={{ padding: '16px 12px' }}>
                       Side
                     </th>
-                    {Array(25)
+                    {Array(40)
                       .fill(null)
                       .map((_, i) => (
                         <th
                           key={i}
-                          className={`py-2 px-1 w-7 relative ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500 light:border-slate-400" : "border-r border-slate-700/50 light:border-slate-300"}`}
+                          className={`py-2 px-1 w-7 min-w-[36px] relative ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500 light:border-slate-400" : "border-r border-slate-700/50 light:border-slate-300"}`}
                         >
                           R{i + 1}
                         </th>
@@ -1400,7 +1399,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </td>
                     <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full"
+                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
                         value={matchWin === "A" ? "Yes" : "No"}
                         onChange={(e) =>
                           setMatchWin(e.target.value === "Yes" ? "A" : "B")
@@ -1412,7 +1411,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </td>
                     <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full"
+                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
                         value={sideA}
                         onChange={(e) => setSideA(e.target.value)}
                       >
@@ -1429,10 +1428,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         )}
                       </select>
                     </td>
-                    {roundLogsA.map((val, i) => (
+                    {Array.from({ length: 40 }, (_, i) => roundLogsA[i] || "").map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
                       >
                         <div
                           className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-emerald-500/20 border-emerald-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
@@ -1451,8 +1450,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               textAlign: "center",
                               backgroundColor: "transparent",
                               color: val ? "#34d399" : "transparent",
-                              fontSize: "14px",
-                              fontWeight: "900",
+                              fontSize: "18px",
+                              fontWeight: "bold",
                               textTransform: "uppercase",
                               padding: 0,
                               margin: 0,
@@ -1486,7 +1485,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </td>
                     <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full"
+                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
                         value={matchWin === "B" ? "Yes" : "No"}
                         onChange={(e) =>
                           setMatchWin(e.target.value === "Yes" ? "B" : "A")
@@ -1498,7 +1497,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     </td>
                     <td className="py-2 px-2 border-r border-slate-700/50" style={{ padding: '16px 12px' }}>
                       <select
-                        className="bg-transparent text-center outline-none cursor-pointer w-full"
+                        className="bg-transparent text-center outline-none cursor-pointer w-full appearance-none font-bold text-sm"
                         value={sideB}
                         onChange={(e) => setSideB(e.target.value)}
                       >
@@ -1515,10 +1514,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                         )}
                       </select>
                     </td>
-                    {roundLogsB.map((val, i) => (
+                    {Array.from({ length: 40 }, (_, i) => roundLogsB[i] || "").map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
                       >
                         <div
                           className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-pink-500/20 border-pink-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
@@ -1537,8 +1536,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               textAlign: "center",
                               backgroundColor: "transparent",
                               color: val ? "#f472b6" : "transparent",
-                              fontSize: "14px",
-                              fontWeight: "900",
+                              fontSize: "18px",
+                              fontWeight: "bold",
                               textTransform: "uppercase",
                               padding: 0,
                               margin: 0,
@@ -1562,10 +1561,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     >
                       TIMEOUTS
                     </td>
-                    {timeoutRowLogs.map((val, i) => (
+                    {Array.from({ length: 40 }, (_, i) => timeoutRowLogs[i] || "").map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
                       >
                         <div
                           className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-amber-500/20 border-amber-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
@@ -1586,8 +1585,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               textAlign: "center",
                               backgroundColor: "transparent",
                               color: val ? "#f59e0b" : "transparent",
-                              fontSize: "14px",
-                              fontWeight: "900",
+                              fontSize: "18px",
+                              fontWeight: "bold",
                               textTransform: "uppercase",
                               padding: 0,
                               margin: 0,
@@ -1612,10 +1611,10 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     >
                       DEAD ROUNDS
                     </td>
-                    {deadRoundRowLogs.map((val, i) => (
+                    {Array.from({ length: 40 }, (_, i) => deadRoundRowLogs[i] || "").map((val, i) => (
                       <td
                         key={i}
-                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '12px 6px' }}
+                        className={`py-1 px-0.5 ${(game === "Crossfire" ? i === 8 || i === 17 || i === 23 : i === 11 || i === 23) ? "border-r-2 border-slate-500" : "border-r border-slate-700/50"}`} style={{ padding: '2px' }}
                       >
                         <div
                           className={`w-full h-10 rounded flex items-center justify-center border transition-colors ${val !== "" ? "bg-purple-500/20 border-purple-500/50" : "bg-transparent border-transparent hover:bg-slate-800 focus-within:bg-slate-800/80 focus-within:border-slate-600"}`}
@@ -1636,8 +1635,8 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                               textAlign: "center",
                               backgroundColor: "transparent",
                               color: val ? "#a855f7" : "transparent",
-                              fontSize: "14px",
-                              fontWeight: "900",
+                              fontSize: "18px",
+                              fontWeight: "bold",
                               textTransform: "uppercase",
                               padding: 0,
                               margin: 0,
@@ -1813,7 +1812,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                   )}
                 </thead>
                 <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
-                  {}
+                  { }
                   {playersA.map((p, idx) => (
                     <tr
                       key={`a-${idx}`}
@@ -2103,14 +2102,14 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       )}
                     </tr>
                   ))}
-                  {}
+                  { }
                   <tr>
                     <td
                       colSpan="7"
                       className="h-0.5 bg-slate-700/30 light:bg-slate-300"
                     ></td>
                   </tr>
-                  {}
+                  { }
                   {playersB.map((p, idx) => (
                     <tr
                       key={`b-${idx}`}
@@ -2404,7 +2403,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </table>
             </div>
           </div>
-          {}
+          { }
           <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm mb-5">
             <SectionHeader
               icon={<IconMap />}
@@ -2413,7 +2412,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               accent="#06b6d4"
             />
             <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: "20px" }}>
-              {}
+              { }
               <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
                 <Field label="Target Round">
                   <div className="relative">
@@ -2511,15 +2510,15 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                       ))}
                     {heatmapData.filter((h) => h.round === selectedRound)
                       .length === 0 && (
-                      <div className="text-[10px] text-slate-500 italic text-center py-4">
-                        No events logged for this round. Click on the map to add
-                        one.
-                      </div>
-                    )}
+                        <div className="text-[10px] text-slate-500 italic text-center py-4">
+                          No events logged for this round. Click on the map to add
+                          one.
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
-              {}
+              { }
               <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]" style={{ padding: '24px' }}>
                 <div
                   className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
@@ -2540,7 +2539,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     }}
                     className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity"
                   />
-                  {}
+                  { }
                   {heatmapData
                     .filter((h) => h.round === selectedRound)
                     .map((h) => (
@@ -2554,7 +2553,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </div>
             </div>
           </div>
-          {}
+          { }
           <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/50 light:border-slate-200 overflow-hidden shadow-xl light:shadow-sm">
             <SectionHeader
               icon={<IconNotes />}
@@ -2567,13 +2566,12 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className={`flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 ${
-                    submitSuccess
+                  className={`flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 hover:-translate-y-0.5 ${submitSuccess
                       ? "bg-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.4)] success-flash"
                       : isSubmitting
                         ? "opacity-70 cursor-wait"
                         : "submit-pulse hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]"
-                  }`}
+                    }`}
                   style={{
                     padding: '12px 32px',
                     borderRadius: '9999px',
@@ -2623,7 +2621,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
               </div>
             </div>
           </div>
-          {}
+          { }
 
           {submittedRecords.length > 0 && (
             <div className="bg-[#0d131c] light:bg-white rounded-2xl border border-slate-800/60 light:border-slate-200 overflow-hidden shadow-2xl">
@@ -2658,7 +2656,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     {submittedRecords.map((rec, idx) => {
                       const isTeamA = rec.team_name === (teamA.name || "Team A");
                       const teamColorClass = isTeamA ? "text-blue-400" : "text-red-400";
-                      
+
                       return (
                         <tr key={idx} className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
                           <td className="px-3 py-2 text-center text-xs font-bold">{rec.week}</td>
@@ -2690,7 +2688,7 @@ const DataEntry = ({ globalGame, globalTournament }) => {
         </div>
       </div>
 
-      {}
+      { }
       {submitSuccess && (
         <div className="fixed bottom-6 right-6 z-50 bg-emerald-500/90 backdrop-blur-xl text-white px-6 py-3 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.4)] flex items-center gap-3 animate-[fadeIn_0.3s_ease]">
           <svg

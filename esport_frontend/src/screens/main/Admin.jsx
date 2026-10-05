@@ -523,7 +523,7 @@ const Admin = ({ globalGame, globalTournament }) => {
           
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-6 p-2">
-              {['League Quick Stats', 'Admin Accounts & User Directory', 'Rulebook Viewer', 'Dynamic Formula Tuning Dashboard'].map(tab => (
+              {['League Quick Stats', 'Admin Accounts & User Directory', 'Rulebook Viewer'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -722,67 +722,7 @@ const Admin = ({ globalGame, globalTournament }) => {
           </div>
 </>
           )}
-          {activeTab === 'Dynamic Formula Tuning Dashboard' && (
-            <><Card title="Dynamic Formula Tuning Dashboard">
-              <div className="flex flex-col" style={{ gap: "24px" }}>
-                 <div className="flex items-center justify-between border-b border-[#1c2532]" style={{ paddingBottom: "24px" }}>
-                   <div className="flex items-center">
-                     <div className="flex flex-col" style={{ gap: "4px" }}>
-                       <h4 className="text-theme-text-base font-bold tracking-wide">Evaluation Formula</h4>
-                       <p className="text-theme-text-faint text-xs">Adjust weights for calculating the final rating.</p>
-                     </div>
-                   </div>
-                   <div className="flex flex-col w-48">
-                     <Select 
-                       label="Formula Role Target" 
-                       options={['Global', 'Rifler', 'Sniper']} 
-                       value={selectedRole} 
-                       onChange={(e) => setSelectedRole(e.target.value)} 
-                     />
-                   </div>
-                 </div>
 
-                 <div className="grid grid-cols-3" style={{ gap: "24px" }}>
-                    <Input label="Kill Weight" type="number" step="0.01" value={activeFormula.kill_weight} onChange={(e) => handleFormulaUpdate('kill_weight', e.target.value)} />
-                    <Input label="Death Weight" type="number" step="0.01" value={activeFormula.death_weight} onChange={(e) => handleFormulaUpdate('death_weight', e.target.value)} />
-                    <Input label="Assist Weight" type="number" step="0.01" value={activeFormula.assist_weight} onChange={(e) => handleFormulaUpdate('assist_weight', e.target.value)} />
-                 </div>
-                 
-                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
-                    <Input label="ACS Weight" type="number" step="0.01" value={activeFormula.acs_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('acs_weight', e.target.value)} />
-                    <Input label="ECON Weight" type="number" step="0.01" value={activeFormula.econ_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('econ_weight', e.target.value)} />
-                    <Input label="First Kill Weight" type="number" step="0.01" value={activeFormula.first_kill_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('first_kill_weight', e.target.value)} />
-                 </div>
-                 
-                 <div className="grid grid-cols-3" style={{ gap: "24px", paddingTop: "24px" }}>
-                    <Input label="Plants Weight" type="number" step="0.01" value={activeFormula.plants_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('plants_weight', e.target.value)} />
-                    <Input label="Defuse Weight" type="number" step="0.01" value={activeFormula.defuse_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('defuse_weight', e.target.value)} />
-                    <Input label="ACE Weight" type="number" step="0.01" value={activeFormula.ace_weight ?? 1.0} onChange={(e) => handleFormulaUpdate('ace_weight', e.target.value)} />
-                 </div>
-                 
-                 <div className="grid grid-cols-2" style={{ gap: "24px" }}>
-                    <Input label="Base Multiplier (e.g. 78.0)" type="number" step="0.1" value={activeFormula.base_multiplier} onChange={(e) => handleFormulaUpdate('base_multiplier', e.target.value)} />
-                    <Input label="Base Rating (e.g. 60.0)" type="number" step="0.1" value={activeFormula.base_rating} onChange={(e) => handleFormulaUpdate('base_rating', e.target.value)} />
-                 </div>
-
-                 <div className="flex justify-between items-center border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
-                    <div className="flex flex-col">
-                      <h4 className="text-theme-text-base font-bold text-sm">Advanced Formula Editor</h4>
-                      <p className="text-theme-text-faint text-[10px]">Open scientific calculator to modify formulas for Performance Score, ACS, K/DA.</p>
-                    </div>
-                    <button onClick={() => { setCalcTarget('excel_formula'); setCalcString(activeFormula.excel_formula || ''); setCalculatorOpen(true); }} className="border border-purple-500/50 light:border-purple-300 bg-purple-900/20 light:bg-purple-50 text-purple-400 light:text-purple-600 font-bold tracking-wider text-xs hover:bg-purple-600 hover:text-white transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "12px 24px", borderRadius: "8px" }}>
-                      Open Editor
-                    </button>
-                 </div>
-
-                 <div className="flex justify-end border-t border-[#1c2532]" style={{ paddingTop: "24px", marginTop: "8px" }}>
-                   <button onClick={saveFormula} className="bg-blue-600 hover:bg-blue-500 text-theme-text-base font-bold text-sm rounded shadow-[0_0_10px_color-mix(in_srgb,var(--color--)_%,transparent)] transition-colors" style={{ padding: "12px 32px", borderRadius: "9999px" }}>
-                     Save Formula
-                   </button>
-                 </div>
-              </div>
-            </Card></>
-          )}
 
 
         </div>

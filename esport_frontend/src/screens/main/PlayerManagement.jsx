@@ -34,7 +34,7 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
   const [loading, setLoading] = useState(true);
   const fetchTeams = async () => {
     try {
-      const res = await apiFetch(`/api/teams?tournament=${encodeURIComponent(globalTournament)}`);
+      const res = await apiFetch(`/api/teams?tournament=${encodeURIComponent(globalTournament)}&t=${Date.now()}`);
       const data = await res.json();
       setTeams(data);
     } catch (err) {
@@ -43,7 +43,7 @@ const PlayerManagement = ({ globalGame, globalTournament }) => {
   };
   const fetchPlayers = async () => {
     try {
-      const res = await apiFetch(`/api/players?tournament=${encodeURIComponent(globalTournament)}`);
+      const res = await apiFetch(`/api/players?tournament=${encodeURIComponent(globalTournament)}&t=${Date.now()}`);
       const data = await res.json();
       setPlayers(data);
     } catch (err) {

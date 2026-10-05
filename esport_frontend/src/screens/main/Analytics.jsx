@@ -615,34 +615,112 @@ const BubbleChart = ({ data, theme, onSelect }) => {
 const StrategyMap = ({
   theme,
   onSelect,
+  availableMatches,
   availableMaps,
   heatmapEvents,
   activeGame,
 }) => {
-  const [selectedMap, setSelectedMap] = useState("");
-  useEffect(() => {
-    if (availableMaps && availableMaps.length > 0 && !selectedMap) {
-      setSelectedMap(availableMaps[0]);
-    } else if (
-      availableMaps &&
-      availableMaps.length > 0 &&
-      !availableMaps.includes(selectedMap)
-    ) {
-      setSelectedMap(availableMaps[0]);
-    } else if (availableMaps && availableMaps.length === 0) {
-      setSelectedMap("");
+  const ALL_POSSIBLE_MAPS = [
+    "Abyss", "Ankara", "Ascent", "Bind", "Black Widow", "Breeze", 
+    "Compound", "Corrode", "Eagle Eye", "Fracture", "Haven", 
+    "Icebox", "Lotus", "Mexico", "Pearl", "Port", "Split", 
+    "Sub Base", "Summit", "Sunset"
+  ];
+
+  // Extract unique maps from heatmapEvents directly
+  const availableMapsFromEvents = useMemo(() => {
+    const maps = new Set();
+    if (heatmapEvents) {
+      heatmapEvents.forEach(h => {
+        if (h.game && h.game.toUpperCase() === activeGame.toUpperCase() && h.match_id) {
+          const matchLower = h.match_id.toLowerCase();
+          const foundMap = ALL_POSSIBLE_MAPS.find(m => 
+            matchLower.includes(m.toLowerCase().replace(/ /g, '_')) || 
+            matchLower.includes(m.toLowerCase())
+          );
+          
+          if (foundMap) {
+            maps.add(foundMap);
+          } else {
+            // Fallback for completely unknown maps
+            const parts = h.match_id.split('_');
+            let mName = parts.length > 3 ? parts[3] : h.match_id;
+            mName = mName.charAt(0).toUpperCase() + mName.slice(1);
+            maps.add(mName);
+          }
+        }
+      });
     }
-  }, [availableMaps, selectedMap]);
+    return Array.from(maps).sort();
+  }, [heatmapEvents, activeGame]);
+
+  const [selectedMap, setSelectedMap] = useState("");
+  const [selectedMatch, setSelectedMatch] = useState("All Matches");
+
+  // Auto-select first map if none selected
+  useEffect(() => {
+    if (availableMapsFromEvents.length > 0) {
+      if (!selectedMap || !availableMapsFromEvents.includes(selectedMap)) {
+        setSelectedMap(availableMapsFromEvents[0]);
+        setSelectedMatch("All Matches");
+      }
+    } else {
+      setSelectedMap("");
+      setSelectedMatch("All Matches");
+    }
+  }, [availableMapsFromEvents, selectedMap]);
+
+  // Filter matches based on selected map
+  const matchesForMap = useMemo(() => {
+    if (!selectedMap) return [];
+    return availableMatches.filter(m => {
+      const matchLower = m.toLowerCase();
+      const foundMap = ALL_POSSIBLE_MAPS.find(map => 
+        matchLower.includes(map.toLowerCase().replace(/ /g, '_')) || 
+        matchLower.includes(map.toLowerCase())
+      );
+      
+      if (foundMap) {
+        return foundMap.toLowerCase() === selectedMap.toLowerCase();
+      }
+      return m.toLowerCase() === selectedMap.toLowerCase();
+    });
+  }, [availableMatches, selectedMap]);
+
+  // Auto-reset match selection if it doesn't belong to the current map
+  useEffect(() => {
+    if (selectedMatch !== "All Matches" && !matchesForMap.includes(selectedMatch)) {
+      setSelectedMatch("All Matches");
+    }
+  }, [matchesForMap, selectedMatch]);
+
   const mapEvents = heatmapEvents
-    ? heatmapEvents.filter(
-        (h) =>
-          h.match_id &&
-          selectedMap &&
-          h.match_id.includes(selectedMap) &&
-          h.game &&
-          h.game.toUpperCase() === activeGame.toUpperCase(),
-      )
+    ? heatmapEvents.filter((h) => {
+        if (!h.game || h.game.toUpperCase() !== activeGame.toUpperCase()) return false;
+        if (!h.match_id) return false;
+        
+        // Map filter
+        const matchLower = h.match_id.toLowerCase();
+        const foundMap = ALL_POSSIBLE_MAPS.find(map => 
+          matchLower.includes(map.toLowerCase().replace(/ /g, '_')) || 
+          matchLower.includes(map.toLowerCase())
+        );
+        let mName = foundMap || h.match_id;
+        
+        if (mName.toLowerCase() !== selectedMap?.toLowerCase()) return false;
+        
+        // Match filter
+        if (selectedMatch !== "All Matches" && h.match_id !== selectedMatch) return false;
+        
+        return true;
+      })
     : [];
+
+  const formatMatchName = (matchId) => {
+    return matchId.replace(/_/g, ' ').replace(/\d{13}$/, '').trim() || "Unknown Set";
+  };
+  
+  let mapNameForImage = selectedMap || "Bind";
   const [tooltip, setTooltip] = useState({
     visible: false,
     x: 0,
@@ -663,35 +741,52 @@ const StrategyMap = ({
       onClick={() =>
         onSelect({
           type: "Heatmap",
-          area: selectedMap || "No Data",
+          area: selectedMatch ? formatMatchName(selectedMatch) : "No Data",
           details: "Strategy heatmap based on match submissions.",
         })
       }
     >
-      {availableMaps && availableMaps.length > 0 && (
+      {availableMapsFromEvents && availableMapsFromEvents.length > 0 && (
         <div
-          className="absolute top-2 left-4 z-20"
+          className="absolute top-2 left-4 z-20 flex gap-2"
           onClick={(e) => e.stopPropagation()}
         >
-          <select
-            value={selectedMap}
-            onChange={(e) => setSelectedMap(e.target.value)}
-            className="bg-bg-300/90 backdrop-blur border border-[#232f40] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer appearance-none"
-            style={{ padding: "4px 8px" }}
-          >
-            {availableMaps.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
+          <div className="relative group cursor-pointer">
+            <select
+              value={selectedMap}
+              onChange={(e) => setSelectedMap(e.target.value)}
+              className="bg-bg-300 border border-[#2a3648] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer max-w-[150px] truncate"
+              style={{ padding: "4px 8px" }}
+            >
+              {availableMapsFromEvents.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="relative group cursor-pointer">
+            <select
+              value={selectedMatch}
+              onChange={(e) => setSelectedMatch(e.target.value)}
+              className="bg-bg-300 border border-[#2a3648] text-sm font-black text-theme-text-base tracking-widest drop-shadow-md outline-none rounded hover:border-blue-500 transition-colors cursor-pointer max-w-[250px] truncate"
+              style={{ padding: "4px 8px" }}
+            >
+              <option value="All Matches">ALL MATCHES</option>
+              {matchesForMap.map((m) => (
+                <option key={m} value={m}>
+                  {formatMatchName(m)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
       <div className="relative w-full max-w-[800px] aspect-[4/3] bg-bg-100 rounded-xl border border-[#2a3648] overflow-hidden shadow-2xl flex items-center justify-center group-hover:border-blue-500 transition-all">
-        {selectedMap && selectedMap !== "No Data" ? (
+        {selectedMatch && selectedMatch !== "No Data" ? (
           <>
             <img
-              src={`/assets/${selectedMap.replace(/ /g, "_")}.png`}
+              src={`/assets/${mapNameForImage.replace(/ /g, "_")}.png`}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.style.display = 'none';
@@ -716,7 +811,7 @@ const StrategyMap = ({
                     <div
                       className={`font-black uppercase tracking-widest text-xs border-b pb-1 ${h.event_type === "Plant" ? "text-red-400 border-red-900/50" : "text-blue-400 border-blue-900/50"}`}
                     >
-                      {h.event_type}
+                      {h.event_type === "Plant" ? "Plant Success" : h.event_type}
                     </div>
                     <div className="text-theme-text-base font-bold">
                       Round <span className="text-theme-text-base">{h.round_number}</span>
@@ -748,7 +843,7 @@ const StrategyMap = ({
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] border border-white shrink-0"></div>
             <span className="text-[10px] font-bold text-theme-text-base uppercase">
-              Plant
+              Plant Success
             </span>
           </div>
           <span className="text-[10px] font-bold text-theme-text-muted">
@@ -825,13 +920,30 @@ const Analytics = ({ globalGame, globalTournament }) => {
     return Array.from(maps);
   }, [matchRecords, activeGame]);
 
+  const uniqueMatches = useMemo(() => {
+    const gameUpper = activeGame.toUpperCase();
+    const gameEvents = heatmapEvents.filter(
+      (h) => h.game && h.game.toUpperCase() === gameUpper,
+    );
+    const matches = new Set();
+    gameEvents.forEach((h) => {
+      if (h.match_id) matches.add(h.match_id);
+    });
+    return Array.from(matches).sort((a, b) => b.localeCompare(a));
+  }, [heatmapEvents, activeGame]);
+
   const dynamicSynergy = useMemo(() => {
     const gameUpper = activeGame.toUpperCase();
     const gameRecords = matchRecords.filter((r) => r.game.toUpperCase() === gameUpper);
     
     const synergyMap = {};
     gameRecords.forEach((r) => {
-      const agent = r.group_label || r.agent;
+      let agent = r.group_label || r.agent;
+      if (activeGame.toUpperCase() === "VALORANT") {
+        agent = r.agent || r.group_label;
+        if (agent === "Rifler") return; // Ignore legacy hardcoded Rifler entries in Valorant
+      }
+      
       if (!agent || agent === "-" || agent === "Unknown" || agent === "null") return;
       
       const mapName = r.map;
@@ -1077,6 +1189,7 @@ const Analytics = ({ globalGame, globalTournament }) => {
             <StrategyMap
               theme={currentData.theme}
               onSelect={openHeatmapOverview}
+              availableMatches={uniqueMatches}
               availableMaps={uniqueMaps}
               heatmapEvents={heatmapEvents}
               activeGame={activeGame}

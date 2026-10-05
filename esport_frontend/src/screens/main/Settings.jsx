@@ -413,74 +413,7 @@ const Settings = ({ globalGame, themeBg, setThemeBg, themeAccent, setThemeAccent
             {}
             
             {}
-            <Card title="Tournament Rule Sets (Integration Defaults)">
-              <div className="flex flex-col" style={{ gap: "32px" }}>
-                <div className="grid grid-cols-2" style={{ gap: "32px" }}>
-                  <div className="flex flex-col" style={{ gap: "16px" }}>
-                    <Select
-                      label="Drag-and-drop maps (Active Pool)"
-                      options={[
-                        "Haven, Split, Ascent",
-                        "All Maps",
-                        "Custom Pool",
-                      ]}
-                      value="Haven, Split, Ascent"
-                      onChange={() => {}}
-                    />
-                    <div className="bg-bg-300 light:bg-slate-50 rounded-xl border border-[#2a3648] light:border-slate-200" style={{ padding: "12px" }}>
-                      <Toggle
-                        enabled={mapVeto}
-                        onChange={setMapVeto}
-                        label="Match Map Veto Process"
-                      />
-                      <Toggle
-                        enabled={adminControl}
-                        onChange={setAdminControl}
-                        label="Admin Control Override"
-                        sublabel="Forces admin approval for vetos"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col" style={{ gap: "16px" }}>
-                    <Select
-                      label="Tie-breaker Logic"
-                      options={[
-                        "Headshot %",
-                        "Round Differential",
-                        "First Bloods",
-                      ]}
-                      value="Headshot %"
-                      onChange={() => {}}
-                    />
-                    <div className="bg-bg-300 light:bg-slate-50 rounded-xl border border-[#2a3648] light:border-slate-200" style={{ padding: "12px" }}>
-                      <Toggle
-                        enabled={friendlyFire}
-                        onChange={setFriendlyFire}
-                        label="Manual Friendly Fire"
-                      />
-                      <Toggle
-                        enabled={tacticalTimeouts}
-                        onChange={setTacticalTimeouts}
-                        label="Manual Tactical Timeouts"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between border-t border-[#1c2532]" style={{ paddingTop: "24px" }}>
-                  <div className="flex flex-col">
-                    <Toggle
-                      enabled={integrityVeto}
-                      onChange={setIntegrityVeto}
-                      label="Automatic Integrity Veto"
-                    />
-                  </div>
-                  <button className="border border-blue-500/50 light:border-blue-300 bg-blue-900/20 light:bg-blue-50 text-blue-400 light:text-blue-600 font-bold tracking-wider text-xs hover:bg-blue-600 hover:text-theme-text-base transition-all shadow-[0_0_15px_color-mix(in_srgb,var(--color--)_%,transparent)]" style={{ padding: "12px 32px", borderRadius: "9999px" }}>
-                    Test Local Override
-                  </button>
-                </div>
-              </div>
-            </Card>
+
             {}
           </div>
           {}
