@@ -934,58 +934,47 @@ const DataEntry = ({ globalGame, globalTournament }) => {
   };
 
   const handleGridNavigation = (e) => {
+    if (e.defaultPrevented) return;
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    
     const currentInput = e.target;
-    if (currentInput.tagName !== 'INPUT') return;
+    if (currentInput.tagName !== 'INPUT' || currentInput.type !== 'number') return;
 
-    const td = currentInput.closest('td');
-    const tr = currentInput.closest('tr');
-    if (!td || !tr) return;
-
-    const tbody = tr.closest('tbody');
-    if (!tbody) return;
-
-    const allTrs = Array.from(tbody.querySelectorAll('tr'));
-    const allTdsInRow = Array.from(tr.querySelectorAll('td'));
-    const colIndex = allTdsInRow.indexOf(td);
-    const rowIndex = allTrs.indexOf(tr);
+    const allInputs = Array.from(document.querySelectorAll('input[type="number"]')).filter(inp => inp.getBoundingClientRect().width > 0);
+    const currentIndex = allInputs.indexOf(currentInput);
+    if (currentIndex === -1) return;
 
     let nextInput = null;
+    const currentRect = currentInput.getBoundingClientRect();
 
-    if (e.key === 'ArrowUp' && rowIndex > 0) {
-      let r = rowIndex - 1;
-      while (r >= 0 && !nextInput) {
-        const targetTd = allTrs[r].querySelectorAll('td')[colIndex];
-        if (targetTd) nextInput = targetTd.querySelector('input');
-        r--;
-      }
-    } else if (e.key === 'ArrowDown' && rowIndex < allTrs.length - 1) {
-      let r = rowIndex + 1;
-      while (r < allTrs.length && !nextInput) {
-        const targetTd = allTrs[r].querySelectorAll('td')[colIndex];
-        if (targetTd) nextInput = targetTd.querySelector('input');
-        r++;
-      }
-    } else if (e.key === 'ArrowLeft' && colIndex > 0) {
-      let c = colIndex - 1;
-      while (c >= 0 && !nextInput) {
-        const prevTd = allTdsInRow[c];
-        if (prevTd) nextInput = prevTd.querySelector('input');
-        c--;
-      }
-    } else if (e.key === 'ArrowRight' && colIndex < allTdsInRow.length - 1) {
-      let c = colIndex + 1;
-      while (c < allTdsInRow.length && !nextInput) {
-        const nextTd = allTdsInRow[c];
-        if (nextTd) nextInput = nextTd.querySelector('input');
-        c++;
+    if (e.key === 'ArrowLeft') {
+      nextInput = allInputs[currentIndex - 1];
+    } else if (e.key === 'ArrowRight') {
+      nextInput = allInputs[currentIndex + 1];
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      const isUp = e.key === 'ArrowUp';
+      const candidateInputs = allInputs.filter(inp => {
+         if (inp === currentInput) return false;
+         const rect = inp.getBoundingClientRect();
+         const isSameCol = Math.abs((rect.left + rect.width / 2) - (currentRect.left + currentRect.width / 2)) < (currentRect.width / 2 + 10);
+         const isCorrectDir = isUp ? rect.top < currentRect.top : rect.top > currentRect.top;
+         return isSameCol && isCorrectDir;
+      });
+      
+      if (candidateInputs.length > 0) {
+         candidateInputs.sort((a, b) => {
+            const aRect = a.getBoundingClientRect();
+            const bRect = b.getBoundingClientRect();
+            return isUp ? bRect.top - aRect.top : aRect.top - bRect.top;
+         });
+         nextInput = candidateInputs[0];
       }
     }
 
     if (nextInput) {
       e.preventDefault();
       nextInput.focus();
-      nextInput.select();
+      if (typeof nextInput.select === 'function') nextInput.select();
     }
   };
 
