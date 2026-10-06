@@ -1545,709 +1545,379 @@ const DataEntry = ({ globalGame, globalTournament }) => {
           <SectionHeader
             icon={<IconStats />}
             label="Player Stats"
-            sub="Adaptive Columns (Scroll Horizontally)"
+            sub="Per-Player Input Cards"
             accent="#8b5cf6"
           />
-          <div className="overflow-x-auto de-scroll relative">
-            <table className="w-full text-left border-collapse min-w-[700px]">
-              <thead>
-                {game === "Crossfire" ? (
-                  <>
-                    <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
-                      <th
-                        rowSpan={2}
-                        className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]"
-                        style={{ paddingLeft: '32px', paddingRight: '20px' }}
-                      >
-                        Player IGN
-                      </th>
-                      {cfGroups.map((g) => (
-                        <th
-                          key={g.id}
-                          colSpan={4}
-                          className="px-2 py-3 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold relative min-w-[200px]"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            <input
-                              type="text"
-                              className="bg-transparent border-b border-slate-700 light:border-slate-300 hover:border-slate-500 light:hover:border-slate-400 focus:border-[#00ffcc] light:focus:border-blue-500 text-slate-300 light:text-slate-700 w-full max-w-[120px] text-center text-[10px] uppercase tracking-widest outline-none transition-colors font-black"
-                              value={g.label}
-                              onChange={(e) =>
-                                handleUpdateCfGroupLabel(g.id, e.target.value)
-                              }
-                            />
-                            {!g.isTotal && (
-                              <button
-                                onClick={() => handleRemoveCfGroup(g.id)}
-                                className="text-red-500/70 hover:text-red-400 p-1 rounded-md hover:bg-red-500/10 transition-colors flex items-center justify-center"
-                                title="Delete Stats Group"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                              </button>
-                            )}
-                          </div>
-                        </th>
-                      ))}
-                      <th rowSpan={2} className="px-3 py-3 text-center w-24" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                        <button
-                          onClick={handleAddCfGroup}
-                          className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap font-bold"
-                        >
-                          + ADD STATS
-                        </button>
-                      </th>
-                    </tr>
-                    <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 relative z-10">
-                      {cfGroups.map((g) => (
-                        <React.Fragment key={`${g.id}-sub`}>
-                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                            K
-                          </th>
-                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                            D
-                          </th>
-                          <th className="px-3 py-2 border-r border-slate-800/40 light:border-slate-200 text-center font-bold min-w-[70px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                            A
-                          </th>
-                          <th className="px-3 py-2 border-r-[4px] border-[#0d131c] light:border-slate-200 text-center font-bold min-w-[70px] text-[#00ffcc] light:text-blue-600" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                            H
-                          </th>
-                        </React.Fragment>
-                      ))}
-                    </tr>
-                  </>
-                ) : (
-                  <tr className="text-[9px] uppercase tracking-[0.15em] text-slate-500 border-b border-slate-800/60 light:border-slate-200 bg-slate-900/90 light:bg-slate-100 relative z-20">
-                    <th className="py-3 font-bold sticky left-0 bg-slate-900 light:bg-slate-100 z-30 min-w-[200px]" style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '32px', paddingRight: '20px' }}>
-                      Player IGN
-                    </th>
-                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 font-bold min-w-[150px]" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      Hero/Agent/Class
-                    </th>
-                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      PERFORMANCE SCORE
-                    </th>
-                    <th colSpan="3" className="px-3 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      KDA
-                    </th>
-                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      TRADES
-                    </th>
-                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      FIRST BLOODS
-                    </th>
-                    <th className="px-4 py-3 border-r border-slate-800/40 light:border-slate-200 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      PLANTS
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-                      DEFUSES
-                    </th>
-                  </tr>
-                )}
-              </thead>
-              <tbody className="divide-y divide-slate-800/30 light:divide-slate-200">
-                { }
-                {playersA.map((p, idx) => (
-                  <tr
-                    key={`a-${idx}`}
-                    className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
-                  >
-                    <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
-                      <select
-                        className={`bg-transparent text-[#38bdf8] light:text-blue-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
-                        value={p.ign}
-                        onChange={(e) =>
-                          updatePlayer("A", idx, "ign", e.target.value)
-                        }
-                      >
-                        <option value="" className="text-black">
-                          Select Player
-                        </option>
-                        {dbPlayers
-                          .filter((dbP) => {
-                            const team = dbTeams.find(
-                              (t) => t.team_name === teamA.name,
-                            );
-                            return team ? dbP.team_id === team.team_id : true;
-                          })
-                          .map((dbP) => (
-                            <option
-                              key={dbP.player_id}
-                              value={dbP.player_name}
-                              className="text-black"
-                            >
-                              {dbP.player_name}
-                            </option>
-                          ))}
-                        <option value={p.ign} className="hidden">
-                          {p.ign}
-                        </option>
-                      </select>
-                    </td>
-                    {game === "Valorant" && (
-                      <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
-                            {p.agent ? p.agent[0] : ""}
-                          </div>
-                          <select
-                            className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
-                            value={p.agent}
-                            onChange={(e) =>
-                              updatePlayer("A", idx, "agent", e.target.value)
-                            }
-                          >
-                            {agents.map((a) => (
-                              <option key={a} value={a}>
-                                {a}
-                              </option>
-                            ))}
-                          </select>
+          <div style={{ padding: '24px 32px' }}>
+            {/* ── Team A Players ── */}
+            <div className="flex flex-col" style={{ gap: '10px' }}>
+              {playersA.map((p, idx) => (
+                <div
+                  key={`a-${idx}`}
+                  className="rounded-xl border border-slate-700/40 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 hover:border-slate-600 light:hover:border-slate-300 transition-all group"
+                  style={{ padding: '16px 20px' }}
+                >
+                  {game === "Valorant" ? (
+                    <div className="flex flex-wrap items-center" style={{ gap: '12px' }}>
+                      {/* Player IGN */}
+                      <div className="flex items-center" style={{ gap: '8px', minWidth: '160px', flex: '1 1 160px' }}>
+                        <div className="w-7 h-7 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[10px] font-black text-[#38bdf8] shrink-0">
+                          {idx + 1}
                         </div>
-                      </td>
-                    )}
-                    {game === "Valorant" ? (
-                      <>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={`\${tableInput} text-emerald-400`}
-                            value={p.acs}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "acs",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.k}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "k",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.d}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "d",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.a}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "a",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-emerald-400" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={`\${tableInput} text-emerald-400`}
-                            value={p.econ}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "econ",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.first_kills}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "first_kills",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.plants}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "plants",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.defuse}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "A",
-                                idx,
-                                "defuse",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        {cfGroups.map((g) => {
-                          if (g.isTotal) {
-                            return (
-                              <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  {getCfTotal(p, "k")}
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  {getCfTotal(p, "d")}
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  {getCfTotal(p, "a")}
-                                </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                  {getCfTotal(p, "h")}
-                                </td>
-                              </React.Fragment>
-                            );
-                          }
-                          return (
-                            <React.Fragment key={g.id}>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_k`] !== undefined
-                                      ? p[`${g.id}_k`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "A",
-                                      idx,
-                                      `${g.id}_k`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_d`] !== undefined
-                                      ? p[`${g.id}_d`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "A",
-                                      idx,
-                                      `${g.id}_d`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_a`] !== undefined
-                                      ? p[`${g.id}_a`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "A",
-                                      idx,
-                                      `${g.id}_a`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                                <input
-                                  type="number"
-                                  className={`${tableInput} text-[#00ffcc]`}
-                                  value={
-                                    p[`${g.id}_h`] !== undefined
-                                      ? p[`${g.id}_h`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "A",
-                                      idx,
-                                      `${g.id}_h`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                            </React.Fragment>
-                          );
-                        })}
-                        <td className="px-2 py-2" style={{ paddingTop: '8px', paddingBottom: '8px' }}></td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-                { }
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="h-0.5 bg-slate-700/30 light:bg-slate-300"
-                  ></td>
-                </tr>
-                { }
-                {playersB.map((p, idx) => (
-                  <tr
-                    key={`b-${idx}`}
-                    className="hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors group"
-                  >
-                    <td className="py-2 sticky left-0 bg-[#0d131c] light:bg-white group-hover:bg-[#111824] light:group-hover:bg-slate-50 z-10 transition-colors" style={{ paddingTop: '8px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '20px' }}>
-                      <select
-                        className={`bg-transparent text-[#f87171] light:text-red-600 ${tableInput} text-left font-black appearance-none cursor-pointer`}
-                        value={p.ign}
-                        onChange={(e) =>
-                          updatePlayer("B", idx, "ign", e.target.value)
-                        }
-                      >
-                        <option value="" className="text-black">
-                          Select Player
-                        </option>
-                        {dbPlayers
-                          .filter((dbP) => {
-                            const team = dbTeams.find(
-                              (t) => t.team_name === teamB.name,
-                            );
-                            return team ? dbP.team_id === team.team_id : true;
-                          })
-                          .map((dbP) => (
-                            <option
-                              key={dbP.player_id}
-                              value={dbP.player_name}
-                              className="text-black"
-                            >
-                              {dbP.player_name}
-                            </option>
-                          ))}
-                        <option value={p.ign} className="hidden">
-                          {p.ign}
-                        </option>
-                      </select>
-                    </td>
-                    {game === "Valorant" && (
-                      <td className="px-4 py-2 border-r border-slate-800/30" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
-                            {p.agent ? p.agent[0] : ""}
-                          </div>
-                          <select
-                            className={`text-white ${tableInput} text-left appearance-none cursor-pointer`}
-                            value={p.agent}
-                            onChange={(e) =>
-                              updatePlayer("B", idx, "agent", e.target.value)
-                            }
-                          >
-                            {agents.map((a) => (
-                              <option key={a} value={a}>
-                                {a}
-                              </option>
+                        <select
+                          className="bg-transparent text-[#38bdf8] light:text-blue-600 text-xs font-black outline-none cursor-pointer appearance-none flex-1 min-w-0 truncate"
+                          value={p.ign}
+                          onChange={(e) => updatePlayer("A", idx, "ign", e.target.value)}
+                        >
+                          <option value="" className="text-black">Select Player</option>
+                          {dbPlayers
+                            .filter((dbP) => {
+                              const team = dbTeams.find((t) => t.team_name === teamA.name);
+                              return team ? dbP.team_id === team.team_id : true;
+                            })
+                            .map((dbP) => (
+                              <option key={dbP.player_id} value={dbP.player_name} className="text-black">{dbP.player_name}</option>
                             ))}
-                          </select>
+                          <option value={p.ign} className="hidden">{p.ign}</option>
+                        </select>
+                      </div>
+                      {/* Agent */}
+                      <div className="flex items-center" style={{ gap: '6px', minWidth: '110px' }}>
+                        <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
+                          {p.agent ? p.agent[0] : ""}
                         </div>
-                      </td>
-                    )}
-                    {game === "Valorant" ? (
-                      <>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={`\${tableInput} text-[#f87171]`}
-                            value={p.acs}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "acs",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.k}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "k",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.d}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "d",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.a}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "a",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-[#f87171]" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={`\${tableInput} text-[#f87171]`}
-                            value={p.econ}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "econ",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.first_kills}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "first_kills",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-r border-slate-800/30 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.plants}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "plants",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-4 py-2 text-white" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
-                          <input
-                            type="number"
-                            className={tableInput}
-                            value={p.defuse}
-                            onChange={(e) =>
-                              updatePlayer(
-                                "B",
-                                idx,
-                                "defuse",
-                                Number(e.target.value) || 0,
-                              )
-                            }
-                          />
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        {cfGroups.map((g) => {
-                          if (g.isTotal) {
-                            return (
-                              <React.Fragment key={g.id}>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                  {getCfTotal(p, "k")}
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                  {getCfTotal(p, "d")}
-                                </td>
-                                <td className="px-2 py-2 border-r border-slate-800/30 text-white text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                  {getCfTotal(p, "a")}
-                                </td>
-                                <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc] text-center font-black bg-emerald-500/10" style={{ padding: '16px 12px' }}>
-                                  {getCfTotal(p, "h")}
-                                </td>
-                              </React.Fragment>
-                            );
-                          }
+                        <select
+                          className="bg-transparent text-white light:text-slate-900 text-xs font-bold outline-none cursor-pointer appearance-none"
+                          value={p.agent}
+                          onChange={(e) => updatePlayer("A", idx, "agent", e.target.value)}
+                        >
+                          {agents.map((a) => (<option key={a} value={a}>{a}</option>))}
+                        </select>
+                      </div>
+                      {/* Divider */}
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {/* Performance score */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '80px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider text-center truncate w-full" title="Performance Score">Perf Score</span>
+                        <input type="number" className={`${tableInput} text-emerald-400 light:text-emerald-600 !w-14`} value={p.acs} onChange={(e) => updatePlayer("A", idx, "acs", Number(e.target.value) || 0)} />
+                      </div>
+                      {/* K / D / A */}
+                      <div className="flex items-end rounded-lg bg-slate-800/40 light:bg-slate-100 border border-slate-700/30 light:border-slate-200" style={{ padding: '4px 8px', gap: '2px' }}>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">K</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.k} onChange={(e) => updatePlayer("A", idx, "k", Number(e.target.value) || 0)} />
+                        </div>
+                        <span className="text-slate-600 text-xs font-bold pb-1">/</span>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">D</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.d} onChange={(e) => updatePlayer("A", idx, "d", Number(e.target.value) || 0)} />
+                        </div>
+                        <span className="text-slate-600 text-xs font-bold pb-1">/</span>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">A</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.a} onChange={(e) => updatePlayer("A", idx, "a", Number(e.target.value) || 0)} />
+                        </div>
+                      </div>
+                      {/* Divider */}
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {/* Trades */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '52px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Trades</span>
+                        <input type="number" className={`${tableInput} text-emerald-400 light:text-emerald-600 !w-14`} value={p.econ} onChange={(e) => updatePlayer("A", idx, "econ", Number(e.target.value) || 0)} />
+                      </div>
+                      {/* FB / Plants / Defuse */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">FB</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.first_kills} onChange={(e) => updatePlayer("A", idx, "first_kills", Number(e.target.value) || 0)} />
+                      </div>
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Plant</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.plants} onChange={(e) => updatePlayer("A", idx, "plants", Number(e.target.value) || 0)} />
+                      </div>
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Defuse</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.defuse} onChange={(e) => updatePlayer("A", idx, "defuse", Number(e.target.value) || 0)} />
+                      </div>
+                    </div>
+                  ) : (
+                    /* Crossfire card layout */
+                    <div className="flex flex-wrap items-center" style={{ gap: '12px' }}>
+                      {/* Player IGN */}
+                      <div className="flex items-center" style={{ gap: '8px', minWidth: '160px', flex: '1 1 160px' }}>
+                        <div className="w-7 h-7 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[10px] font-black text-[#38bdf8] shrink-0">
+                          {idx + 1}
+                        </div>
+                        <select
+                          className="bg-transparent text-[#38bdf8] light:text-blue-600 text-xs font-black outline-none cursor-pointer appearance-none flex-1 min-w-0 truncate"
+                          value={p.ign}
+                          onChange={(e) => updatePlayer("A", idx, "ign", e.target.value)}
+                        >
+                          <option value="" className="text-black">Select Player</option>
+                          {dbPlayers
+                            .filter((dbP) => {
+                              const team = dbTeams.find((t) => t.team_name === teamA.name);
+                              return team ? dbP.team_id === team.team_id : true;
+                            })
+                            .map((dbP) => (
+                              <option key={dbP.player_id} value={dbP.player_name} className="text-black">{dbP.player_name}</option>
+                            ))}
+                          <option value={p.ign} className="hidden">{p.ign}</option>
+                        </select>
+                      </div>
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {cfGroups.map((g) => {
+                        if (g.isTotal) {
                           return (
-                            <React.Fragment key={g.id}>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_k`] !== undefined
-                                      ? p[`${g.id}_k`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "B",
-                                      idx,
-                                      `${g.id}_k`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_d`] !== undefined
-                                      ? p[`${g.id}_d`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "B",
-                                      idx,
-                                      `${g.id}_d`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r border-slate-800/30 text-white" style={{ padding: '16px 12px' }}>
-                                <input
-                                  type="number"
-                                  className={tableInput}
-                                  value={
-                                    p[`${g.id}_a`] !== undefined
-                                      ? p[`${g.id}_a`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "B",
-                                      idx,
-                                      `${g.id}_a`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-2 py-2 border-r-[4px] border-[#0d131c] text-[#00ffcc]" style={{ padding: '16px 12px' }}>
-                                <input
-                                  type="number"
-                                  className={`${tableInput} text-[#00ffcc]`}
-                                  value={
-                                    p[`${g.id}_h`] !== undefined
-                                      ? p[`${g.id}_h`]
-                                      : 0
-                                  }
-                                  onChange={(e) =>
-                                    updatePlayer(
-                                      "B",
-                                      idx,
-                                      `${g.id}_h`,
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                            </React.Fragment>
+                            <div key={g.id} className="flex items-end rounded-lg bg-emerald-500/10 border border-emerald-500/20" style={{ padding: '4px 8px', gap: '6px' }}>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">K</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "k")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">D</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "d")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">A</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "a")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-[#00ffcc]/70 uppercase">H</span>
+                                <span className="text-xs font-black text-[#00ffcc] text-center">{getCfTotal(p, "h")}</span>
+                              </div>
+                            </div>
                           );
-                        })}
-                        <td className="px-2 py-2" style={{ padding: '16px 12px' }}></td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        }
+                        return (
+                          <div key={g.id} className="flex items-end rounded-lg bg-slate-800/40 light:bg-slate-100 border border-slate-700/30 light:border-slate-200" style={{ padding: '4px 8px', gap: '2px' }}>
+                            <div className="text-[7px] font-bold text-slate-500 uppercase tracking-wider self-center mr-1 max-w-[60px] truncate" title={g.label}>{g.label}</div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">K</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_k`] !== undefined ? p[`${g.id}_k`] : 0} onChange={(e) => updatePlayer("A", idx, `${g.id}_k`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">D</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_d`] !== undefined ? p[`${g.id}_d`] : 0} onChange={(e) => updatePlayer("A", idx, `${g.id}_d`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">A</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_a`] !== undefined ? p[`${g.id}_a`] : 0} onChange={(e) => updatePlayer("A", idx, `${g.id}_a`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-[#00ffcc]/70 uppercase">H</span>
+                              <input type="number" className={`${tableInput} text-[#00ffcc] !w-10`} value={p[`${g.id}_h`] !== undefined ? p[`${g.id}_h`] : 0} onChange={(e) => updatePlayer("A", idx, `${g.id}_h`, e.target.value)} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* ── Separator ── */}
+            <div className="flex items-center my-4" style={{ gap: '12px' }}>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">vs</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
+            </div>
+
+            {/* ── Team B Players ── */}
+            <div className="flex flex-col" style={{ gap: '10px' }}>
+              {playersB.map((p, idx) => (
+                <div
+                  key={`b-${idx}`}
+                  className="rounded-xl border border-slate-700/40 light:border-slate-200 bg-slate-900/40 light:bg-slate-50 hover:border-slate-600 light:hover:border-slate-300 transition-all group"
+                  style={{ padding: '16px 20px' }}
+                >
+                  {game === "Valorant" ? (
+                    <div className="flex flex-wrap items-center" style={{ gap: '12px' }}>
+                      {/* Player IGN */}
+                      <div className="flex items-center" style={{ gap: '8px', minWidth: '160px', flex: '1 1 160px' }}>
+                        <div className="w-7 h-7 rounded-lg bg-[#f87171]/10 border border-[#f87171]/30 flex items-center justify-center text-[10px] font-black text-[#f87171] shrink-0">
+                          {idx + 1}
+                        </div>
+                        <select
+                          className="bg-transparent text-[#f87171] light:text-red-600 text-xs font-black outline-none cursor-pointer appearance-none flex-1 min-w-0 truncate"
+                          value={p.ign}
+                          onChange={(e) => updatePlayer("B", idx, "ign", e.target.value)}
+                        >
+                          <option value="" className="text-black">Select Player</option>
+                          {dbPlayers
+                            .filter((dbP) => {
+                              const team = dbTeams.find((t) => t.team_name === teamB.name);
+                              return team ? dbP.team_id === team.team_id : true;
+                            })
+                            .map((dbP) => (
+                              <option key={dbP.player_id} value={dbP.player_name} className="text-black">{dbP.player_name}</option>
+                            ))}
+                          <option value={p.ign} className="hidden">{p.ign}</option>
+                        </select>
+                      </div>
+                      {/* Agent */}
+                      <div className="flex items-center" style={{ gap: '6px', minWidth: '110px' }}>
+                        <div className="w-6 h-6 rounded-md bg-slate-700/50 border border-slate-600/40 flex items-center justify-center text-[8px] font-bold text-slate-400 shrink-0">
+                          {p.agent ? p.agent[0] : ""}
+                        </div>
+                        <select
+                          className="bg-transparent text-white light:text-slate-900 text-xs font-bold outline-none cursor-pointer appearance-none"
+                          value={p.agent}
+                          onChange={(e) => updatePlayer("B", idx, "agent", e.target.value)}
+                        >
+                          {agents.map((a) => (<option key={a} value={a}>{a}</option>))}
+                        </select>
+                      </div>
+                      {/* Divider */}
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {/* Performance score */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '80px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider text-center truncate w-full" title="Performance Score">Perf Score</span>
+                        <input type="number" className={`${tableInput} text-[#f87171] light:text-red-600 !w-14`} value={p.acs} onChange={(e) => updatePlayer("B", idx, "acs", Number(e.target.value) || 0)} />
+                      </div>
+                      {/* K / D / A */}
+                      <div className="flex items-end rounded-lg bg-slate-800/40 light:bg-slate-100 border border-slate-700/30 light:border-slate-200" style={{ padding: '4px 8px', gap: '2px' }}>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">K</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.k} onChange={(e) => updatePlayer("B", idx, "k", Number(e.target.value) || 0)} />
+                        </div>
+                        <span className="text-slate-600 text-xs font-bold pb-1">/</span>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">D</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.d} onChange={(e) => updatePlayer("B", idx, "d", Number(e.target.value) || 0)} />
+                        </div>
+                        <span className="text-slate-600 text-xs font-bold pb-1">/</span>
+                        <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                          <span className="text-[8px] font-bold text-slate-500 uppercase">A</span>
+                          <input type="number" className={`${tableInput} !w-10`} value={p.a} onChange={(e) => updatePlayer("B", idx, "a", Number(e.target.value) || 0)} />
+                        </div>
+                      </div>
+                      {/* Divider */}
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {/* Trades */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '52px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Trades</span>
+                        <input type="number" className={`${tableInput} text-[#f87171] light:text-red-600 !w-14`} value={p.econ} onChange={(e) => updatePlayer("B", idx, "econ", Number(e.target.value) || 0)} />
+                      </div>
+                      {/* FB / Plants / Defuse */}
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">FB</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.first_kills} onChange={(e) => updatePlayer("B", idx, "first_kills", Number(e.target.value) || 0)} />
+                      </div>
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Plant</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.plants} onChange={(e) => updatePlayer("B", idx, "plants", Number(e.target.value) || 0)} />
+                      </div>
+                      <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Defuse</span>
+                        <input type="number" className={`${tableInput} !w-10`} value={p.defuse} onChange={(e) => updatePlayer("B", idx, "defuse", Number(e.target.value) || 0)} />
+                      </div>
+                    </div>
+                  ) : (
+                    /* Crossfire card layout */
+                    <div className="flex flex-wrap items-center" style={{ gap: '12px' }}>
+                      {/* Player IGN */}
+                      <div className="flex items-center" style={{ gap: '8px', minWidth: '160px', flex: '1 1 160px' }}>
+                        <div className="w-7 h-7 rounded-lg bg-[#f87171]/10 border border-[#f87171]/30 flex items-center justify-center text-[10px] font-black text-[#f87171] shrink-0">
+                          {idx + 1}
+                        </div>
+                        <select
+                          className="bg-transparent text-[#f87171] light:text-red-600 text-xs font-black outline-none cursor-pointer appearance-none flex-1 min-w-0 truncate"
+                          value={p.ign}
+                          onChange={(e) => updatePlayer("B", idx, "ign", e.target.value)}
+                        >
+                          <option value="" className="text-black">Select Player</option>
+                          {dbPlayers
+                            .filter((dbP) => {
+                              const team = dbTeams.find((t) => t.team_name === teamB.name);
+                              return team ? dbP.team_id === team.team_id : true;
+                            })
+                            .map((dbP) => (
+                              <option key={dbP.player_id} value={dbP.player_name} className="text-black">{dbP.player_name}</option>
+                            ))}
+                          <option value={p.ign} className="hidden">{p.ign}</option>
+                        </select>
+                      </div>
+                      <div className="w-px h-6 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+                      {cfGroups.map((g) => {
+                        if (g.isTotal) {
+                          return (
+                            <div key={g.id} className="flex items-end rounded-lg bg-emerald-500/10 border border-emerald-500/20" style={{ padding: '4px 8px', gap: '6px' }}>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">K</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "k")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">D</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "d")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-emerald-500/70 uppercase">A</span>
+                                <span className="text-xs font-black text-white text-center">{getCfTotal(p, "a")}</span>
+                              </div>
+                              <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                                <span className="text-[8px] font-bold text-[#00ffcc]/70 uppercase">H</span>
+                                <span className="text-xs font-black text-[#00ffcc] text-center">{getCfTotal(p, "h")}</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={g.id} className="flex items-end rounded-lg bg-slate-800/40 light:bg-slate-100 border border-slate-700/30 light:border-slate-200" style={{ padding: '4px 8px', gap: '2px' }}>
+                            <div className="text-[7px] font-bold text-slate-500 uppercase tracking-wider self-center mr-1 max-w-[60px] truncate" title={g.label}>{g.label}</div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">K</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_k`] !== undefined ? p[`${g.id}_k`] : 0} onChange={(e) => updatePlayer("B", idx, `${g.id}_k`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">D</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_d`] !== undefined ? p[`${g.id}_d`] : 0} onChange={(e) => updatePlayer("B", idx, `${g.id}_d`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-slate-500 uppercase">A</span>
+                              <input type="number" className={`${tableInput} !w-10`} value={p[`${g.id}_a`] !== undefined ? p[`${g.id}_a`] : 0} onChange={(e) => updatePlayer("B", idx, `${g.id}_a`, e.target.value)} />
+                            </div>
+                            <div className="flex flex-col items-center" style={{ minWidth: '36px' }}>
+                              <span className="text-[8px] font-bold text-[#00ffcc]/70 uppercase">H</span>
+                              <input type="number" className={`${tableInput} text-[#00ffcc] !w-10`} value={p[`${g.id}_h`] !== undefined ? p[`${g.id}_h`] : 0} onChange={(e) => updatePlayer("B", idx, `${g.id}_h`, e.target.value)} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Crossfire: Add Stats Group button */}
+            {game === "Crossfire" && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-800/40 light:border-slate-200">
+                <div className="flex items-center" style={{ gap: '8px' }}>
+                  {cfGroups.filter(g => !g.isTotal).map(g => (
+                    <div key={g.id} className="flex items-center bg-slate-800/50 rounded-lg border border-slate-700/40" style={{ padding: '6px 10px', gap: '6px' }}>
+                      <input
+                        type="text"
+                        className="bg-transparent text-[10px] font-bold text-slate-300 uppercase tracking-wider outline-none w-20"
+                        value={g.label}
+                        onChange={(e) => handleUpdateCfGroupLabel(g.id, e.target.value)}
+                      />
+                      <button onClick={() => handleRemoveCfGroup(g.id)} className="text-red-500/60 hover:text-red-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={handleAddCfGroup}
+                  className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-4 py-2 rounded-lg border border-slate-700 transition-colors whitespace-nowrap font-bold"
+                >
+                  + ADD STATS GROUP
+                </button>
+              </div>
+            )}
           </div>
         </div>
         { }
@@ -2258,144 +1928,157 @@ const DataEntry = ({ globalGame, globalTournament }) => {
             sub="Event Coordinate Plotting"
             accent="#06b6d4"
           />
-          <div className="flex flex-col lg:flex-row items-start" style={{ padding: '32px', gap: "20px" }}>
-            { }
-            <div className="w-full lg:w-64 shrink-0 bg-slate-900/50 light:bg-slate-50 border border-slate-700/50 light:border-slate-200 rounded-xl flex flex-col" style={{ padding: '24px', gap: '24px' }}>
-              <Field label="Target Round">
+          <div className="flex flex-col" style={{ padding: '24px 32px 32px' }}>
+            {/* ── Compact Toolbar ── */}
+            <div className="flex flex-wrap items-center justify-between mb-4 rounded-xl bg-slate-900/60 light:bg-slate-100 border border-slate-700/40 light:border-slate-200 backdrop-blur-sm" style={{ padding: '10px 16px', gap: '12px' }}>
+              {/* Round Selector */}
+              <div className="flex items-center" style={{ gap: '8px' }}>
+                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Round</span>
                 <div className="relative">
                   <select
-                    className={selectBase}
+                    className="appearance-none bg-slate-800/70 light:bg-white border border-slate-600/50 light:border-slate-300 text-cyan-400 light:text-cyan-600 text-xs font-black rounded-lg outline-none focus:border-cyan-500 transition-colors cursor-pointer"
+                    style={{ padding: '6px 28px 6px 12px' }}
                     value={selectedRound}
                     onChange={(e) => setSelectedRound(Number(e.target.value))}
                   >
-                    {Array.from(
-                      { length: scoreA + scoreB || 1 },
-                      (_, i) => i + 1,
-                    ).map((r) => (
-                      <option key={r} value={r}>
-                        Round {r}
-                      </option>
+                    {Array.from({ length: scoreA + scoreB || 1 }, (_, i) => i + 1).map((r) => (
+                      <option key={r} value={r}>R{r}</option>
                     ))}
                   </select>
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                    ▾
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">▾</div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="w-px h-5 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+
+              {/* Action Toggle */}
+              <div className="flex items-center rounded-lg overflow-hidden border border-slate-700/50 light:border-slate-300">
+                <button
+                  onClick={() => setSelectedAction("Plant")}
+                  className={`text-[9px] font-black uppercase tracking-widest transition-all ${selectedAction === "Plant"
+                    ? "bg-red-500/20 text-red-400 light:text-red-600 shadow-[inset_0_0_12px_rgba(239,68,68,0.15)]"
+                    : "bg-transparent text-slate-500 hover:text-slate-300"}`}
+                  style={{ padding: '6px 16px' }}
+                >
+                  ● Plant
+                </button>
+                <button
+                  onClick={() => setSelectedAction("Defuse")}
+                  className={`text-[9px] font-black uppercase tracking-widest transition-all ${selectedAction === "Defuse"
+                    ? "bg-blue-500/20 text-blue-400 light:text-blue-600 shadow-[inset_0_0_12px_rgba(59,130,246,0.15)]"
+                    : "bg-transparent text-slate-500 hover:text-slate-300"}`}
+                  style={{ padding: '6px 16px' }}
+                >
+                  ● Defuse
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="w-px h-5 bg-slate-700/50 light:bg-slate-300 hidden sm:block"></div>
+
+              {/* Manual Coords */}
+              <div className="flex items-center" style={{ gap: '6px' }}>
+                <input
+                  type="number"
+                  className="bg-slate-800/60 light:bg-white border border-slate-700/50 light:border-slate-300 text-white light:text-slate-900 text-[10px] font-bold text-center rounded-md outline-none focus:border-cyan-500 transition-colors w-14"
+                  style={{ padding: '5px 4px' }}
+                  placeholder="X%"
+                  value={manualX}
+                  onChange={(e) => setManualX(e.target.value)}
+                />
+                <input
+                  type="number"
+                  className="bg-slate-800/60 light:bg-white border border-slate-700/50 light:border-slate-300 text-white light:text-slate-900 text-[10px] font-bold text-center rounded-md outline-none focus:border-cyan-500 transition-colors w-14"
+                  style={{ padding: '5px 4px' }}
+                  placeholder="Y%"
+                  value={manualY}
+                  onChange={(e) => setManualY(e.target.value)}
+                />
+                <button
+                  onClick={handleManualAdd}
+                  className="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 font-black text-[9px] uppercase tracking-wider rounded-md border border-cyan-500/30 transition-all"
+                  style={{ padding: '5px 14px' }}
+                >
+                  +Add
+                </button>
+              </div>
+
+              {/* Spacer */}
+              <div className="flex-1"></div>
+
+              {/* Events Counter Badge */}
+              <div className="flex items-center" style={{ gap: '8px' }}>
+                {heatmapData.filter((h) => h.round === selectedRound).length > 0 && (
+                  <div className="flex items-center" style={{ gap: '6px' }}>
+                    {heatmapData.filter((h) => h.round === selectedRound).map((h) => (
+                      <button
+                        key={h.id}
+                        onClick={() => removeHeatmapEvent(h.id)}
+                        className={`group/ev flex items-center rounded-full text-[8px] font-bold transition-all hover:pr-1 ${h.type === "Plant"
+                          ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                          : "bg-blue-500/15 text-blue-400 border border-blue-500/30"}`}
+                        style={{ padding: '3px 8px', gap: '4px' }}
+                        title={`${h.type} at (${Math.round(h.x)}%, ${Math.round(h.y)}%) — click to remove`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${h.type === "Plant" ? "bg-red-400" : "bg-blue-400"}`}></span>
+                        {h.type[0]}
+                        <span className="hidden group-hover/ev:inline text-red-400 ml-0.5">✕</span>
+                      </button>
+                    ))}
                   </div>
-                </div>
-              </Field>
-              <Field label="Action Marker">
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  <button
-                    onClick={() => setSelectedAction("Plant")}
-                    className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Plant" ? "bg-red-500/20 border-red-500 text-red-400 light:text-red-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
-                    style={{ flex: 1, padding: '12px' }}
-                  >
-                    Plant
-                  </button>
-                  <button
-                    onClick={() => setSelectedAction("Defuse")}
-                    className={`text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${selectedAction === "Defuse" ? "bg-blue-500/20 border-blue-500 text-blue-400 light:text-blue-600" : "bg-slate-800/50 light:bg-white border-slate-700 light:border-slate-300 text-slate-400"}`}
-                    style={{ flex: 1, padding: '12px' }}
-                  >
-                    Defuse
-                  </button>
-                </div>
-              </Field>
-              <Field label="Manual Input (X/Y %)">
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <input
-                    type="number"
-                    className={inputBase}
-                    style={{ flex: 1 }}
-                    placeholder="X %"
-                    value={manualX}
-                    onChange={(e) => setManualX(e.target.value)}
+                )}
+              </div>
+            </div>
+
+            {/* ── Map Area ── */}
+            <div
+              className="relative rounded-xl overflow-hidden border border-slate-700/40 light:border-slate-300 bg-[#080c12] light:bg-slate-100 shadow-[0_0_40px_rgba(6,182,212,0.06)]"
+              style={{ minHeight: '500px' }}
+            >
+              {/* Subtle corner glow */}
+              <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-cyan-500/5 to-transparent pointer-events-none rounded-tl-xl"></div>
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-cyan-500/5 to-transparent pointer-events-none rounded-br-xl"></div>
+
+              <div className="flex items-center justify-center w-full h-full" style={{ padding: '16px' }}>
+                <div
+                  className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden"
+                  onClick={handleMapClick}
+                >
+                  {heatmapNotif && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 text-white px-4 py-2 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.4)] pointer-events-none animate-[slideUpFade_0.3s_ease]">
+                      {heatmapNotif}
+                    </div>
+                  )}
+                  <img
+                    key={mapName}
+                    src={`/assets/${mapName.replace(/\s+/g, "_")}.png`}
+                    alt={`${mapName} Map`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/assets/map_placeholder.png";
+                    }}
+                    className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity"
                   />
-                  <input
-                    type="number"
-                    className={inputBase}
-                    style={{ flex: 1 }}
-                    placeholder="Y %"
-                    value={manualY}
-                    onChange={(e) => setManualY(e.target.value)}
-                  />
-                  <button
-                    onClick={handleManualAdd}
-                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-[10px] uppercase tracking-widest transition-colors shadow-lg"
-                    style={{ padding: '12px 24px' }}
-                  >
-                    Add
-                  </button>
-                </div>
-              </Field>
-              <div className="flex-1">
-                <div className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-3">
-                  Round {selectedRound} Events
-                </div>
-                <div className="space-y-2 max-h-[300px] overflow-y-auto de-scroll pr-1">
                   {heatmapData
                     .filter((h) => h.round === selectedRound)
                     .map((h) => (
                       <div
                         key={h.id}
-                        className="flex items-center justify-between bg-slate-800/40 light:bg-slate-100 border border-slate-700/50 light:border-slate-300 rounded p-2"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_8px_#ef4444]" : "bg-blue-500 shadow-[0_0_8px_#3b82f6]"}`}
-                          ></div>
-                          <span className="text-[10px] font-bold text-slate-300 light:text-slate-700">
-                            {h.type}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => removeHeatmapEvent(h.id)}
-                          className="text-slate-500 hover:text-red-400"
-                        >
-                          ✕
-                        </button>
-                      </div>
+                        className={`absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white animate-in zoom-in ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_12px_#ef4444]" : "bg-blue-500 shadow-[0_0_12px_#3b82f6]"}`}
+                        style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                      ></div>
                     ))}
-                  {heatmapData.filter((h) => h.round === selectedRound)
-                    .length === 0 && (
-                      <div className="text-[10px] text-slate-500 italic text-center py-4">
-                        No events logged for this round. Click on the map to add
-                        one.
-                      </div>
-                    )}
+
+                  {/* Empty state overlay */}
+                  {heatmapData.filter((h) => h.round === selectedRound).length === 0 && (
+                    <div className="absolute inset-0 flex items-end justify-center pointer-events-none" style={{ paddingBottom: '24px' }}>
+                      <span className="text-[10px] text-slate-600 font-medium bg-slate-900/60 light:bg-white/80 backdrop-blur-sm rounded-full border border-slate-700/30 light:border-slate-300" style={{ padding: '6px 16px' }}>
+                        Click anywhere on the map to plot a {selectedAction.toLowerCase()} event
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-            { }
-            <div className="flex-1 flex justify-center bg-[#0a0f16] light:bg-slate-100 border border-slate-800/80 light:border-slate-300 rounded-xl overflow-hidden relative shadow-inner w-full min-h-[400px] lg:min-h-[600px]" style={{ padding: '24px' }}>
-              <div
-                className="relative cursor-crosshair w-full max-w-[800px] aspect-[4/3] rounded-lg overflow-hidden border border-slate-700/30 light:border-slate-300"
-                onClick={handleMapClick}
-              >
-                {heatmapNotif && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 text-white px-4 py-2 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(16,185,129,0.4)] pointer-events-none animate-[slideUpFade_0.3s_ease]">
-                    {heatmapNotif}
-                  </div>
-                )}
-                <img
-                  key={mapName}
-                  src={`/assets/${mapName.replace(/\s+/g, "_")}.png`}
-                  alt={`${mapName} Map`}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/assets/map_placeholder.png";
-                  }}
-                  className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
-                { }
-                {heatmapData
-                  .filter((h) => h.round === selectedRound)
-                  .map((h) => (
-                    <div
-                      key={h.id}
-                      className={`absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white animate-in zoom-in ${h.type === "Plant" ? "bg-red-500 shadow-[0_0_12px_#ef4444]" : "bg-blue-500 shadow-[0_0_12px_#3b82f6]"}`}
-                      style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                    ></div>
-                  ))}
               </div>
             </div>
           </div>
@@ -2488,11 +2171,11 @@ const DataEntry = ({ globalGame, globalTournament }) => {
                     <th className="px-4 py-3 font-bold text-left">PLAYER</th>
                     <th className="px-4 py-3 font-bold text-center">AGENTS</th>
                     <th className="px-3 py-3 font-bold text-center text-emerald-400">Win</th>
-                    <th className="px-4 py-3 font-bold text-center text-emerald-400">ACS</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">PERFORMANCE SCORE</th>
                     <th className="px-3 py-3 font-bold text-center">KILLS</th>
                     <th className="px-3 py-3 font-bold text-center">DEATHS</th>
                     <th className="px-3 py-3 font-bold text-center">ASSIST</th>
-                    <th className="px-4 py-3 font-bold text-center text-emerald-400">ECON</th>
+                    <th className="px-4 py-3 font-bold text-center text-emerald-400">TRADES</th>
                     <th className="px-4 py-3 font-bold text-center">FIRST KILLS</th>
                     <th className="px-4 py-3 font-bold text-center">PLANTS</th>
                     <th className="px-4 py-3 font-bold text-center">DEFUSE</th>
